@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Darts Trainer V12.8</title>
+<style>
+body { margin:0; font-family:sans-serif; background:#111; color:#fff; text-align:center; overflow-y:auto; }
+.screen { display:none; padding:20px; padding-bottom:80px; }
+.active { display:block; }
+button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12px; }
+.primary { background:#E8681A; color:#fff; }
+.miss { background:#ff4444; color:#fff; }
+.segment { stroke:#111; cursor:pointer; }
+.activeTarget { stroke:#E8681A; stroke-width:2.5; }
+.bottom-nav { position:fixed; bottom:0; width:100%; max-width:360px; left:50%; transform:translateX(-50%); background:#1e293b; display:flex; justify-content:space-around; padding:10px 0; z-index:100; }
+.bottom-nav button { flex:1; background:none; border:none; color:#64748b; font-size:11px; padding:4px; cursor:pointer; }
+.bottom-nav button.active { color:#E8681A; }
+.micro { position:fixed; top:10px; left:0; right:0; font-size:14px; }
+.session { margin-top:10px; font-size:14px; opacity:0.8; }
+.coach { margin-top:8px; font-size:13px; opacity:0.7; }
+.flash { position:fixed; inset:0; pointer-events:none; opacity:0; transition:opacity 120ms ease; }
+.flash.green { background:rgba(0,255,0,0.15); }
+.flash.red { background:rgba(255,0,0,0.15); }
+.result { font-size:20px; margin-top:20px; white-space:pre-line; }
+.dashboard { margin-top:20px; }
+.card { background:#1e293b; margin:10px auto; padding:15px; border-radius:12px; max-width:320px; }
+.card h3 { margin:5px 0; font-size:16px; opacity:0.7; }
+.card p { margin:5px 0; font-size:20px; }
+.modal { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:200; }
+.modal.active { display:flex; }
+.modal-box { background:#1e293b; padding:20px; border-radius:12px; max-width:320px; width:90%; }
+.stat-section { margin-bottom:20px; text-align:left; }
+.stat-section h3 { font-size:13px; color:#64748b; margin-bottom:8px; }
+.stat-list { list-style:none; padding:0; margin:0; }
+.stat-list li { padding:6px 0; border-bottom:1px solid #0f172a; font-size:14px; }
+.toggle-btn { flex:1; background:#0f172a; color:#fff; border:2px solid #334155; border-radius:8px; font-size:15px; font-weight:bold; min-height:44px; padding:0; margin:0; cursor:pointer; }
+.toggle-btn.active { background:#E8681A; color:#fff; border-color:#E8681A; }
+.bull-row { display:flex; gap:6px; margin:6px 0; }
+.bull-btn { flex:1; background:#0f172a; color:#fff; border:1px solid #334155; border-radius:8px; font-size:15px; font-weight:bold; min-height:44px; padding:0; margin:0; cursor:pointer; }
+/* Shared */
+.game-board { width:320px; max-width:90vw; margin:8px auto; display:block; }
+.round-indicator { display:flex; justify-content:center; gap:5px; margin:6px auto; flex-wrap:wrap; max-width:320px; }
+.round-dot { width:10px; height:10px; border-radius:50%; background:#334155; display:inline-block; }
+.round-dot.active { background:#E8681A; }
+.round-dot.done { background:#27ae60; }
+.score-big { font-size:48px; font-weight:bold; margin:8px 0; color:#E8681A; }
+.info-row { font-size:13px; color:#64748b; margin:3px 0; }
+.target-label { font-size:22px; font-weight:bold; color:#E8681A; margin:4px 0; }
+.input-name { width:90%; padding:10px; margin:8px 0; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #334155; font-size:16px; box-sizing:border-box; }
+/* Cricket */
+.cricket-board { display:grid; grid-template-columns:1fr auto 1fr; gap:4px; max-width:320px; margin:10px auto; }
+.cricket-num { font-size:20px; font-weight:bold; text-align:center; padding:8px 0; }
+.cricket-marks { display:flex; gap:4px; justify-content:center; align-items:center; }
+.cricket-mark { width:18px; height:18px; border-radius:50%; background:#334155; }
+.cricket-mark.hit { background:#E8681A; }
+.cricket-mark.closed { background:#27ae60; }
+/* Elimination */
+.elim-players { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:10px auto; max-width:360px; }
+.elim-player { background:#1e293b; border-radius:12px; padding:10px 16px; min-width:80px; text-align:center; }
+.elim-player.active-turn { border:2px solid #E8681A; }
+.elim-player.zeroed { opacity:0.4; }
+.elim-player .ep-name { font-size:12px; color:#64748b; }
+.elim-player .ep-score { font-size:24px; font-weight:bold; }
+/* ATC progress */
+.atc-progress-bar { background:#334155; border-radius:6px; height:8px; margin:4px 0; max-width:260px; margin-left:auto; margin-right:auto; }
+.atc-progress-fill { background:#E8681A; height:8px; border-radius:6px; transition:width 200ms; }
+/* B27 warning */
+.warn-label { font-size:14px; color:#ff4444; margin:4px 0; }
+/* Checkout */
+.checkout-big { font-size:56px; font-weight:bold; color:#E8681A; margin:4px 0; }
+.checkout-remain { font-size:28px; color:#fff; margin:4px 0; }
+/* Online */
+.online-bar { background:#0f172a; border-bottom:1px solid #1e293b; padding:6px 12px; font-size:12px; display:flex; justify-content:space-between; align-items:center; }
+.online-bar .ob-status { color:#27ae60; }
+.online-bar .ob-turn { color:#E8681A; font-weight:bold; }
+.online-bar.waiting { background:#1e3a1e; }
+.online-bar.myturn { background:#1a2a0f; }
+.online-bar.oppturn { background:#1e1e1e; }
+.room-code { font-size:42px; font-weight:bold; letter-spacing:8px; color:#E8681A; margin:16px 0; font-family:monospace; }
+.online-name-input { width:90%; padding:10px; margin:8px 0; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #334155; font-size:16px; box-sizing:border-box; }
+.online-code-input { width:90%; padding:10px; margin:8px 0; border-radius:8px; background:#0f172a; color:#fff; border:2px solid #E8681A; font-size:22px; font-family:monospace; letter-spacing:4px; text-align:center; text-transform:uppercase; box-sizing:border-box; }
+.game-end-modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:300; }
+.game-end-modal.active { display:flex; }
+.game-end-box { background:#1e293b; padding:28px 24px; border-radius:16px; max-width:300px; width:90%; text-align:center; }
+.game-end-box h2 { margin:0 0 8px; font-size:24px; color:#E8681A; }
+.game-end-box p { margin:0 0 20px; font-size:15px; color:#94a3b8; }
+</style>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="start" class="screen active">
+  <h1>Darts Trainer</h1>
+  <div class="dashboard">
+    <div class="card"><h3>Wuerfe heute</h3><p id="todayThrows">0</p></div>
+    <div class="card"><h3>Trefferquote</h3><p id="todayAccuracy">0%</p></div>
+    <div class="card"><h3>Bester Streak</h3><p id="bestStreak">0</p></div>
+    <div class="card"><h3>Letzter Score</h3><p id="lastScore">0</p></div>
+  </div>
+  <button class="primary" onclick="openModal()">Training starten</button>
+  <button class="primary" onclick="phoenixStart()">Phoenix Split</button>
+  <button class="primary" onclick="splitscoreStart()">Splitscore Classic</button>
+  <button class="primary" onclick="x01Setup(501)">501 spielen</button>
+  <button class="primary" onclick="x01Setup(301)">301 spielen</button>
+  <button class="primary" onclick="x01Setup(701)">701 spielen</button>
+  <button class="primary" onclick="cricketSetup()">Cricket</button>
+  <button class="primary" onclick="eliminationSetup()">Elimination</button>
+  <button class="primary" onclick="shanghaiSetup()">Shanghai</button>
+  <button class="primary" onclick="atcSetup()">Around the Clock</button>
+  <button class="primary" onclick="b27Start()">Bob's 27</button>
+  <button class="primary" onclick="checkoutStart()">Checkout Training</button>
+  <hr style="border-color:#334155; margin:16px auto; max-width:280px;">
+  <button onclick="onlineOpen()" style="background:#0f4c75;color:#fff;width:100%;max-width:280px;border-radius:12px;padding:15px;font-size:18px;margin:4px;">🌐 Online spielen</button>
+</div>
+
+<!-- MODAL Training -->
+<div id="modeModal" class="modal">
+  <div class="modal-box">
+    <h3>Modus waehlen</h3>
+    <button class="primary" onclick="startFromModal('classic')">Classic</button>
+    <button class="primary" onclick="startFromModal('flow')">Flow</button>
+    <button class="primary" onclick="startFromModal('phoenix')">Phoenix Split</button>
+    <button onclick="closeModal()">Abbrechen</button>
+  </div>
+</div>
+
+<!-- CLASSIC -->
+<div id="classic" class="screen">
+  <h2>Classic</h2>
+  <svg id="board-classic" class="game-board" viewBox="0 0 200 200"></svg>
+  <button class="miss" onclick="miss()">MISS</button>
+  <div id="info"></div>
+  <div class="session" id="sessionInfo"></div>
+  <div class="coach" id="coach"></div>
+</div>
+
+<!-- FLOW -->
+<div id="flow" class="screen">
+  <div class="micro" id="micro"></div>
+  <svg id="board-flow" class="game-board" viewBox="0 0 200 200"></svg>
+  <button class="miss" onclick="miss()">MISS</button>
+</div>
+
+<!-- SPLITSCORE CLASSIC -->
+<div id="splitscore" class="screen">
+  <h2>Splitscore Classic</h2>
+  <div class="round-indicator" id="ssDots"></div>
+  <div class="score-big" id="ssScore">40</div>
+  <div class="card" style="max-width:320px; margin:8px auto;">
+    <div id="ssRoundName" style="font-size:16px; font-weight:bold;"></div>
+    <div id="ssDartCount" class="info-row"></div>
+    <div id="ssTarget" class="target-label"></div>
+    <div id="ssHits" class="info-row" style="color:#27ae60;"></div>
+    <div id="ssRoundPts" class="info-row"></div>
+  </div>
+  <svg id="board-splitscore" class="game-board" viewBox="0 0 200 200"></svg>
+  <button class="miss" onclick="ssMiss()">MISS</button>
+  <div id="ssCoach" class="info-row" style="margin-top:6px;"></div>
+</div>
+
+<!-- PHOENIX SPLIT -->
+<div id="phoenix" class="screen">
+  <h2>Phoenix Split</h2>
+  <div class="round-indicator" id="pDots"></div>
+  <div class="score-big" id="pScore">64</div>
+  <div class="card" style="max-width:320px; margin:8px auto;">
+    <div id="pRoundName" style="font-size:15px; font-weight:bold;"></div>
+    <div id="pDartCount" class="info-row"></div>
+    <div id="pTarget" class="target-label"></div>
+    <div id="pBlockInfo" class="info-row"></div>
+    <div id="pHits" class="info-row" style="color:#27ae60;"></div>
+    <div id="pRoundScore" class="info-row"></div>
+  </div>
+  <svg id="board-phoenix" class="game-board" viewBox="0 0 200 200"></svg>
+  <button class="miss" onclick="phoenixMiss()">MISS</button>
+  <div id="pCoach" class="info-row" style="margin-top:6px;"></div>
+</div>
+
+<!-- X01 SETUP -->
+<div id="x01Setup" class="screen">
+  <h2 id="x01SetupTitle">501</h2>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <input id="nameP1" class="input-name" type="text" placeholder="Spieler 1" maxlength="12">
+    <input id="nameP2" class="input-name" type="text" placeholder="Spieler 2" maxlength="12">
+  </div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div style="font-size:13px; color:#64748b; margin-bottom:8px;">Einstieg</div>
+    <div style="display:flex; gap:8px;">
+      <button class="toggle-btn" id="inSingle" onclick="x01SetIn('single')">Single</button>
+      <button class="toggle-btn" id="inDouble" onclick="x01SetIn('double')">Double</button>
+      <button class="toggle-btn" id="inMaster" onclick="x01SetIn('master')">Master</button>
+    </div>
+  </div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div style="font-size:13px; color:#64748b; margin-bottom:8px;">Abschluss</div>
+    <div style="display:flex; gap:8px;">
+      <button class="toggle-btn" id="outSingle" onclick="x01SetOut('single')">Single</button>
+      <button class="toggle-btn" id="outDouble" onclick="x01SetOut('double')">Double</button>
+      <button class="toggle-btn" id="outMaster" onclick="x01SetOut('master')">Master</button>
+    </div>
+  </div>
+  <button onclick="x01SetIn('master');x01SetOut('master');" style="background:#334155;color:#fff;width:100%;max-width:320px;margin-bottom:4px;">Master In / Master Out</button>
+  <div class="card" style="max-width:320px; margin:10px auto;" id="botSetupCard">
+    <div style="font-size:13px; color:#64748b; margin-bottom:8px;">KI-Gegner (Spieler 2)</div>
+    <div style="display:flex; gap:8px; margin-bottom:8px;">
+      <button class="toggle-btn" id="botToggle" onclick="x01ToggleBot()">Bot: AUS</button>
+    </div>
+    <div id="botDiffCard" style="display:none;">
+      <div style="font-size:12px; color:#64748b; margin-bottom:6px;">Schwierigkeit</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">
+        <button class="toggle-btn" id="botDiffLv1" onclick="setBotDiff('lv1')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Couch-Profi<br><span style="font-size:9px;opacity:0.7;">Ø 20</span></button>
+        <button class="toggle-btn" id="botDiffLv2" onclick="setBotDiff('lv2')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Kneipenhocker<br><span style="font-size:9px;opacity:0.7;">Ø 30</span></button>
+        <button class="toggle-btn" id="botDiffLv3" onclick="setBotDiff('lv3')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Gelegenheitstäter<br><span style="font-size:9px;opacity:0.7;">Ø 40</span></button>
+        <button class="toggle-btn" id="botDiffLv4" onclick="setBotDiff('lv4')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobby-Held<br><span style="font-size:9px;opacity:0.7;">Ø 50</span></button>
+        <button class="toggle-btn" id="botDiffLv5" onclick="setBotDiff('lv5')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsmitglied<br><span style="font-size:9px;opacity:0.7;">Ø 60</span></button>
+        <button class="toggle-btn" id="botDiffLv6" onclick="setBotDiff('lv6')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Amateur<br><span style="font-size:9px;opacity:0.7;">Ø 70</span></button>
+        <button class="toggle-btn" id="botDiffLv7" onclick="setBotDiff('lv7')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Liga-Kämpfer<br><span style="font-size:9px;opacity:0.7;">Ø 78</span></button>
+        <button class="toggle-btn" id="botDiffLv8" onclick="setBotDiff('lv8')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtisch-König<br><span style="font-size:9px;opacity:0.7;">Ø 85</span></button>
+        <button class="toggle-btn" id="botDiffLv9" onclick="setBotDiff('lv9')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Fast Profi<br><span style="font-size:9px;opacity:0.7;">Ø 92</span></button>
+        <button class="toggle-btn" id="botDiffLv10" onclick="setBotDiff('lv10')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Semi-Legende<br><span style="font-size:9px;opacity:0.7;">Ø 98</span></button>
+        <button class="toggle-btn" id="botDiffLv11" onclick="setBotDiff('lv11')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Phil Taylor<br><span style="font-size:9px;opacity:0.7;">Ø 105</span></button>
+      </div>
+    </div>
+  </div>
+  <button class="primary" id="x01StartBtn">Spiel starten</button>
+  <button onclick="show('start')" style="background:#333;color:#fff;">Abbrechen</button>
+</div>
+
+<!-- X01 SPIEL -->
+<div id="x01" class="screen">
+  <h2 id="x01Title">501</h2>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div id="x01P1Block" style="text-align:left;">
+        <div class="info-row" id="x01P1Name">Spieler 1</div>
+        <div style="font-size:36px; font-weight:bold;" id="x01P1Score">501</div>
+        <div style="font-size:11px; color:#64748b;" id="x01P1Opener"></div>
+      </div>
+      <div id="x01P2Block" style="text-align:right;">
+        <div class="info-row" id="x01P2Name">Spieler 2</div>
+        <div style="font-size:36px; font-weight:bold;" id="x01P2Score">501</div>
+        <div style="font-size:11px; color:#64748b;" id="x01P2Opener"></div>
+      </div>
+    </div>
+    <div class="info-row" id="x01Turn">Spieler 1 ist dran</div>
+    <div class="info-row" id="x01OutMode"></div>
+  </div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <svg id="board-x01" class="game-board" viewBox="0 0 200 200"></svg>
+    <div class="bull-row" style="max-width:300px; margin:4px auto;">
+      <button class="bull-btn" onclick="x01BoardHit(25,'S')">Bull 25</button>
+      <button class="bull-btn" onclick="x01BoardHit(50,'B')">Bull 50</button>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:6px;">
+      <button class="miss" onclick="x01MissHit()" style="flex:2;">MISS</button>
+      <button onclick="x01Undo()" style="flex:1;background:#334155;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+    </div>
+  </div>
+  <div class="card" style="max-width:320px;margin:10px auto;font-size:13px;color:#64748b;" id="x01Log"></div>
+  <button onclick="show('start')" style="background:#333;color:#fff;width:100%;max-width:320px;">Zurueck</button>
+</div>
+
+<!-- CRICKET SETUP MODAL -->
+<div id="cricketSetupModal" class="modal">
+  <div class="modal-box">
+    <h3>Cricket</h3>
+    <input id="cricName1" class="input-name" type="text" placeholder="Spieler 1" maxlength="12">
+    <input id="cricName2" class="input-name" type="text" placeholder="Spieler 2" maxlength="12">
+    <div style="display:flex; gap:8px; margin:8px 0;">
+      <button class="toggle-btn" id="cricBotToggle" onclick="cricToggleBot()">Bot: AUS</button>
+    </div>
+    <div id="cricBotDiffCard" style="display:none; margin-bottom:8px;">
+      <div style="font-size:12px; color:#64748b; margin-bottom:6px;">Schwierigkeit</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">
+        <button class="toggle-btn" id="cricBotDiffLv1" onclick="setBotDiff('lv1')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Couch-Profi<br><span style="font-size:9px;opacity:0.7;">Ø 20</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv2" onclick="setBotDiff('lv2')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Kneipenhocker<br><span style="font-size:9px;opacity:0.7;">Ø 30</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv3" onclick="setBotDiff('lv3')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Gelegenheitstäter<br><span style="font-size:9px;opacity:0.7;">Ø 40</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv4" onclick="setBotDiff('lv4')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobby-Held<br><span style="font-size:9px;opacity:0.7;">Ø 50</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv5" onclick="setBotDiff('lv5')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsmitglied<br><span style="font-size:9px;opacity:0.7;">Ø 60</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv6" onclick="setBotDiff('lv6')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Amateur<br><span style="font-size:9px;opacity:0.7;">Ø 70</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv7" onclick="setBotDiff('lv7')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Liga-Kämpfer<br><span style="font-size:9px;opacity:0.7;">Ø 78</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv8" onclick="setBotDiff('lv8')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtisch-König<br><span style="font-size:9px;opacity:0.7;">Ø 85</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv9" onclick="setBotDiff('lv9')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Fast Profi<br><span style="font-size:9px;opacity:0.7;">Ø 92</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv10" onclick="setBotDiff('lv10')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Semi-Legende<br><span style="font-size:9px;opacity:0.7;">Ø 98</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv11" onclick="setBotDiff('lv11')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Phil Taylor<br><span style="font-size:9px;opacity:0.7;">Ø 105</span></button>
+      </div>
+    </div>
+    <button class="primary" onclick="cricketStart()">Starten</button>
+    <button onclick="document.getElementById('cricketSetupModal').classList.remove('active')" style="background:#333;color:#fff;">Abbrechen</button>
+  </div>
+</div>
+
+<!-- CRICKET -->
+<div id="cricket" class="screen">
+  <h2>Cricket</h2>
+  <div style="display:flex; justify-content:space-between; max-width:320px; margin:8px auto; font-size:13px; color:#64748b;">
+    <div id="cricP1Name" style="font-weight:bold; font-size:16px;"></div>
+    <div id="cricP2Name" style="font-weight:bold; font-size:16px;"></div>
+  </div>
+  <div style="display:flex; justify-content:space-between; max-width:320px; margin:0 auto 8px;">
+    <div style="font-size:28px; font-weight:bold;" id="cricP1Score">0</div>
+    <div style="font-size:28px; font-weight:bold;" id="cricP2Score">0</div>
+  </div>
+  <div id="cricketBoard" class="cricket-board"></div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div class="info-row" id="cricTurn"></div>
+    <div class="info-row" id="cricDart"></div>
+    <svg id="board-cricket" class="game-board" viewBox="0 0 200 200" style="margin-top:8px;"></svg>
+    <div style="display:flex; gap:8px; margin-top:6px;">
+      <button class="miss" onclick="cricMiss()" style="flex:2;">MISS</button>
+      <button onclick="cricUndo()" style="flex:1;background:#334155;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+    </div>
+  </div>
+  <button onclick="show('start')" style="background:#333;color:#fff;width:100%;max-width:320px;margin-top:8px;">Zurueck</button>
+</div>
+
+<!-- ELIMINATION SETUP -->
+<div id="eliminationSetup" class="screen">
+  <h2>Elimination</h2>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div class="info-row" style="margin-bottom:4px;">Spielernamen (min. 2, max. 6)</div>
+    <div class="info-row" style="color:#E8681A; margin-bottom:8px;">Tipp: "Bot" als Name = KI-Gegner</div>
+    <input id="elimName1" class="input-name" type="text" placeholder="Spieler 1" maxlength="12">
+    <input id="elimName2" class="input-name" type="text" placeholder="Spieler 2" maxlength="12">
+    <input id="elimName3" class="input-name" type="text" placeholder="Spieler 3 (opt.)" maxlength="12">
+    <input id="elimName4" class="input-name" type="text" placeholder="Spieler 4 (opt.)" maxlength="12">
+    <input id="elimName5" class="input-name" type="text" placeholder="Spieler 5 (opt.)" maxlength="12">
+    <input id="elimName6" class="input-name" type="text" placeholder="Spieler 6 (opt.)" maxlength="12">
+  </div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div class="info-row" style="margin-bottom:6px;">Zielscore</div>
+    <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+      <button class="toggle-btn" id="elimGoal201" onclick="elimSetGoal(201)">201</button>
+      <button class="toggle-btn" id="elimGoal301" onclick="elimSetGoal(301)">301</button>
+      <button class="toggle-btn" id="elimGoal401" onclick="elimSetGoal(401)">401</button>
+      <button class="toggle-btn" id="elimGoal501" onclick="elimSetGoal(501)">501</button>
+    </div>
+  </div>
+  <button class="primary" onclick="eliminationStart()">Spiel starten</button>
+  <button onclick="show('start')" style="background:#333;color:#fff;">Abbrechen</button>
+</div>
+
+<!-- ELIMINATION SPIEL -->
+<div id="elimination" class="screen">
+  <h2>Elimination</h2>
+  <div class="info-row" id="elimGoalDisplay" style="margin-bottom:4px;"></div>
+  <div class="elim-players" id="elimPlayers"></div>
+  <div class="card" style="max-width:320px; margin:8px auto;">
+    <div class="info-row" id="elimTurn"></div>
+    <div class="info-row" id="elimDart"></div>
+    <svg id="board-elimination" class="game-board" viewBox="0 0 200 200" style="margin-top:6px;"></svg>
+    <div class="bull-row" style="max-width:300px; margin:4px auto;">
+      <button class="bull-btn" onclick="elimBullHit(25)">Bull 25</button>
+      <button class="bull-btn" onclick="elimBullHit(50)">Bull 50</button>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:6px;">
+      <button class="miss" onclick="elimMiss()" style="flex:2;">MISS</button>
+      <button onclick="elimUndo()" style="flex:1;background:#334155;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+    </div>
+  </div>
+  <button onclick="show('start')" style="background:#333;color:#fff;width:100%;max-width:320px;margin-top:8px;">Zurueck</button>
+</div>
+
+<!-- SHANGHAI SETUP MODAL -->
+<div id="shanghaiSetupModal" class="modal">
+  <div class="modal-box">
+    <h3>Shanghai</h3>
+    <div class="info-row" style="margin-bottom:4px;">2–6 Spieler | 7 Runden | Segmente 1–7</div>
+    <div class="info-row" style="color:#E8681A; margin-bottom:8px;">Tipp: "Bot" als Name = KI-Gegner</div>
+    <input id="shanName1" class="input-name" type="text" placeholder="Spieler 1" maxlength="12">
+    <input id="shanName2" class="input-name" type="text" placeholder="Spieler 2" maxlength="12">
+    <input id="shanName3" class="input-name" type="text" placeholder="Spieler 3 (opt.)" maxlength="12">
+    <input id="shanName4" class="input-name" type="text" placeholder="Spieler 4 (opt.)" maxlength="12">
+    <input id="shanName5" class="input-name" type="text" placeholder="Spieler 5 (opt.)" maxlength="12">
+    <input id="shanName6" class="input-name" type="text" placeholder="Spieler 6 (opt.)" maxlength="12">
+    <button class="primary" onclick="shanghaiStart()">Starten</button>
+    <button onclick="document.getElementById('shanghaiSetupModal').classList.remove('active')" style="background:#333;color:#fff;">Abbrechen</button>
+  </div>
+</div>
+
+<!-- SHANGHAI SPIEL -->
+<div id="shanghai" class="screen">
+  <h2>Shanghai</h2>
+  <div class="round-indicator" id="shanDots"></div>
+  <div class="card" style="max-width:320px; margin:8px auto;">
+    <div id="shanRound" style="font-size:18px; font-weight:bold;"></div>
+    <div id="shanTurn" class="info-row"></div>
+    <div id="shanDart" class="info-row"></div>
+    <div id="shanShanghai" class="info-row" style="color:#27ae60;"></div>
+  </div>
+  <div class="elim-players" id="shanPlayers"></div>
+  <div class="card" style="max-width:320px; margin:8px auto;">
+    <svg id="board-shanghai" class="game-board" viewBox="0 0 200 200"></svg>
+    <div style="display:flex; gap:8px; margin-top:6px;">
+      <button class="miss" onclick="shanMiss()" style="flex:2;">MISS</button>
+      <button onclick="shanUndo()" style="flex:1;background:#334155;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+    </div>
+  </div>
+  <div class="card" style="max-width:320px;margin:8px auto;font-size:13px;color:#64748b;" id="shanLog"></div>
+  <button onclick="show('start')" style="background:#333;color:#fff;width:100%;max-width:320px;">Zurueck</button>
+</div>
+
+<!-- ATC SETUP -->
+<div id="atcSetup" class="screen">
+  <h2>Around the Clock</h2>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div class="info-row" style="margin-bottom:4px;">Spielernamen (1–4)</div>
+    <div class="info-row" style="color:#E8681A; margin-bottom:8px;">Tipp: "Bot" als Name = KI-Gegner</div>
+    <input id="atcName1" class="input-name" type="text" placeholder="Spieler 1" maxlength="12">
+    <input id="atcName2" class="input-name" type="text" placeholder="Spieler 2 (opt.)" maxlength="12">
+    <input id="atcName3" class="input-name" type="text" placeholder="Spieler 3 (opt.)" maxlength="12">
+    <input id="atcName4" class="input-name" type="text" placeholder="Spieler 4 (opt.)" maxlength="12">
+  </div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div class="info-row" style="margin-bottom:6px;">Variante</div>
+    <div style="display:flex; gap:8px;">
+      <button class="toggle-btn" id="atcVarSingle" onclick="atcSetVar('single')">Single</button>
+      <button class="toggle-btn" id="atcVarDouble" onclick="atcSetVar('double')">Double</button>
+      <button class="toggle-btn" id="atcVarTriple" onclick="atcSetVar('triple')">Triple</button>
+    </div>
+  </div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div class="info-row" style="margin-bottom:6px;">Bull einschließen</div>
+    <div style="display:flex; gap:8px;">
+      <button class="toggle-btn" id="atcBullYes" onclick="atcSetBull(true)">Ja</button>
+      <button class="toggle-btn" id="atcBullNo" onclick="atcSetBull(false)">Nein</button>
+    </div>
+  </div>
+  <button class="primary" onclick="atcStart()">Spiel starten</button>
+  <button onclick="show('start')" style="background:#333;color:#fff;">Abbrechen</button>
+</div>
+
+<!-- ATC SPIEL -->
+<div id="atc" class="screen">
+  <h2>Around the Clock</h2>
+  <div class="round-indicator" id="atcDots"></div>
+  <div id="atcPlayers" style="max-width:360px; margin:8px auto;"></div>
+  <div class="card" style="max-width:320px; margin:8px auto;">
+    <div id="atcTurn" class="info-row"></div>
+    <div id="atcDart" class="info-row"></div>
+    <div id="atcTarget" class="target-label"></div>
+    <svg id="board-atc" class="game-board" viewBox="0 0 200 200"></svg>
+    <button class="miss" onclick="atcMiss()" style="width:100%;margin-top:6px;">MISS</button>
+  </div>
+  <button onclick="show('start')" style="background:#333;color:#fff;width:100%;max-width:320px;">Zurueck</button>
+</div>
+
+<!-- BOB'S 27 -->
+<div id="b27" class="screen">
+  <h2>Bob's 27</h2>
+  <div class="round-indicator" id="b27Dots"></div>
+  <div class="score-big" id="b27Score">27</div>
+  <div class="card" style="max-width:320px; margin:8px auto;">
+    <div id="b27RoundName" style="font-size:16px; font-weight:bold;"></div>
+    <div id="b27DartCount" class="info-row"></div>
+    <div id="b27Target" class="target-label"></div>
+    <div id="b27Hits" class="info-row" style="color:#27ae60;"></div>
+    <div id="b27Warn" class="warn-label"></div>
+    <div id="b27Best" class="info-row"></div>
+  </div>
+  <svg id="board-b27" class="game-board" viewBox="0 0 200 200"></svg>
+  <button class="miss" onclick="b27Miss()" style="width:100%;max-width:320px;margin-top:6px;" style="background:#ff4444;color:#fff;">MISS</button>
+</div>
+
+<!-- CHECKOUT TRAINING -->
+<div id="checkout" class="screen">
+  <h2>Checkout Training</h2>
+  <div class="round-indicator" id="coDots"></div>
+  <div class="checkout-big" id="coTarget">-</div>
+  <div class="checkout-remain" id="coRemain"></div>
+  <div class="card" style="max-width:320px; margin:8px auto;">
+    <div id="coDart" class="info-row"></div>
+    <div id="coRound" class="info-row"></div>
+    <div id="coHits" class="info-row" style="color:#27ae60;"></div>
+  </div>
+  <div class="card" style="max-width:320px; margin:8px auto;">
+    <svg id="board-checkout" class="game-board" viewBox="0 0 200 200"></svg>
+    <div class="bull-row" style="max-width:300px; margin:4px auto;">
+      <button class="bull-btn" onclick="coHit('B25',25,'B')">Bull 25</button>
+      <button class="bull-btn" onclick="coHit('B50',50,'B')">Bull 50</button>
+    </div>
+    <button class="miss" onclick="coMiss()" style="width:100%;margin-top:6px;">MISS</button>
+  </div>
+  <button onclick="show('start')" style="background:#333;color:#fff;width:100%;max-width:320px;">Zurueck</button>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="screen">
+  <h2>Session beendet</h2>
+  <div id="resultText" class="result"></div>
+  <button class="primary" onclick="show('start')">Zurueck</button>
+</div>
+
+<!-- ONLINE SETUP MODAL -->
+<div id="onlineModal" class="modal">
+  <div class="modal-box">
+    <h3>Online spielen</h3>
+    <input id="onlineName" class="online-name-input" type="text" placeholder="Dein Name" maxlength="12">
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="primary" onclick="onlineCreate()" style="flex:1;">Raum erstellen</button>
+      <button onclick="onlineJoinOpen()" style="flex:1;background:#0f4c75;color:#fff;border-radius:12px;">Beitreten</button>
+    </div>
+    <button onclick="document.getElementById('onlineModal').classList.remove('active')" style="background:#333;color:#fff;width:100%;margin-top:8px;">Abbrechen</button>
+  </div>
+</div>
+
+<!-- ONLINE JOIN MODAL -->
+<div id="onlineJoinModal" class="modal">
+  <div class="modal-box">
+    <h3>Raum beitreten</h3>
+    <p style="color:#64748b;font-size:13px;margin:4px 0 12px;">Code vom Freund eingeben:</p>
+    <input id="onlineCodeInput" class="online-code-input" type="text" placeholder="XXXXX" maxlength="5">
+    <div id="onlineJoinError" style="color:#ff4444;font-size:13px;min-height:18px;margin:4px 0;"></div>
+    <button class="primary" onclick="onlineJoin()" style="width:100%;margin-top:8px;">Verbinden</button>
+    <button onclick="document.getElementById('onlineJoinModal').classList.remove('active')" style="background:#333;color:#fff;width:100%;margin-top:8px;">Zurück</button>
+  </div>
+</div>
+
+<!-- ONLINE WAITING MODAL (room created, waiting for opponent) -->
+<div id="onlineWaitModal" class="modal">
+  <div class="modal-box" style="text-align:center;">
+    <h3>Warte auf Gegner…</h3>
+    <p style="color:#64748b;font-size:13px;">Schick deinem Freund diesen Code:</p>
+    <div class="room-code" id="onlineRoomCode">XXXXX</div>
+    <p style="color:#64748b;font-size:12px;margin-top:4px;">Er öffnet die App → Online spielen → Beitreten</p>
+    <button onclick="onlineCancel()" style="background:#333;color:#fff;width:100%;margin-top:16px;">Abbrechen</button>
+  </div>
+</div>
+
+<!-- ONLINE CONNECTED MODAL (both in room, creator picks game) -->
+<div id="onlineReadyModal" class="modal">
+  <div class="modal-box" style="text-align:center;">
+    <h3 id="onlineReadyTitle">Verbunden!</h3>
+    <p id="onlineReadyMsg" style="color:#64748b;font-size:14px;"></p>
+    <div id="onlineGamePicker" style="display:none;">
+      <p style="font-size:13px;color:#94a3b8;margin:12px 0 8px;">Welches Spiel?</p>
+      <button class="primary" onclick="onlinePickGame('x01',501)" style="width:100%;margin:4px 0;">501</button>
+      <button class="primary" onclick="onlinePickGame('x01',301)" style="width:100%;margin:4px 0;">301</button>
+      <button class="primary" onclick="onlinePickGame('cricket',0)" style="width:100%;margin:4px 0;">Cricket</button>
+      <button class="primary" onclick="onlinePickGame('elim',301)" style="width:100%;margin:4px 0;">Elimination (301)</button>
+      <button class="primary" onclick="onlinePickGame('shanghai',0)" style="width:100%;margin:4px 0;">Shanghai</button>
+    </div>
+    <button onclick="onlineCancel()" style="background:#333;color:#fff;width:100%;margin-top:12px;">Abbrechen</button>
+  </div>
+</div>
+
+<!-- ONLINE BAR (shown during online games at top) -->
+<div id="onlineBar" style="display:none;" class="online-bar">
+  <span class="ob-status" id="obStatus">●  Online</span>
+  <span id="obOpponent"></span>
+  <span class="ob-turn" id="obTurn"></span>
+</div>
+
+<!-- GAME END MODAL (replaces confirm() dialogs) -->
+<div id="gameEndModal" class="game-end-modal">
+  <div class="game-end-box">
+    <h2 id="gameEndTitle">Spiel beendet</h2>
+    <p id="gameEndMsg"></p>
+    <div style="display:flex;gap:8px;">
+      <button class="primary" id="gameEndYes" style="flex:1;">Nochmal</button>
+      <button id="gameEndNo" style="flex:1;background:#334155;color:#fff;border-radius:12px;padding:15px;font-size:18px;">Beenden</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" id="bottomNav">
+  <button onclick="show('start')" id="nav-home">Home</button>
+  <button onclick="show('classic')" id="nav-training">Training</button>
+  <button onclick="show('stats-screen')" id="nav-stats">Stats</button>
+  <button onclick="show('profil')" id="nav-profil">Profil</button>
+</div>
+
+<!-- STATS -->
+<div id="stats-screen" class="screen">
+  <h2>Statistik</h2>
+  <div class="stat-section"><h3>Gesamt</h3><ul id="overallStats" class="stat-list"></ul></div>
+  <div class="stat-section"><h3>Top Segmente</h3><ul id="topSegments" class="stat-list"></ul></div>
+  <div class="stat-section"><h3>Flop Segmente</h3><ul id="flopSegments" class="stat-list"></ul></div>
+  <div class="stat-section"><h3>Runden</h3><ul id="roundStats" class="stat-list"></ul></div>
+  <div class="stat-section"><h3>X01</h3><ul id="x01Stats" class="stat-list"></ul></div>
+  <div class="stat-section"><h3>Training</h3><ul id="trainingStats" class="stat-list"></ul></div>
+  <div class="stat-section"><h3>Multiplayer</h3><ul id="multiStats" class="stat-list"></ul></div>
+</div>
+
+<!-- PROFIL -->
+<div id="profil" class="screen">
+  <h2>Profil</h2>
+  <p style="opacity:0.5">Kommt bald</p>
+</div>
+
+<div id="flash" class="flash"></div>
+
+<script>
+const segments=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+
+// 4 Ringe: Double außen, Single, Triple, Single innen
+const RINGS=[
+  {r1:60,r2:80,type:'D'},
+  {r1:38,r2:60,type:'S'},
+  {r1:26,r2:38,type:'T'},
+  {r1:8, r2:26,type:'S'}
+];
+const BOARD_OFFSET=-9; // 20 gerade oben
+
+// ── Shared Helpers ─────────────────────────────────────────────────────────────
+function polar(cx,cy,r,a){
+  let rad=(a-90)*Math.PI/180;
+  return{x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)};
+}
+function ringArc(cx,cy,r1,r2,start,end){
+  let s1=polar(cx,cy,r2,end),e1=polar(cx,cy,r2,start);
+  let s2=polar(cx,cy,r1,start),e2=polar(cx,cy,r1,end);
+  let large=end-start<=180?0:1;
+  return'M '+s1.x+' '+s1.y+' A '+r2+' '+r2+' 0 '+large+' 0 '+e1.x+' '+e1.y+
+        ' L '+s2.x+' '+s2.y+' A '+r1+' '+r1+' 0 '+large+' 1 '+e2.x+' '+e2.y+' Z';
+}
+function colorForSegment(type,index){
+  let a=index%2===0;
+  if(type==='D'||type==='T') return a?'#c0392b':'#27ae60';
+  return a?'#1a1a1a':'#f5e6c8';
+}
+function pointsForId(boardId){
+  if(boardId==='B25') return 25;
+  if(boardId==='B50') return 50;
+  const t=boardId.charAt(0),n=parseInt(boardId.substring(1));
+  if(t==='D') return n*2;
+  if(t==='T') return n*3;
+  return n;
+}
+function flashFeedback(isHit){
+  const f=document.getElementById('flash');
+  f.classList.remove('green','red');
+  f.classList.add(isHit?'green':'red');
+  f.style.opacity=1;
+  setTimeout(()=>f.style.opacity=0,120);
+  if(navigator.vibrate) navigator.vibrate(isHit?20:60);
+}
+
+// buildBoard(svg, onHit(id,num,type), isTarget(id,type,num))
+function buildBoard(svg, onHit, isTarget){
+  if(!svg) return;
+  svg.innerHTML='';
+  const step=360/20;
+  segments.forEach((num,i)=>{
+    let start=i*step+BOARD_OFFSET, end=start+step;
+    RINGS.forEach(r=>{
+      let path=ringArc(100,100,r.r1,r.r2,start,end);
+      let el=document.createElementNS("http://www.w3.org/2000/svg","path");
+      let id=r.type+num;
+      el.setAttribute('d',path);
+      el.setAttribute('class','segment');
+      el.setAttribute('fill',colorForSegment(r.type,i));
+      el.onclick=()=>onHit(id,num,r.type);
+      if(isTarget&&isTarget(id,r.type,num)) el.classList.add('activeTarget');
+      svg.appendChild(el);
+    });
+  });
+  // Bull outer B25
+  let b1=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  b1.setAttribute('cx',100);b1.setAttribute('cy',100);b1.setAttribute('r',8);
+  b1.setAttribute('fill','#27ae60');
+  b1.onclick=()=>onHit('B25',25,'B');
+  if(isTarget&&isTarget('B25','B',25)) b1.classList.add('activeTarget');
+  svg.appendChild(b1);
+  // Bull inner B50
+  let b2=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  b2.setAttribute('cx',100);b2.setAttribute('cy',100);b2.setAttribute('r',4);
+  b2.setAttribute('fill','#c0392b');
+  b2.onclick=()=>onHit('B50',50,'B');
+  if(isTarget&&isTarget('B50','B',50)) b2.classList.add('activeTarget');
+  svg.appendChild(b2);
+  // Segment numbers
+  segments.forEach((num,i)=>{
+    let angle=i*step+BOARD_OFFSET+step/2;
+    let pos=polar(100,100,88,angle);
+    let txt=document.createElementNS("http://www.w3.org/2000/svg","text");
+    txt.setAttribute('x',pos.x);txt.setAttribute('y',pos.y);
+    txt.setAttribute('font-size','7');txt.setAttribute('fill','#ffffff');
+    txt.setAttribute('text-anchor','middle');txt.setAttribute('dominant-baseline','central');
+    txt.setAttribute('pointer-events','none');txt.textContent=num;
+    svg.appendChild(txt);
+  });
+}
+
+// ── Classic / Flow State ───────────────────────────────────────────────────────
+let state={
+  score:40,roundHits:0,throws:[],total:0,round:'double',dart:1,
+  heat:{},streak:0,bestStreak:0,sessionStart:Date.now(),
+  sessionDuration:180,sessionScore:0,highscore:0,sessionActive:true
+};
+
+const splitDoubleTargets=['D16','D8','D4','D16','D12','D20','D20','D10','D5'];
+function currentTarget(){
+  if(state.round==='double') return splitDoubleTargets[state.dart-1];
+  if(state.round==='triple') return 'T';
+  if(state.round==='bull')   return 'BULL';
+}
+function isValidHit(id){
+  if(state.round==='double'&&id.startsWith('D')) return true;
+  if(state.round==='triple'&&id.startsWith('T')) return true;
+  if(state.round==='bull'&&(id==='B25'||id==='B50')) return true;
+  return false;
+}
+function nextDartClassic(){
+  state.dart++;
+  if(state.dart>9){
+    if(state.roundHits===0) state.score=Math.floor(state.score/2);
+    state.roundHits=0;state.dart=1;
+    state.round=state.round==='double'?'triple':state.round==='triple'?'bull':'double';
+  }
+}
+function hit(boardId){
+  state.throws.push({hit:false,id:boardId,time:Date.now(),round:state.round});
+  state.total++;
+  state.heat[boardId]=(state.heat[boardId]||0)+1;
+  let valid=isValidHit(boardId);
+  if(valid){
+    state.throws[state.throws.length-1].hit=true;
+    state.roundHits++;state.streak++;
+    state.sessionScore+=pointsForId(boardId);
+    if(state.streak>state.bestStreak) state.bestStreak=state.streak;
+  } else { state.streak=0; }
+  flashFeedback(valid);
+  nextDartClassic();save();render();
+}
+function miss(){
+  state.throws.push({hit:false,time:Date.now(),round:state.round});
+  state.total++;state.streak=0;
+  flashFeedback(false);nextDartClassic();save();render();
+}
+function coaching(){
+  const last20=state.throws.slice(-20);
+  const misses=last20.filter(x=>!x.hit).length;
+  if(misses>15) return "Fokus: ruhiger Wurf, weniger Kraft";
+  if(state.streak>=5) return "Stark! Bleib im Rhythmus";
+  return "Sauber spielen, Rhythmus halten";
+}
+function render(){
+  const svgC=document.getElementById('board-classic');
+  if(svgC) buildBoard(svgC,(id)=>hit(id),(id,type)=>{
+    const tgt=currentTarget();
+    if(tgt===id) return true;
+    if(tgt==='T'&&type==='T') return true;
+    if(tgt==='BULL'&&(id==='B25'||id==='B50')) return true;
+    return false;
+  });
+  const svgF=document.getElementById('board-flow');
+  if(svgF) buildBoard(svgF,(id)=>hit(id),(id,type)=>{
+    const tgt=currentTarget();
+    if(tgt===id) return true;
+    if(tgt==='T'&&type==='T') return true;
+    if(tgt==='BULL'&&(id==='B25'||id==='B50')) return true;
+    return false;
+  });
+  updateDashboard();
+  const info=document.getElementById('info');
+  if(info) info.innerHTML='Score: '+state.score+'<br>'+state.round+' | Dart '+state.dart+' = '+currentTarget()+'<br>Session Score: '+state.sessionScore;
+  const coachEl=document.getElementById('coach');
+  if(coachEl) coachEl.innerText=coaching();
+  const micro=document.getElementById('micro');
+  if(micro){const l9=state.throws.slice(-9);micro.innerHTML='Streak: '+state.streak+' - Last9: '+l9.filter(x=>x.hit).length;}
+}
+
+// Timer — nur Classic/Flow
+setInterval(()=>{
+  if(!state.sessionActive) return;
+  const activeScreen=document.querySelector('.screen.active');
+  if(!activeScreen||(activeScreen.id!=='classic'&&activeScreen.id!=='flow')) return;
+  const sessionEl=document.getElementById('sessionInfo');if(!sessionEl)return;
+  let elapsed=Math.floor((Date.now()-state.sessionStart)/1000);
+  let left=Math.max(0,state.sessionDuration-elapsed);
+  sessionEl.innerHTML='Session: '+left+'s — Highscore: '+state.highscore;
+  if(left===0){
+    state.sessionActive=false;
+    if(state.sessionScore>state.highscore) state.highscore=state.sessionScore;
+    document.getElementById('resultText').innerText='Score: '+state.sessionScore+'\nBest Streak: '+state.bestStreak;
+    save();show('result');
+  }
+},1000);
+
+function updateDashboard(){
+  const today=new Date().toDateString();
+  const tt=state.throws.filter(t=>new Date(t.time).toDateString()===today);
+  const hits=tt.filter(t=>t.hit).length;
+  document.getElementById('todayThrows').innerText=tt.length;
+  document.getElementById('todayAccuracy').innerText=tt.length?Math.round((hits/tt.length)*100)+'%':'0%';
+  document.getElementById('bestStreak').innerText=state.bestStreak;
+  document.getElementById('lastScore').innerText=state.score;
+}
+function updateStats(){
+  let total=state.throws.length,hits=state.throws.filter(t=>t.hit).length;
+  let acc=total?Math.round((hits/total)*100):0;
+  document.getElementById('overallStats').innerHTML='<li>Gesamtwuerfe: '+total+'</li><li>Trefferquote: '+acc+'%</li><li>Bester Streak: '+state.bestStreak+'</li><li>Highscore: '+state.highscore+'</li>';
+  let entries=Object.entries(state.heat).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('topSegments').innerHTML=entries.slice(0,3).length?entries.slice(0,3).map(e=>'<li>'+e[0]+': '+e[1]+'x</li>').join(''):'<li>Noch keine Daten</li>';
+  document.getElementById('flopSegments').innerHTML=entries.filter(e=>e[1]>0).slice(-3).reverse().length?entries.filter(e=>e[1]>0).slice(-3).reverse().map(e=>'<li>'+e[0]+': '+e[1]+'x</li>').join(''):'<li>Noch keine Daten</li>';
+  let rounds={double:{t:0,h:0},triple:{t:0,h:0},bull:{t:0,h:0}};
+  state.throws.forEach(t=>{if(!t.round||!rounds[t.round])return;rounds[t.round].t++;if(t.hit)rounds[t.round].h++;});
+  function pct(r){return r.t?Math.round((r.h/r.t)*100)+'%':'n/a';}
+  document.getElementById('roundStats').innerHTML='<li>Double: '+pct(rounds.double)+'</li><li>Triple: '+pct(rounds.triple)+'</li><li>Bull: '+pct(rounds.bull)+'</li>';
+  // X01
+  const gs=gameStats;
+  const x01Avg=gs.x01.totalDarts>0?Math.round(gs.x01.totalPoints/(gs.x01.totalDarts/3)*10)/10:0;
+  const coRate=gs.x01.checkoutAttempts>0?Math.round((gs.x01.checkoutHits/gs.x01.checkoutAttempts)*100):'0';
+  document.getElementById('x01Stats').innerHTML=
+    '<li>Spiele: '+gs.x01.gamesPlayed+' | Gewonnen: '+gs.x01.gamesWon+'</li>'+
+    '<li>Avg: '+x01Avg+'</li>'+
+    '<li>Checkouts: '+gs.x01.checkoutHits+'/'+gs.x01.checkoutAttempts+' ('+coRate+'%)</li>'+
+    '<li>Tons: '+gs.x01.tons+' | 140+: '+gs.x01.tonsPlus+' | 180s: '+gs.x01.eighties+'</li>';
+  // Training
+  document.getElementById('trainingStats').innerHTML=
+    '<li>Phoenix Best: '+gs.phoenix.bestScore+'</li>'+
+    '<li>Splitscore Best: '+gs.splitscore.bestScore+'</li>'+
+    '<li>Bob\'s 27 Best: '+gs.b27.bestScore+'</li>'+
+    '<li>Checkout: '+(gs.checkout.totalRounds>0?Math.round((gs.checkout.totalHits/gs.checkout.totalRounds)*100)+'%':'n/a')+'</li>';
+  // Multiplayer
+  document.getElementById('multiStats').innerHTML=
+    '<li>Cricket W/L: '+gs.cricket.gamesWon+'/'+(gs.cricket.gamesPlayed-gs.cricket.gamesWon)+'</li>'+
+    '<li>Elim. Wins: '+gs.elimination.gamesWon+'</li>'+
+    '<li>Shanghai: '+gs.shanghai.gamesPlayed+' Spiele | Gewonnen: '+gs.shanghai.gamesWon+'</li>'+
+    '<li>ATC: '+gs.atc.gamesPlayed+' Spiele | Gewonnen: '+gs.atc.gamesWon+'</li>';
+}
+
+// ── Navigation ─────────────────────────────────────────────────────────────────
+function openModal(){document.getElementById('modeModal').classList.add('active');}
+function closeModal(){document.getElementById('modeModal').classList.remove('active');}
+function startFromModal(mode){closeModal();if(mode==='phoenix'){phoenixStart();}else{startMode(mode);}}
+function startMode(mode){state.sessionStart=Date.now();state.sessionScore=0;state.sessionActive=true;show(mode);render();}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));
+  const map={
+    'start':'nav-home','classic':'nav-training','flow':'nav-training',
+    'phoenix':'nav-training','splitscore':'nav-training',
+    'stats-screen':'nav-stats','profil':'nav-profil',
+    'x01':'nav-home','x01Setup':'nav-home',
+    'cricket':'nav-home','elimination':'nav-home','eliminationSetup':'nav-home',
+    'shanghai':'nav-home','shanghaiSetup':'nav-home',
+    'atc':'nav-home','atcSetup':'nav-home',
+    'b27':'nav-home','checkout':'nav-home'
+  };
+  if(map[id]) document.getElementById(map[id]).classList.add('active');
+  document.getElementById('bottomNav').style.display=(id==='start')?'none':'flex';
+  if(id==='stats-screen') updateStats();
+  if(id==='x01') x01DrawBoard();
+}
+
+function save(){localStorage.setItem('dartsV12',JSON.stringify(state));}
+function load(){let d=localStorage.getItem('dartsV12');if(d)state=JSON.parse(d);}
+
+// ── Splitscore Classic ─────────────────────────────────────────────────────────
+const ssRounds=[
+  {name:'15er', type:'single',num:15},
+  {name:'16er', type:'single',num:16},
+  {name:'Doppel',type:'double',num:0},
+  {name:'17er', type:'single',num:17},
+  {name:'18er', type:'single',num:18},
+  {name:'Triple',type:'triple',num:0},
+  {name:'19er', type:'single',num:19},
+  {name:'20er', type:'single',num:20},
+  {name:'Bull', type:'bull',  num:0}
+];
+let ssState={score:40,round:0,dart:0,roundScore:0,roundHits:0};
+
+function splitscoreStart(){
+  ssState={score:40,round:0,dart:0,roundScore:0,roundHits:0};
+  show('splitscore');ssRender();
+}
+function ssIsValid(boardId){
+  const r=ssRounds[ssState.round];
+  if(r.type==='single'){const n=r.num;return boardId==='S'+n||boardId==='D'+n||boardId==='T'+n;}
+  if(r.type==='double') return boardId.startsWith('D');
+  if(r.type==='triple') return boardId.startsWith('T');
+  if(r.type==='bull')   return boardId==='B25'||boardId==='B50';
+  return false;
+}
+function ssHit(boardId){
+  const valid=ssIsValid(boardId);
+  if(valid){ssState.roundHits++;ssState.roundScore+=pointsForId(boardId);}
+  flashFeedback(valid);ssNextDart();
+}
+function ssMiss(){flashFeedback(false);ssNextDart();}
+function ssNextDart(){
+  ssState.dart++;
+  if(ssState.dart>=3){
+    if(ssState.roundHits===0) ssState.score=Math.floor(ssState.score/2);
+    else ssState.score+=ssState.roundScore;
+    ssState.round++;ssState.dart=0;ssState.roundScore=0;ssState.roundHits=0;
+    if(ssState.round>=ssRounds.length){
+      gameStats.splitscore.gamesPlayed++;
+      if(ssState.score>gameStats.splitscore.bestScore) gameStats.splitscore.bestScore=ssState.score;
+      gameStats.splitscore.lastScore=ssState.score;
+      saveStats();
+      document.getElementById('resultText').innerText='Splitscore Classic\nFinaler Score: '+ssState.score;
+      show('result');return;
+    }
+  }
+  ssRender();
+}
+function ssRender(){
+  const r=ssRounds[ssState.round];
+  document.getElementById('ssScore').innerText=ssState.score;
+  document.getElementById('ssRoundName').innerText='Runde '+(ssState.round+1)+'/9 — '+r.name;
+  document.getElementById('ssDartCount').innerText='Pfeil '+(ssState.dart+1)+'/3';
+  let tl='';
+  if(r.type==='single') tl='Ziel: '+r.num+' (Single/Double/Triple)';
+  if(r.type==='double') tl='Ziel: Beliebiges Doppel';
+  if(r.type==='triple') tl='Ziel: Beliebiges Triple';
+  if(r.type==='bull')   tl='Ziel: Bull (25 oder 50)';
+  document.getElementById('ssTarget').innerText=tl;
+  document.getElementById('ssHits').innerText=ssState.roundHits>0?'Treffer: '+ssState.roundHits+' (+'+ssState.roundScore+' Pkt)':'0 Treffer — Halbieren droht!';
+  document.getElementById('ssRoundPts').innerText='Rundenpunkte: +'+ssState.roundScore;
+  const c=document.getElementById('ssCoach');
+  if(ssState.dart===2&&ssState.roundHits===0) c.innerText='Letzter Pfeil — jetzt oder halbieren!';
+  else if(ssState.roundHits>0) c.innerText='Score gesichert!';
+  else c.innerText='';
+  // Dots
+  const dotsEl=document.getElementById('ssDots');dotsEl.innerHTML='';
+  for(let i=0;i<9;i++){let d=document.createElement('div');d.className='round-dot';if(i<ssState.round)d.classList.add('done');else if(i===ssState.round)d.classList.add('active');dotsEl.appendChild(d);}
+  // Board
+  buildBoard(document.getElementById('board-splitscore'),(id)=>ssHit(id),(id,type,num)=>{
+    if(r.type==='single'&&num===r.num) return true;
+    if(r.type==='double'&&type==='D') return true;
+    if(r.type==='triple'&&type==='T') return true;
+    if(r.type==='bull'&&(id==='B25'||id==='B50')) return true;
+    return false;
+  });
+}
+
+// ── Phoenix Split ──────────────────────────────────────────────────────────────
+const pxRounds=[
+  {name:'15er',       type:'single',      darts:['S15','S15','S15']},
+  {name:'16er',       type:'single',      darts:['S16','S16','S16']},
+  {name:'Doppel I',   type:'double',      darts:['D16','D8','D4']  },
+  {name:'Doppel II',  type:'double',      darts:['D16','D12','D20']},
+  {name:'Doppel III', type:'double',      darts:['D20','D10','D5'] },
+  {name:'17er',       type:'single',      darts:['S17','S17','S17']},
+  {name:'18er',       type:'single',      darts:['S18','S18','S18']},
+  {name:'Triple I',   type:'triple',      darts:['T20','T19','T18']},
+  {name:'Triple II',  type:'triple_free', darts:['T','T','T']      },
+  {name:'Triple III', type:'triple',      darts:['T19','T18','T20']},
+  {name:'19er',       type:'single',      darts:['S19','S19','S19']},
+  {name:'20er',       type:'single',      darts:['S20','S20','S20']},
+  {name:'Bull',       type:'bull',        darts:['B','B','B','B','B','B','B','B','B']}
+];
+let pState={score:64,round:0,dart:0,roundScore:0,roundHits:0,active:false};
+
+function phoenixStart(){
+  pState={score:64,round:0,dart:0,roundScore:0,roundHits:0,active:true};
+  show('phoenix');phoenixRender();
+}
+function pxCurrentRound(){return pxRounds[pState.round];}
+function pxTargetForDart(){return pxCurrentRound().darts[pState.dart];}
+function pxIsValid(boardId){
+  const r=pxCurrentRound(),target=pxTargetForDart();
+  if(r.type==='single'){const num=parseInt(target.substring(1));return boardId==='S'+num||boardId==='D'+num||boardId==='T'+num;}
+  if(r.type==='double') return boardId===target;
+  if(r.type==='triple') return boardId===target;
+  if(r.type==='triple_free') return boardId.startsWith('T');
+  if(r.type==='bull') return boardId==='B25'||boardId==='B50';
+  return false;
+}
+function phoenixHit(boardId){
+  const valid=pxIsValid(boardId);
+  if(valid){pState.roundHits++;pState.roundScore+=pointsForId(boardId);}
+  flashFeedback(valid);pxNextDart();
+}
+function phoenixMiss(){flashFeedback(false);pxNextDart();}
+function pxNextDart(){
+  pState.dart++;
+  const r=pxCurrentRound();
+  if(pState.dart>=r.darts.length){
+    if(pState.roundHits===0) pState.score=Math.floor(pState.score/2);
+    else pState.score+=pState.roundScore;
+    pState.round++;pState.dart=0;pState.roundScore=0;pState.roundHits=0;
+    if(pState.round>=pxRounds.length){
+      gameStats.phoenix.gamesPlayed++;
+      if(pState.score>gameStats.phoenix.bestScore) gameStats.phoenix.bestScore=pState.score;
+      gameStats.phoenix.lastScore=pState.score;
+      saveStats();
+      document.getElementById('resultText').innerText='Phoenix Split\nFinaler Score: '+pState.score;
+      show('result');return;
+    }
+  }
+  phoenixRender();
+}
+function phoenixRender(){
+  const r=pxCurrentRound(),target=pxTargetForDart();
+  document.getElementById('pScore').innerText=pState.score;
+  document.getElementById('pRoundName').innerText='Runde '+(pState.round+1)+'/'+pxRounds.length+' — '+r.name;
+  document.getElementById('pDartCount').innerText='Pfeil '+(pState.dart+1)+'/'+r.darts.length;
+  document.getElementById('pTarget').innerText='Ziel: '+target;
+  document.getElementById('pBlockInfo').innerText='Block: '+r.darts.join(' · ');
+  document.getElementById('pHits').innerText=pState.roundHits>0?'Treffer: '+pState.roundHits+' (+'+pState.roundScore+' Pkt)':'0 Treffer — Halbieren droht!';
+  document.getElementById('pRoundScore').innerText='Rundenpunkte: +'+pState.roundScore;
+  const c=document.getElementById('pCoach');
+  const left=r.darts.length-pState.dart-1;
+  if(left===0&&pState.roundHits===0) c.innerText='Letzter Pfeil — jetzt oder halbieren!';
+  else if(pState.roundHits>0) c.innerText='Score gesichert — weiter so';
+  else c.innerText='';
+  const dotsEl=document.getElementById('pDots');dotsEl.innerHTML='';
+  for(let i=0;i<pxRounds.length;i++){let d=document.createElement('div');d.className='round-dot';if(i<pState.round)d.classList.add('done');else if(i===pState.round)d.classList.add('active');dotsEl.appendChild(d);}
+  buildBoard(document.getElementById('board-phoenix'),(id)=>phoenixHit(id),(id,type,num)=>{
+    if(r.type==='single'&&num===parseInt(target.substring(1))) return true;
+    if(r.type==='double'&&id===target) return true;
+    if(r.type==='triple'&&id===target) return true;
+    if(r.type==='triple_free'&&type==='T') return true;
+    if(r.type==='bull'&&(id==='B25'||id==='B50')) return true;
+    return false;
+  });
+}
+
+// ── X01 ────────────────────────────────────────────────────────────────────────
+let x01State={scores:[501,501],names:['Spieler 1','Spieler 2'],turn:0,startScore:501,dartCount:0,log:[],outMode:'double',inMode:'single',opened:[true,true],currentTurnPoints:0,currentTurnDarts:0,botPlayer:null,gameOver:false};
+let x01LastState=null;
+
+function x01SetIn(mode){
+  x01State.inMode=mode;
+  ['single','double','master'].forEach(m=>{
+    document.getElementById('in'+m.charAt(0).toUpperCase()+m.slice(1)).classList.toggle('active',m===mode);
+  });
+}
+let x01BotEnabled=false;
+function x01ToggleBot(){
+  x01BotEnabled=!x01BotEnabled;
+  const btn=document.getElementById('botToggle');
+  const p2=document.getElementById('nameP2');
+  const dc=document.getElementById('botDiffCard');
+  if(x01BotEnabled){
+    btn.innerText='Bot: EIN';btn.classList.add('active');
+    p2.value='Bot';p2.disabled=true;
+    dc.style.display='block';setBotDiff('lv6');
+  } else {
+    btn.innerText='Bot: AUS';btn.classList.remove('active');
+    p2.value='';p2.disabled=false;dc.style.display='none';
+  }
+}
+function x01Setup(startScore){
+  document.getElementById('x01SetupTitle').innerText=startScore;
+  x01State.startScore=startScore;
+  x01SetIn('single');x01SetOut('double');
+  // Reset bot UI
+  x01BotEnabled=false;
+  const btn=document.getElementById('botToggle');if(btn){btn.innerText='Bot: AUS';btn.classList.remove('active');}
+  const p2=document.getElementById('nameP2');if(p2)p2.disabled=false;
+  const dc=document.getElementById('botDiffCard');if(dc)dc.style.display='none';
+  document.getElementById('x01StartBtn').onclick=function(){
+    let n1=document.getElementById('nameP1').value.trim()||'Spieler 1';
+    let n2=x01BotEnabled?'Bot':(document.getElementById('nameP2').value.trim()||'Spieler 2');
+    x01State.names=[n1,n2];
+    x01State.botPlayer=x01BotEnabled?1:null;
+    x01Init(startScore);show('x01');
+  };
+  show('x01Setup');
+}
+function x01SetOut(mode){
+  x01State.outMode=mode;
+  ['single','double','master'].forEach(m=>{
+    document.getElementById('out'+m.charAt(0).toUpperCase()+m.slice(1)).classList.toggle('active',m===mode);
+  });
+}
+function x01Init(startScore){
+  x01State.startScore=startScore;x01State.scores=[startScore,startScore];
+  x01State.turn=0;x01State.dartCount=0;x01State.log=[];
+  x01State.opened=x01State.inMode==='single'?[true,true]:[false,false];
+  x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
+  x01State.gameOver=false;x01BotThinking=false;
+  x01Render();
+}
+function x01Render(){
+  document.getElementById('x01Title').innerText=x01State.startScore;
+  document.getElementById('x01P1Name').innerText=x01State.names[0];
+  document.getElementById('x01P2Name').innerText=x01State.names[1];
+  document.getElementById('x01P1Score').innerText=x01State.scores[0];
+  document.getElementById('x01P2Score').innerText=x01State.scores[1];
+  document.getElementById('x01P1Block').style.opacity=x01State.turn===0?'1':'0.4';
+  document.getElementById('x01P2Block').style.opacity=x01State.turn===1?'1':'0.4';
+  document.getElementById('x01Turn').innerText=x01State.names[x01State.turn]+' — Dart '+(x01State.dartCount+1)+'/3';
+  document.getElementById('x01OutMode').innerText='In: '+x01State.inMode+' | Out: '+x01State.outMode;
+  const openerHint=['single','double','master'].indexOf(x01State.inMode)>0?
+    (x01State.inMode==='double'?'Noch kein Double':'Noch kein Double/Triple'):'';
+  for(let pi=0;pi<2;pi++){
+    const el=document.getElementById('x01P'+(pi+1)+'Opener');
+    if(el) el.innerText=(x01State.opened&&!x01State.opened[pi]&&x01State.inMode!=='single')?openerHint:'';
+  }
+  let logEl=document.getElementById('x01Log');
+  if(logEl) logEl.innerHTML=x01State.log.slice(0,5).map(l=>'<div>'+l+'</div>').join('');
+  x01DrawBoard();
+}
+function x01DrawBoard(){
+  buildBoard(document.getElementById('board-x01'),(id,num,type)=>x01BoardHit(num,type),null);
+  x01BotCheck();
+}
+function x01BoardHit(num,type){
+  if(!isMyOnlineTurn('x01')) return;
+  let mult=1;
+  if(type==='D') mult=2;
+  if(type==='T') mult=3;
+  if(num===25||num===50) mult=1;
+  let points=mult*num;
+  const actualType=type==='D'?'D':type==='T'?'T':'S';
+  x01LastState=JSON.parse(JSON.stringify(x01State));
+  sendOnlineAction({mode:'x01',fn:'throw',args:[mult,num,points,actualType]});
+  x01ProcessThrow(mult,num,points,actualType);
+  updateOnlineTurnLabel();
+}
+function x01MissHit(){
+  if(!isMyOnlineTurn('x01')) return;
+  x01LastState=JSON.parse(JSON.stringify(x01State));
+  sendOnlineAction({mode:'x01',fn:'miss'});
+  x01ProcessThrow(1,0,0,'S');
+  updateOnlineTurnLabel();
+}
+function x01Undo(){
+  if(!x01LastState) return;
+  x01State=x01LastState;x01LastState=null;x01BotThinking=false;x01Render();
+  updateOnlineTurnLabel();
+}
+function x01IsValidFinish(mult,num){
+  const mode=x01State.outMode;
+  if(mode==='single') return true;
+  if(mode==='double') return mult===2||(num===50);
+  if(mode==='master') return mult===2||mult===3||(num===50);
+  return true;
+}
+function x01ProcessThrow(mult,num,points,type){
+  let player=x01State.turn;
+
+  // In-mode: check if player needs to open
+  if(x01State.opened&&!x01State.opened[player]&&x01State.inMode!=='single'){
+    let isOpener=false;
+    if(x01State.inMode==='double') isOpener=(type==='D')||(num===50);
+    if(x01State.inMode==='master') isOpener=(type==='D')||(type==='T')||(num===50);
+    if(!isOpener){
+      let thrown=num===0?'MISS':(num===50?'B50':num===25?'B25':type+num);
+      x01State.log.unshift(x01State.names[player]+' — kein Öffner ('+thrown+')');
+      flashFeedback(false);
+      x01State.dartCount++;x01State.currentTurnDarts++;
+      if(x01State.dartCount>=3){
+        x01RecordTurn();
+        x01State.dartCount=0;x01State.turn=x01State.turn===0?1:0;
+        x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
+      }
+      x01Render();return;
+    }
+    x01State.opened[player]=true;
+    let openedWith=num===50?'B50':type+num;
+    x01State.log.unshift(x01State.names[player]+' — geöffnet mit '+openedWith+' (-'+points+')');
+  }
+
+  let current=x01State.scores[player];
+  let newScore=current-points;
+  let isBust=false;
+  if(newScore<0) isBust=true;
+  if(newScore===0&&!x01IsValidFinish(mult,num)) isBust=true;
+  if(newScore===1&&x01State.outMode!=='single') isBust=true;
+  if(isBust){
+    x01State.log.unshift(x01State.names[player]+': BUST (bleibt bei '+current+')');
+    x01State.dartCount++;x01State.currentTurnDarts++;
+    if(x01State.dartCount>=3){
+      x01RecordTurn();
+      x01State.dartCount=0;x01State.turn=x01State.turn===0?1:0;
+      x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
+    }
+    x01Render();return;
+  }
+
+  x01State.scores[player]=newScore;
+  x01State.currentTurnPoints+=points;
+  x01State.currentTurnDarts++;
+
+  if(x01State.log[0]&&x01State.log[0].indexOf('geöffnet')>-1){
+    x01State.log[0]=x01State.log[0].replace(')',') = '+newScore);
+  } else {
+    x01State.log.unshift(x01State.names[player]+': -'+points+' = '+newScore);
+  }
+
+  if(newScore===0){
+    // Win: track checkout
+    if(x01State.outMode!=='single'){
+      gameStats.x01.checkoutAttempts++;
+      gameStats.x01.checkoutHits++;
+    }
+    gameStats.x01.gamesPlayed++;
+    gameStats.x01.gamesWon++;
+    gameStats.x01.totalPoints+=x01State.currentTurnPoints;
+    gameStats.x01.totalDarts+=x01State.currentTurnDarts;
+    saveStats();
+    x01State.log.unshift(x01State.names[player]+' GEWINNT!');
+    x01State.gameOver=true;x01BotThinking=false;
+    x01Render();
+    showGameEnd(x01State.names[player]+' gewinnt!','',
+      ()=>{if(onlineState.active)onlineCancel();x01Init(x01State.startScore);show('x01');},
+      ()=>{if(onlineState.active)onlineCancel();show('start');}
+    );
+    return;
+  }
+
+  // Track checkout attempts (last dart before 170+)
+  if(x01State.outMode!=='single'&&newScore<=170){
+    gameStats.x01.checkoutAttempts++;
+  }
+
+  x01State.dartCount++;
+  if(x01State.dartCount>=3){
+    x01RecordTurn();
+    x01State.dartCount=0;x01State.turn=x01State.turn===0?1:0;
+    x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
+  }
+  x01Render();
+}
+function x01RecordTurn(){
+  const tp=x01State.currentTurnPoints;
+  gameStats.x01.totalPoints+=tp;
+  gameStats.x01.totalDarts+=3;
+  if(tp>=180) gameStats.x01.eighties++;
+  else if(tp>=140) gameStats.x01.tonsPlus++;
+  else if(tp>=100) gameStats.x01.tons++;
+  saveStats();
+}
+
+// ── Cricket ────────────────────────────────────────────────────────────────────
+const CRICKET_NUMS=[20,19,18,17,16,15,'B'];
+let cricState={marks:[[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]],scores:[0,0],names:['Spieler 1','Spieler 2'],turn:0,dartCount:0,botPlayer:null,gameOver:false};
+let cricLastState=null;
+
+let cricBotEnabled=false;
+function cricToggleBot(){
+  cricBotEnabled=!cricBotEnabled;
+  const btn=document.getElementById('cricBotToggle');
+  const p2=document.getElementById('cricName2');
+  const dc=document.getElementById('cricBotDiffCard');
+  if(cricBotEnabled){
+    btn.innerText='Bot: EIN';btn.classList.add('active');
+    p2.value='Bot';p2.disabled=true;
+    dc.style.display='block';setBotDiff('lv6');
+  } else {
+    btn.innerText='Bot: AUS';btn.classList.remove('active');
+    p2.value='';p2.disabled=false;dc.style.display='none';
+  }
+}
+function cricketSetup(){
+  cricBotEnabled=false;
+  const btn=document.getElementById('cricBotToggle');if(btn){btn.innerText='Bot: AUS';btn.classList.remove('active');}
+  const p2=document.getElementById('cricName2');if(p2)p2.disabled=false;
+  const dc=document.getElementById('cricBotDiffCard');if(dc)dc.style.display='none';
+  document.getElementById('cricketSetupModal').classList.add('active');
+}
+function cricketStart(){
+  let n1=document.getElementById('cricName1').value.trim()||'Spieler 1';
+  let n2=cricBotEnabled?'Bot':(document.getElementById('cricName2').value.trim()||'Spieler 2');
+  document.getElementById('cricketSetupModal').classList.remove('active');
+  cricState={marks:[[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]],scores:[0,0],names:[n1,n2],turn:0,dartCount:0,botPlayer:cricBotEnabled?1:null,gameOver:false};
+  cricBotThinking=false;
+  gameStats.cricket.gamesPlayed+=2;
+  saveStats();
+  show('cricket');cricRender();
+}
+function cricHitNum(num,mult,fromOnline){
+  if(!fromOnline&&!isMyOnlineTurn('cricket')) return;
+  if(mult===undefined) mult=1;
+  if(num==='B'||num===25||num===50) mult=1;
+  if(!fromOnline) sendOnlineAction({mode:'cricket',fn:'hit',args:[num,mult,true]});
+  cricLastState=JSON.parse(JSON.stringify(cricState));
+  let fieldIdx=num==='B'?6:CRICKET_NUMS.indexOf(num);
+  if(fieldIdx===-1){cricNextDart();return;}
+  let p=cricState.turn,opp=p===0?1:0;
+  let pts=num==='B'?25:(num===50)?50:num;
+  for(let i=0;i<mult;i++){
+    if(cricState.marks[p][fieldIdx]<3){cricState.marks[p][fieldIdx]++;}
+    else{if(cricState.marks[opp][fieldIdx]<3){cricState.scores[p]+=pts;}}
+  }
+  flashFeedback(true);
+  cricNextDart();cricCheckWin();
+}
+function cricMiss(fromOnline){
+  if(!fromOnline&&!isMyOnlineTurn('cricket')) return;
+  if(!fromOnline) sendOnlineAction({mode:'cricket',fn:'miss'});
+  cricLastState=JSON.parse(JSON.stringify(cricState));
+  flashFeedback(false);cricNextDart();
+  updateOnlineTurnLabel();
+}
+function cricUndo(){
+  if(!cricLastState) return;
+  cricState=cricLastState;cricLastState=null;cricBotThinking=false;cricRender();
+  updateOnlineTurnLabel();
+}
+function cricNextDart(){
+  cricState.dartCount++;
+  if(cricState.dartCount>=3){cricState.dartCount=0;cricState.turn=cricState.turn===0?1:0;}
+  cricRender();
+}
+function cricCheckWin(){
+  for(let p=0;p<2;p++){
+    if(cricState.marks[p].every(m=>m>=3)&&cricState.scores[p]>=cricState.scores[p===0?1:0]){
+      gameStats.cricket.gamesWon++;
+      saveStats();
+      cricState.gameOver=true;cricBotThinking=false;
+      setTimeout(()=>{
+        showGameEnd(cricState.names[p]+' gewinnt!','',
+          ()=>{if(onlineState.active)onlineCancel();cricketSetup();},
+          ()=>{if(onlineState.active)onlineCancel();show('start');}
+        );
+      },100);
+    }
+  }
+}
+function cricRender(){
+  document.getElementById('cricP1Name').innerText=cricState.names[0];
+  document.getElementById('cricP2Name').innerText=cricState.names[1];
+  document.getElementById('cricP1Score').innerText=cricState.scores[0];
+  document.getElementById('cricP2Score').innerText=cricState.scores[1];
+  document.getElementById('cricTurn').innerText=cricState.names[cricState.turn]+' ist dran';
+  document.getElementById('cricDart').innerText='Dart '+(cricState.dartCount+1)+'/3';
+  const board=document.getElementById('cricketBoard');board.innerHTML='';
+  CRICKET_NUMS.forEach((num,i)=>{
+    let m1=document.createElement('div');m1.className='cricket-marks';
+    for(let j=0;j<3;j++){let dot=document.createElement('div');dot.className='cricket-mark'+(cricState.marks[0][i]>j?(cricState.marks[0][i]>=3?' closed':' hit'):'');m1.appendChild(dot);}
+    let numEl=document.createElement('div');numEl.className='cricket-num';numEl.innerText=num==='B'?'Bull':num;
+    let m2=document.createElement('div');m2.className='cricket-marks';
+    for(let j=0;j<3;j++){let dot=document.createElement('div');dot.className='cricket-mark'+(cricState.marks[1][i]>j?(cricState.marks[1][i]>=3?' closed':' hit'):'');m2.appendChild(dot);}
+    board.appendChild(m1);board.appendChild(numEl);board.appendChild(m2);
+  });
+  buildBoard(document.getElementById('board-cricket'),(id,num,type)=>{
+    if(id==='B25'||id==='B50'){cricHitNum('B',1,false);}
+    else{let m=type==='T'?3:type==='D'?2:1;if(CRICKET_NUMS.includes(num))cricHitNum(num,m,false);else{if(isMyOnlineTurn('cricket')){cricLastState=JSON.parse(JSON.stringify(cricState));cricNextDart();}}}
+  },(id,type,num)=>{
+    return CRICKET_NUMS.includes(num)||(id==='B25'||id==='B50');
+  });
+  cricBotCheck();
+}
+
+// ── Elimination ────────────────────────────────────────────────────────────────
+let elimState={scores:[],names:[],turn:0,dartCount:0,goal:301,active:false,gameOver:false};
+let elimLastState=null;
+let elimGoalVal=301;
+
+function eliminationSetup(){elimSetGoal(301);show('eliminationSetup');}
+function elimSetGoal(g){
+  elimGoalVal=g;
+  [201,301,401,501].forEach(v=>{document.getElementById('elimGoal'+v).classList.toggle('active',v===g);});
+}
+function eliminationStart(){
+  let names=[];
+  for(let i=1;i<=6;i++){let v=document.getElementById('elimName'+i).value.trim();if(v)names.push(v);}
+  if(names.length<2){alert('Mindestens 2 Spieler!');return;}
+  elimState={scores:new Array(names.length).fill(0),names:names,turn:0,dartCount:0,goal:elimGoalVal,active:true,gameOver:false};elimBotThinking=false;
+  show('elimination');elimRender();
+}
+function elimBullHit(pts,fromOnline){
+  if(!fromOnline&&!isMyOnlineTurn('elim')) return;
+  if(!fromOnline) sendOnlineAction({mode:'elim',fn:'hit',args:[pts]});
+  elimLastState=JSON.parse(JSON.stringify(elimState));
+  elimProcessHit(pts);
+  updateOnlineTurnLabel();
+}
+function elimMiss(fromOnline){
+  if(!fromOnline&&!isMyOnlineTurn('elim')) return;
+  if(!fromOnline) sendOnlineAction({mode:'elim',fn:'miss'});
+  elimLastState=JSON.parse(JSON.stringify(elimState));
+  elimNextDart();
+  updateOnlineTurnLabel();
+}
+function elimUndo(){
+  if(!elimLastState) return;
+  elimState=elimLastState;elimLastState=null;elimBotThinking=false;elimRender();
+  updateOnlineTurnLabel();
+}
+function elimProcessHit(points){
+  let p=elimState.turn;
+  elimState.scores[p]+=points;
+  for(let i=0;i<elimState.scores.length;i++){
+    if(i!==p&&elimState.scores[i]===elimState.scores[p]&&elimState.scores[p]>0){
+      elimState.scores[i]=0;flashFeedback(true);
+    }
+  }
+  if(elimState.scores[p]>=elimState.goal){
+    gameStats.elimination.gamesPlayed++;
+    gameStats.elimination.gamesWon++;
+    saveStats();
+    elimState.gameOver=true;elimBotThinking=false;
+    elimRender();
+    setTimeout(()=>{
+      showGameEnd(elimState.names[p]+' gewinnt!','Score: '+elimState.scores[p],
+        ()=>{if(onlineState.active)onlineCancel();eliminationSetup();},
+        ()=>{if(onlineState.active)onlineCancel();show('start');}
+      );
+    },100);return;
+  }
+  flashFeedback(true);elimNextDart();
+}
+function elimNextDart(){
+  elimState.dartCount++;
+  if(elimState.dartCount>=3){elimState.dartCount=0;elimState.turn=(elimState.turn+1)%elimState.names.length;}
+  elimRender();
+}
+function elimRender(){
+  document.getElementById('elimGoalDisplay').innerText='Ziel: '+elimState.goal+' Punkte';
+  document.getElementById('elimTurn').innerText=elimState.names[elimState.turn]+' ist dran';
+  document.getElementById('elimDart').innerText='Dart '+(elimState.dartCount+1)+'/3';
+  const playersEl=document.getElementById('elimPlayers');playersEl.innerHTML='';
+  elimState.names.forEach((name,i)=>{
+    let div=document.createElement('div');
+    div.className='elim-player'+(i===elimState.turn?' active-turn':'')+(elimState.scores[i]===0&&i!==elimState.turn?' zeroed':'');
+    div.innerHTML='<div class="ep-name">'+name+'</div><div class="ep-score">'+elimState.scores[i]+'</div>';
+    playersEl.appendChild(div);
+  });
+  buildBoard(document.getElementById('board-elimination'),(id,num,type)=>{
+    if(!isMyOnlineTurn('elim')) return;
+    let mult=type==='T'?3:type==='D'?2:1;
+    const pts=mult*num;
+    sendOnlineAction({mode:'elim',fn:'hit',args:[pts]});
+    elimLastState=JSON.parse(JSON.stringify(elimState));
+    elimProcessHit(pts);
+    updateOnlineTurnLabel();
+  },null);
+  elimBotCheck();
+}
+
+// ── SHANGHAI ───────────────────────────────────────────────────────────────────
+let shanState={names:[],scores:[],turn:0,round:1,dartCount:0,roundHits:{S:false,D:false,T:false},active:false,gameOver:false};
+let shanLastState=null;
+
+function shanghaiSetup(){document.getElementById('shanghaiSetupModal').classList.add('active');}
+function shanghaiStart(){
+  let names=[];
+  for(let i=1;i<=6;i++){let v=document.getElementById('shanName'+i).value.trim();if(v)names.push(v);}
+  if(names.length<2){alert('Mindestens 2 Spieler!');return;}
+  document.getElementById('shanghaiSetupModal').classList.remove('active');
+  shanState={names:names,scores:new Array(names.length).fill(0),turn:0,round:1,dartCount:0,roundHits:{S:false,D:false,T:false},active:true,gameOver:false};shanBotThinking=false;
+  show('shanghai');shanRender();
+}
+function shanHit(id,num,type,fromOnline){
+  if(!fromOnline&&!isMyOnlineTurn('shanghai')) return;
+  let mult=1,hitType='S';
+  if(type==='D'){mult=2;hitType='D';}
+  else if(type==='T'){mult=3;hitType='T';}
+  if(!fromOnline) sendOnlineAction({mode:'shanghai',fn:'hit',args:[id,num,type,true]});
+  shanLastState=JSON.parse(JSON.stringify(shanState));
+
+  if(num!==shanState.round){
+    // Wrong segment — no score
+    flashFeedback(false);
+    shanNextDart();return;
+  }
+  // Correct segment
+  shanState.scores[shanState.turn]+=num*mult;
+  shanState.roundHits[hitType]=true;
+  flashFeedback(true);
+  // Shanghai check: S + D + T all hit this round
+  if(shanState.roundHits.S&&shanState.roundHits.D&&shanState.roundHits.T){
+    gameStats.shanghai.gamesPlayed++;
+    gameStats.shanghai.gamesWon++;
+    saveStats();
+    shanState.dartCount++;shanState.gameOver=true;shanBotThinking=false;
+    shanRender();
+    setTimeout(()=>{
+      showGameEnd('SHANGHAI!',shanState.names[shanState.turn]+' — Sofortiger Sieg!',
+        ()=>{if(onlineState.active)onlineCancel();show('start');},
+        ()=>{if(onlineState.active)onlineCancel();show('start');}
+      );
+    },100);return;
+  }
+  shanNextDart();
+}
+function shanMiss(fromOnline){
+  if(!fromOnline&&!isMyOnlineTurn('shanghai')) return;
+  if(!fromOnline) sendOnlineAction({mode:'shanghai',fn:'miss'});
+  shanLastState=JSON.parse(JSON.stringify(shanState));
+  flashFeedback(false);shanNextDart();
+  updateOnlineTurnLabel();
+}
+function shanUndo(){
+  if(!shanLastState) return;
+  shanState=shanLastState;shanLastState=null;shanBotThinking=false;shanRender();
+  updateOnlineTurnLabel();
+}
+function shanNextDart(){
+  shanState.dartCount++;
+  if(shanState.dartCount>=3){
+    shanState.dartCount=0;
+    shanState.roundHits={S:false,D:false,T:false};
+    // Advance to next player
+    let nextPlayer=(shanState.turn+1)%shanState.names.length;
+    if(nextPlayer===0){
+      // All players done this round
+      shanState.round++;
+      if(shanState.round>7){
+        // Game end — highest score wins
+        let maxScore=Math.max(...shanState.scores);
+        let winners=shanState.names.filter((_,i)=>shanState.scores[i]===maxScore);
+        gameStats.shanghai.gamesPlayed++;
+        if(winners.length===1) gameStats.shanghai.gamesWon++;
+        saveStats();
+        shanState.gameOver=true;shanBotThinking=false;
+        shanRender();
+        setTimeout(()=>{
+          showGameEnd('Spielende!','Sieger: '+winners.join(', ')+' ('+maxScore+' Pkt)',
+            ()=>{if(onlineState.active)onlineCancel();show('start');},
+            ()=>{if(onlineState.active)onlineCancel();show('start');}
+          );
+        },100);return;
+      }
+    }
+    shanState.turn=nextPlayer;
+  }
+  shanRender();
+}
+function shanRender(){
+  const shanDotsEl = document.getElementById('shanDots');
+  shanDotsEl.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    let d = document.createElement('div');
+    d.className = 'round-dot';
+    if (i < shanState.round - 1) d.classList.add('done');
+    else if (i === shanState.round - 1) d.classList.add('active');
+    shanDotsEl.appendChild(d);
+  }
+  document.getElementById('shanRound').innerText='Runde '+shanState.round+'/7 — Segment: '+shanState.round;
+  document.getElementById('shanTurn').innerText=shanState.names[shanState.turn]+' ist dran';
+  document.getElementById('shanDart').innerText='Dart '+(shanState.dartCount+1)+'/3';
+  const hits=shanState.roundHits;
+  const hitStr=[hits.S?'S':'_',hits.D?'D':'_',hits.T?'T':'_'].join(' ');
+  document.getElementById('shanShanghai').innerText='Runden-Treffer: '+hitStr+(hits.S&&hits.D&&hits.T?' ← SHANGHAI!':'');
+  // Player tiles
+  const pl=document.getElementById('shanPlayers');pl.innerHTML='';
+  shanState.names.forEach((name,i)=>{
+    let div=document.createElement('div');
+    div.className='elim-player'+(i===shanState.turn?' active-turn':'');
+    div.innerHTML='<div class="ep-name">'+name+'</div><div class="ep-score">'+shanState.scores[i]+'</div>';
+    pl.appendChild(div);
+  });
+  // Log
+  const logEl=document.getElementById('shanLog');
+  if(logEl) logEl.innerText='Segment '+shanState.round+' | '+shanState.names[shanState.turn]+' | Dart '+(shanState.dartCount+1)+'/3';
+  // Board: highlight current round segment
+  buildBoard(document.getElementById('board-shanghai'),(id,num,type)=>shanHit(id,num,type),(id,type,num)=>{
+    return num===shanState.round;
+  });
+  shanBotCheck();
+}
+
+// ── AROUND THE CLOCK ──────────────────────────────────────────────────────────
+let atcState={names:[],progress:[],turn:0,dartCount:0,variant:'single',includeBull:true,active:false,gameOver:false};
+
+function atcSetup(){
+  atcSetVar('single');atcSetBull(true);
+  show('atcSetup');
+}
+function atcSetVar(v){
+  atcState.variant=v;
+  ['single','double','triple'].forEach(x=>{
+    document.getElementById('atcVar'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active',x===v);
+  });
+}
+function atcSetBull(b){
+  atcState.includeBull=b;
+  document.getElementById('atcBullYes').classList.toggle('active',b);
+  document.getElementById('atcBullNo').classList.toggle('active',!b);
+}
+function atcStart(){
+  let names=[];
+  for(let i=1;i<=4;i++){let v=document.getElementById('atcName'+i).value.trim();if(v)names.push(v);}
+  if(names.length<1){alert('Mindestens 1 Spieler!');return;}
+  atcState={names:names,progress:new Array(names.length).fill(0),turn:0,dartCount:0,
+    variant:atcState.variant,includeBull:atcState.includeBull,active:true,gameOver:false};atcBotThinking=false;
+  show('atc');atcRender();
+}
+function atcTargetFor(playerIdx){
+  let p=atcState.progress[playerIdx]+1;
+  if(p>20&&atcState.includeBull) return 'Bull';
+  return p;
+}
+function atcIsHit(id,num,type){
+  const p=atcState.turn,target=atcTargetFor(p);
+  if(target==='Bull') return id==='B25'||id==='B50';
+  const targetNum=target;
+  if(atcState.variant==='single') return num===targetNum;
+  if(atcState.variant==='double') return id==='D'+targetNum;
+  if(atcState.variant==='triple') return id==='T'+targetNum;
+  return false;
+}
+function atcHit(id,num,type){
+  const isHit=atcIsHit(id,num,type);
+  flashFeedback(isHit);
+  if(isHit){
+    atcState.progress[atcState.turn]++;
+    const maxProgress=atcState.includeBull?21:20;
+    if(atcState.progress[atcState.turn]>=maxProgress){
+      gameStats.atc.gamesPlayed++;
+      gameStats.atc.gamesWon++;
+      saveStats();
+      atcState.gameOver=true;atcBotThinking=false;
+      atcRender();
+      setTimeout(()=>{
+        alert(atcState.names[atcState.turn]+' gewinnt! Alle Felder getroffen!');
+        show('start');
+      },100);return;
+    }
+  }
+  atcNextDart();
+}
+function atcMiss(){flashFeedback(false);atcNextDart();}
+function atcNextDart(){
+  atcState.dartCount++;
+  if(atcState.dartCount>=3){
+    atcState.dartCount=0;
+    atcState.turn=(atcState.turn+1)%atcState.names.length;
+  }
+  atcRender();
+}
+function atcRender(){
+  const p=atcState.turn,target=atcTargetFor(p);
+  const atcDotsEl = document.getElementById('atcDots');
+  atcDotsEl.innerHTML = '';
+  const maxP = atcState.includeBull ? 21 : 20;
+  const currentProgress = atcState.progress[atcState.turn];
+  for (let i = 0; i < maxP; i++) {
+    let d = document.createElement('div');
+    d.className = 'round-dot';
+    if (i < currentProgress) d.classList.add('done');
+    else if (i === currentProgress) d.classList.add('active');
+    atcDotsEl.appendChild(d);
+  }
+  document.getElementById('atcTurn').innerText=atcState.names[p]+' ist dran';
+  document.getElementById('atcDart').innerText='Dart '+(atcState.dartCount+1)+'/3';
+  document.getElementById('atcTarget').innerText='Ziel: '+(target==='Bull'?'Bull':target)+
+    (atcState.variant!=='single'?' ('+atcState.variant+')':'');
+  // Player cards
+  const pl=document.getElementById('atcPlayers');pl.innerHTML='';
+  atcState.names.forEach((name,i)=>{
+    const maxP=atcState.includeBull?21:20;
+    const prog=atcState.progress[i];
+    const pct=Math.round((prog/maxP)*100);
+    let div=document.createElement('div');
+    div.className='card';div.style.maxWidth='320px';div.style.margin='4px auto';
+    div.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;">'
+      +'<span style="font-weight:bold;'+(i===p?'color:#E8681A':'')+'">'+name+'</span>'
+      +'<span>'+prog+'/'+maxP+'</span></div>'
+      +'<div class="atc-progress-bar"><div class="atc-progress-fill" style="width:'+pct+'%"></div></div>';
+    pl.appendChild(div);
+  });
+  // Board: highlight target
+  buildBoard(document.getElementById('board-atc'),(id,num,type)=>atcHit(id,num,type),(id,type,num)=>{
+    if(target==='Bull') return id==='B25'||id==='B50';
+    if(atcState.variant==='single') return num===target;
+    if(atcState.variant==='double') return id==='D'+target;
+    if(atcState.variant==='triple') return id==='T'+target;
+    return false;
+  });
+  atcBotCheck();
+}
+
+// ── BOB'S 27 ──────────────────────────────────────────────────────────────────
+const b27RoundsData=[
+  {name:'D1', type:'double',num:1, value:2, bustValue:2},
+  {name:'D2', type:'double',num:2, value:4, bustValue:4},
+  {name:'D3', type:'double',num:3, value:6, bustValue:6},
+  {name:'D4', type:'double',num:4, value:8, bustValue:8},
+  {name:'D5', type:'double',num:5, value:10,bustValue:10},
+  {name:'D6', type:'double',num:6, value:12,bustValue:12},
+  {name:'D7', type:'double',num:7, value:14,bustValue:14},
+  {name:'D8', type:'double',num:8, value:16,bustValue:16},
+  {name:'D9', type:'double',num:9, value:18,bustValue:18},
+  {name:'D10',type:'double',num:10,value:20,bustValue:20},
+  {name:'D11',type:'double',num:11,value:22,bustValue:22},
+  {name:'D12',type:'double',num:12,value:24,bustValue:24},
+  {name:'D13',type:'double',num:13,value:26,bustValue:26},
+  {name:'D14',type:'double',num:14,value:28,bustValue:28},
+  {name:'D15',type:'double',num:15,value:30,bustValue:30},
+  {name:'D16',type:'double',num:16,value:32,bustValue:32},
+  {name:'D17',type:'double',num:17,value:34,bustValue:34},
+  {name:'D18',type:'double',num:18,value:36,bustValue:36},
+  {name:'D19',type:'double',num:19,value:38,bustValue:38},
+  {name:'D20',type:'double',num:20,value:40,bustValue:40},
+  {name:'Bull',type:'bull', num:0, value:0, bustValue:25}
+];
+let b27St={score:27,round:0,dart:0,hits:0,active:false};
+
+function b27Start(){
+  b27St={score:27,round:0,dart:0,hits:0,active:true};
+  show('b27');b27Render();
+}
+function b27Hit(id,num,type){
+  const r=b27RoundsData[b27St.round];
+  let isHit=false;
+  if(r.type==='double'&&id==='D'+r.num){
+    b27St.score+=r.value;b27St.hits++;isHit=true;
+  } else if(r.type==='bull'&&id==='B25'){
+    b27St.score+=25;b27St.hits++;isHit=true;
+  } else if(r.type==='bull'&&id==='B50'){
+    b27St.score+=50;b27St.hits++;isHit=true;
+  }
+  flashFeedback(isHit);
+  b27St.dart++;
+  if(b27St.dart>=3){
+    if(b27St.hits===0) b27St.score-=r.bustValue;
+    b27St.round++;b27St.dart=0;b27St.hits=0;
+    if(b27St.round>=b27RoundsData.length){
+      gameStats.b27.gamesPlayed++;
+      if(b27St.score>gameStats.b27.bestScore) gameStats.b27.bestScore=b27St.score;
+      gameStats.b27.lastScore=b27St.score;
+      saveStats();
+      b27Render();
+      setTimeout(()=>{
+        let best=gameStats.b27.bestScore;
+        alert('Bob\'s 27 — Finalscore: '+b27St.score+(b27St.score===best?'\n🏆 Neuer Rekord!':'\nRekord: '+best));
+        show('start');
+      },100);return;
+    }
+  }
+  b27Render();
+}
+function b27Miss(){
+  const r=b27RoundsData[b27St.round];
+  flashFeedback(false);
+  b27St.dart++;
+  if(b27St.dart>=3){
+    if(b27St.hits===0) b27St.score-=r.bustValue;
+    b27St.round++;b27St.dart=0;b27St.hits=0;
+    if(b27St.round>=b27RoundsData.length){
+      gameStats.b27.gamesPlayed++;
+      if(b27St.score>gameStats.b27.bestScore) gameStats.b27.bestScore=b27St.score;
+      gameStats.b27.lastScore=b27St.score;
+      saveStats();
+      b27Render();
+      setTimeout(()=>{
+        alert('Bob\'s 27 — Finalscore: '+b27St.score+'\nRekord: '+gameStats.b27.bestScore);
+        show('start');
+      },100);return;
+    }
+  }
+  b27Render();
+}
+function b27Render(){
+  const r=b27RoundsData[b27St.round];
+  document.getElementById('b27Score').innerText=b27St.score;
+  document.getElementById('b27RoundName').innerText='Runde '+(b27St.round+1)+'/21 — '+r.name;
+  document.getElementById('b27DartCount').innerText='Pfeil '+(b27St.dart+1)+'/3';
+  document.getElementById('b27Target').innerText='Ziel: '+r.name;
+  document.getElementById('b27Hits').innerText=b27St.hits>0?'Treffer: '+b27St.hits:'Noch kein Treffer';
+  const warn=document.getElementById('b27Warn');
+  if(b27St.dart===2&&b27St.hits===0) warn.innerText='⚠ Kein Treffer — -'+r.bustValue+' droht!';
+  else warn.innerText='';
+  document.getElementById('b27Best').innerText='Bestleistung: '+gameStats.b27.bestScore;
+  // Dots
+  const dotsEl=document.getElementById('b27Dots');dotsEl.innerHTML='';
+  for(let i=0;i<21;i++){let d=document.createElement('div');d.className='round-dot';if(i<b27St.round)d.classList.add('done');else if(i===b27St.round)d.classList.add('active');dotsEl.appendChild(d);}
+  // Board
+  buildBoard(document.getElementById('board-b27'),(id,num,type)=>b27Hit(id,num,type),(id,type,num)=>{
+    if(r.type==='double') return id==='D'+r.num;
+    if(r.type==='bull') return id==='B25'||id==='B50';
+    return false;
+  });
+}
+
+// ── CHECKOUT TRAINING ─────────────────────────────────────────────────────────
+const VALID_CHECKOUTS=[
+  2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+  21,22,23,24,25,26,27,28,29,30,32,33,34,35,36,38,40,
+  41,42,44,45,48,50,51,52,54,56,57,60,62,64,66,67,
+  68,70,72,74,76,78,80,81,82,84,85,87,88,90,91,92,
+  94,95,96,98,100,101,104,105,107,108,110,112,113,
+  114,116,117,119,120,121,122,124,125,126,128,129,
+  130,131,132,134,135,136,138,139,140,141,144,145,
+  146,148,150,151,152,153,154,155,156,157,158,160,161,164,167,170
+];
+let coState={target:0,remaining:0,dart:0,round:0,hits:0,history:[],active:false};
+
+function checkoutStart(){
+  coState={target:0,remaining:0,dart:0,round:0,hits:0,history:[],active:true};
+  coNextCheckout();
+  show('checkout');coRender();
+}
+function coNextCheckout(){
+  coState.target=VALID_CHECKOUTS[Math.floor(Math.random()*VALID_CHECKOUTS.length)];
+  coState.remaining=coState.target;
+  coState.dart=0;
+}
+function coHit(id,num,type){
+  if(!coState.active) return;
+  const pts=pointsForId(id);
+  const newRem=coState.remaining-pts;
+  let isBust=false,isCheckout=false;
+  if(newRem<0) isBust=true;
+  else if(newRem===1) isBust=true;  // can't finish with 1
+  else if(newRem===0){
+    if(id.startsWith('D')||id==='B50'){isCheckout=true;}
+    else isBust=true;
+  }
+  if(isBust){
+    flashFeedback(false);
+    coState.history.push({target:coState.target,success:false});
+    coState.round++;
+    coEndOrNext();return;
+  }
+  if(isCheckout){
+    flashFeedback(true);
+    coState.hits++;
+    coState.history.push({target:coState.target,success:true});
+    coState.round++;
+    coEndOrNext();return;
+  }
+  flashFeedback(true);
+  coState.remaining=newRem;
+  coState.dart++;
+  if(coState.dart>=3){
+    coState.history.push({target:coState.target,success:false});
+    coState.round++;
+    coEndOrNext();return;
+  }
+  coRender();
+}
+function coMiss(){
+  if(!coState.active) return;
+  flashFeedback(false);
+  coState.dart++;
+  if(coState.dart>=3){
+    coState.history.push({target:coState.target,success:false});
+    coState.round++;
+    coEndOrNext();return;
+  }
+  coRender();
+}
+function coEndOrNext(){
+  if(coState.round>=10){
+    // Session end
+    gameStats.checkout.totalRounds+=10;
+    gameStats.checkout.totalHits+=coState.hits;
+    saveStats();
+    coState.active=false;
+    const pct=Math.round((coState.hits/10)*100);
+    document.getElementById('resultText').innerText='Checkout Training\n'+coState.hits+'/10 Checkouts — '+pct+'%\n\nGesamt: '+gameStats.checkout.totalHits+'/'+gameStats.checkout.totalRounds+' ('+Math.round((gameStats.checkout.totalHits/gameStats.checkout.totalRounds)*100)+'%)';
+    show('result');return;
+  }
+  coNextCheckout();coRender();
+}
+function coRender(){
+  document.getElementById('coTarget').innerText=coState.target;
+  document.getElementById('coRemain').innerText='Noch: '+coState.remaining;
+  document.getElementById('coDart').innerText='Dart '+(coState.dart+1)+'/3';
+  document.getElementById('coRound').innerText='Checkout '+(coState.round+1)+'/10';
+  document.getElementById('coHits').innerText='Getroffen: '+coState.hits;
+  // Dots
+  const dotsEl=document.getElementById('coDots');dotsEl.innerHTML='';
+  for(let i=0;i<10;i++){
+    let d=document.createElement('div');d.className='round-dot';
+    if(i<coState.history.length){
+      d.classList.add(coState.history[i].success?'done':'active');
+      if(!coState.history[i].success) d.style.background='#ff4444';
+    } else if(i===coState.round) d.classList.add('active');
+    dotsEl.appendChild(d);
+  }
+  // Board — highlight double field of remaining if <= 40
+  buildBoard(document.getElementById('board-checkout'),(id,num,type)=>coHit(id,num,type),(id,type,num)=>{
+    if(coState.remaining===50) return id==='B50';
+    if(coState.remaining<=40&&coState.remaining%2===0&&type==='D'&&num===coState.remaining/2) return true;
+    return false;
+  });
+}
+
+// ── GAME STATS ────────────────────────────────────────────────────────────────
+let gameStats={
+  x01:{gamesPlayed:0,gamesWon:0,totalDarts:0,totalPoints:0,checkoutAttempts:0,checkoutHits:0,tons:0,tonsPlus:0,eighties:0},
+  cricket:{gamesPlayed:0,gamesWon:0},
+  elimination:{gamesPlayed:0,gamesWon:0},
+  phoenix:{gamesPlayed:0,bestScore:0,lastScore:0},
+  splitscore:{gamesPlayed:0,bestScore:0,lastScore:0},
+  shanghai:{gamesPlayed:0,gamesWon:0},
+  atc:{gamesPlayed:0,gamesWon:0},
+  b27:{gamesPlayed:0,bestScore:0,lastScore:0},
+  checkout:{totalRounds:0,totalHits:0}
+};
+function saveStats(){localStorage.setItem('dartsV12_stats',JSON.stringify(gameStats));}
+function loadStats(){let d=localStorage.getItem('dartsV12_stats');if(d){let s=JSON.parse(d);Object.keys(gameStats).forEach(k=>{if(s[k])gameStats[k]=Object.assign(gameStats[k],s[k]);});}}
+
+load();loadStats();render();
+
+// ── BOT MODULE v1.0 ────────────────────────────────────────────────────────────
+// Shared difficulty: 'easy' | 'medium' | 'hard'
+// Kalibriert auf 3-Dart-Average: acc = (avg - 4) / 176
+// lv1=Ø20 lv2=Ø30 lv3=Ø40 lv4=Ø50 lv5=Ø60 lv6=Ø70 lv7=Ø78 lv8=Ø85 lv9=Ø92 lv10=Ø98 lv11=Ø105
+const BOT_ACC={lv1:0.09,lv2:0.15,lv3:0.20,lv4:0.26,lv5:0.32,lv6:0.37,lv7:0.42,lv8:0.46,lv9:0.50,lv10:0.53,lv11:0.57};
+let botDiff='lv6';
+
+function setBotDiff(d){
+  botDiff=d;
+  ['lv1','lv2','lv3','lv4','lv5','lv6','lv7','lv8','lv9','lv10','lv11'].forEach(x=>{
+    const cap=x.charAt(0).toUpperCase()+x.slice(1);
+    const el=document.getElementById('botDiff'+cap);if(el)el.classList.toggle('active',x===d);
+    const cel=document.getElementById('cricBotDiff'+cap);if(cel)cel.classList.toggle('active',x===d);
+  });
+}
+
+// Adjacent segments on the board (clockwise order)
+const BOT_ADJ={20:[1,5],1:[20,18],18:[1,4],4:[18,13],13:[4,6],6:[13,10],
+  10:[6,15],15:[10,2],2:[15,17],17:[2,3],3:[17,19],19:[3,7],7:[19,16],
+  16:[7,8],8:[16,11],11:[8,14],14:[11,9],9:[14,12],12:[9,5],5:[12,20]};
+
+function botAdjNum(n){const a=BOT_ADJ[n]||[20,1];return a[Math.floor(Math.random()*2)];}
+
+// Simulate a throw aimed at (num, mult). Returns {num, mult} of actual result.
+function botSimThrow(aimNum,aimMult){
+  if(Math.random()<BOT_ACC[botDiff]) return {num:aimNum,mult:aimMult};
+  if(Math.random()<0.45) return {num:botAdjNum(aimNum),mult:1};
+  return {num:0,mult:0}; // miss
+}
+
+function isBot(name){return name&&name.toLowerCase().trim()==='bot';}
+
+// ── X01 BOT ───────────────────────────────────────────────────────────────────
+let x01BotThinking=false;
+
+function x01BotCheck(){
+  if(x01State.botPlayer==null||x01State.turn!==x01State.botPlayer||x01BotThinking||x01State.gameOver) return;
+  x01BotThinking=true;
+  setTimeout(x01BotDart,700);
+}
+function x01BotDart(){
+  if(x01State.gameOver||!document.getElementById('x01').classList.contains('active')){x01BotThinking=false;return;}
+  if(x01State.botPlayer==null||x01State.turn!==x01State.botPlayer){x01BotThinking=false;return;}
+  const{num,mult}=x01BotPickAim();
+  const r=botSimThrow(num,mult);
+  const type=r.mult===3?'T':r.mult===2?'D':'S';
+  x01ProcessThrow(r.mult,r.num,r.mult*r.num,type);
+  if(!x01State.gameOver&&x01State.turn===x01State.botPlayer) setTimeout(x01BotDart,700);
+  else x01BotThinking=false;
+}
+function x01BotPickAim(){
+  const s=x01State.scores[x01State.botPlayer];
+  if(s===50) return{num:50,mult:1};
+  if(s<=40&&s>0&&s%2===0){
+    if(s===40) return{num:20,mult:2};
+    if(s===32) return{num:16,mult:2};
+    if(s===24) return{num:12,mult:2};
+    if(s===16) return{num:8,mult:2};
+    if(s===8)  return{num:4,mult:2};
+    return{num:s/2,mult:2};
+  }
+  if(s<=60) return{num:20,mult:1};
+  if(s<=100) return{num:19,mult:3};
+  return{num:20,mult:3};
+}
+
+// ── CRICKET BOT ───────────────────────────────────────────────────────────────
+let cricBotThinking=false;
+
+function cricBotCheck(){
+  if(cricState.botPlayer==null||cricState.turn!==cricState.botPlayer||cricBotThinking||cricState.gameOver) return;
+  cricBotThinking=true;
+  setTimeout(cricBotDart,700);
+}
+function cricBotDart(){
+  if(cricState.gameOver||!document.getElementById('cricket').classList.contains('active')){cricBotThinking=false;return;}
+  if(cricState.botPlayer==null||cricState.turn!==cricState.botPlayer){cricBotThinking=false;return;}
+  const{num,mult}=cricBotPickAim();
+  const r=botSimThrow(typeof num==='number'?num:25,mult);
+  if(r.num===0){
+    cricMiss();
+  } else {
+    const hitNum=(num==='B')?'B':r.num;
+    const hitMult=r.mult||1;
+    if(CRICKET_NUMS.includes(hitNum)){cricHitNum(hitNum,hitMult);}
+    else{cricLastState=JSON.parse(JSON.stringify(cricState));cricNextDart();}
+  }
+  if(!cricState.gameOver&&cricState.turn===cricState.botPlayer) setTimeout(cricBotDart,700);
+  else cricBotThinking=false;
+}
+function cricBotPickAim(){
+  const p=cricState.botPlayer;
+  // Close own open numbers first (highest value first)
+  for(const num of [20,19,18,17,16,15,'B']){
+    const i=num==='B'?6:CRICKET_NUMS.indexOf(num);
+    if(cricState.marks[p][i]<3) return{num,mult:3};
+  }
+  // All closed — try to score on any opponent-open number
+  const opp=p===0?1:0;
+  for(const num of [20,19,18,17,16,15,'B']){
+    const i=num==='B'?6:CRICKET_NUMS.indexOf(num);
+    if(cricState.marks[opp][i]<3) return{num,mult:1};
+  }
+  return{num:20,mult:3};
+}
+
+// ── ELIMINATION BOT ───────────────────────────────────────────────────────────
+let elimBotThinking=false;
+
+function elimBotCheck(){
+  if(elimState.gameOver||!isBot(elimState.names[elimState.turn])||elimBotThinking) return;
+  elimBotThinking=true;
+  setTimeout(elimBotDart,700);
+}
+function elimBotDart(){
+  if(elimState.gameOver||!document.getElementById('elimination').classList.contains('active')){elimBotThinking=false;return;}
+  if(!isBot(elimState.names[elimState.turn])){elimBotThinking=false;return;}
+  const r=botSimThrow(20,3);
+  if(r.num===0) elimNextDart();
+  else elimProcessHit(r.num*r.mult);
+  if(!elimState.gameOver&&isBot(elimState.names[elimState.turn])) setTimeout(elimBotDart,700);
+  else elimBotThinking=false;
+}
+
+// ── SHANGHAI BOT ──────────────────────────────────────────────────────────────
+let shanBotThinking=false;
+
+function shanBotCheck(){
+  if(shanState.gameOver||!isBot(shanState.names[shanState.turn])||shanBotThinking) return;
+  shanBotThinking=true;
+  setTimeout(shanBotDart,700);
+}
+function shanBotDart(){
+  if(shanState.gameOver||!document.getElementById('shanghai').classList.contains('active')){shanBotThinking=false;return;}
+  if(!isBot(shanState.names[shanState.turn])){shanBotThinking=false;return;}
+  const target=shanState.round;
+  // Rotate: try T on dart 0, D on dart 1, S on dart 2
+  const mults=[3,2,1];
+  const m=mults[shanState.dartCount%3];
+  const r=botSimThrow(target,m);
+  if(r.num===0){shanMiss();}
+  else if(r.num===target){
+    const type=r.mult===3?'T':r.mult===2?'D':'S';
+    shanHit(type+r.num,r.num,type);
+  } else {shanMiss();}
+  if(!shanState.gameOver&&isBot(shanState.names[shanState.turn])) setTimeout(shanBotDart,700);
+  else shanBotThinking=false;
+}
+
+// ── ONLINE MODULE ─────────────────────────────────────────────────────────────
+// Auto-detect: file:// → local dev, everything else → same origin (works on Render)
+const SERVER_URL = location.protocol === 'file:' ? 'http://localhost:3000' : location.origin;
+
+let onlineState={
+  active:false, roomId:null, playerIdx:null,
+  opponentName:null, myName:null, socket:null, gameMode:null
+};
+
+// ── Connection Setup ──────────────────────────────────────────────────────────
+function onlineOpen(){
+  document.getElementById('onlineModal').classList.add('active');
+}
+function onlineJoinOpen(){
+  document.getElementById('onlineModal').classList.remove('active');
+  document.getElementById('onlineJoinError').innerText='';
+  document.getElementById('onlineCodeInput').value='';
+  document.getElementById('onlineJoinModal').classList.add('active');
+}
+function onlineCancel(){
+  if(onlineState.socket){onlineState.socket.disconnect();onlineState.socket=null;}
+  Object.assign(onlineState,{active:false,roomId:null,playerIdx:null,opponentName:null,myName:null,gameMode:null});
+  ['onlineWaitModal','onlineReadyModal','onlineModal','onlineJoinModal'].forEach(id=>{
+    document.getElementById(id).classList.remove('active');
+  });
+  document.getElementById('onlineBar').style.display='none';
+}
+
+function getOnlineName(){
+  return document.getElementById('onlineName').value.trim()||'Spieler';
+}
+
+function ensureSocket(cb){
+  if(onlineState.socket&&onlineState.socket.connected){cb();return;}
+  if(onlineState.socket){onlineState.socket.disconnect();}
+  const sock=io(SERVER_URL,{transports:['websocket','polling']});
+  onlineState.socket=sock;
+  sock.on('connect',()=>cb());
+  sock.on('connect_error',()=>{
+    alert('Kein Server erreichbar. Ist der Server gestartet?\n\n'+SERVER_URL);
+    onlineCancel();
+  });
+  setupSocketListeners(sock);
+}
+
+function onlineCreate(){
+  const name=getOnlineName();
+  if(!name){alert('Bitte deinen Namen eingeben.');return;}
+  onlineState.myName=name;
+  document.getElementById('onlineModal').classList.remove('active');
+  ensureSocket(()=>{
+    onlineState.socket.emit('create_room',{playerName:name});
+  });
+}
+
+function onlineJoin(){
+  const code=document.getElementById('onlineCodeInput').value.trim().toUpperCase();
+  const name=getOnlineName()||document.getElementById('onlineName').value.trim()||'Spieler';
+  onlineState.myName=name;
+  if(code.length<5){document.getElementById('onlineJoinError').innerText='Bitte 5-stelligen Code eingeben.';return;}
+  document.getElementById('onlineJoinModal').classList.remove('active');
+  ensureSocket(()=>{
+    onlineState.socket.emit('join_room',{roomId:code,playerName:name});
+  });
+}
+
+// ── Socket Event Listeners ────────────────────────────────────────────────────
+function setupSocketListeners(sock){
+  sock.on('room_created',({roomId,playerIdx})=>{
+    onlineState.roomId=roomId;onlineState.playerIdx=playerIdx;
+    document.getElementById('onlineRoomCode').innerText=roomId;
+    document.getElementById('onlineWaitModal').classList.add('active');
+  });
+
+  sock.on('room_joined',({playerIdx,opponentName})=>{
+    onlineState.playerIdx=playerIdx;onlineState.opponentName=opponentName;
+    document.getElementById('onlineWaitModal').classList.remove('active');
+    // Player 1: wait for creator to pick game
+    const rm=document.getElementById('onlineReadyModal');
+    document.getElementById('onlineReadyTitle').innerText='Verbunden!';
+    document.getElementById('onlineReadyMsg').innerText='Verbunden mit '+opponentName+'\nWarte, '+opponentName+' wählt das Spiel…';
+    document.getElementById('onlineGamePicker').style.display='none';
+    rm.classList.add('active');
+  });
+
+  sock.on('opponent_joined',({opponentName})=>{
+    onlineState.opponentName=opponentName;
+    document.getElementById('onlineWaitModal').classList.remove('active');
+    // Player 0: pick game
+    const rm=document.getElementById('onlineReadyModal');
+    document.getElementById('onlineReadyTitle').innerText=opponentName+' ist da!';
+    document.getElementById('onlineReadyMsg').innerText='Verbunden mit '+opponentName;
+    document.getElementById('onlineGamePicker').style.display='block';
+    rm.classList.add('active');
+  });
+
+  sock.on('join_error',(msg)=>{
+    document.getElementById('onlineJoinModal').classList.add('active');
+    document.getElementById('onlineJoinError').innerText=msg;
+    onlineCancel();
+  });
+
+  sock.on('game_start',(config)=>{
+    // Received by player 1 (joiner)
+    document.getElementById('onlineReadyModal').classList.remove('active');
+    onlineState.active=true;onlineState.gameMode=config.mode;
+    startOnlineGame(config,false);
+  });
+
+  sock.on('game_action',(action)=>{
+    receiveOnlineAction(action);
+  });
+
+  sock.on('player_disconnected',({playerName})=>{
+    showGameEnd(playerName+' hat die Verbindung getrennt.','',()=>{onlineCancel();show('start');},()=>{onlineCancel();show('start');});
+    onlineCancel();
+  });
+}
+
+// ── Game Start ────────────────────────────────────────────────────────────────
+function onlinePickGame(mode,score){
+  // Player 0 (creator) picks game → start locally + send config to opponent
+  document.getElementById('onlineReadyModal').classList.remove('active');
+  onlineState.active=true;onlineState.gameMode=mode;
+
+  let config={mode};
+  const myName=onlineState.myName||'Spieler 1';
+  const oppName=onlineState.opponentName||'Spieler 2';
+
+  if(mode==='x01'){
+    config={mode,score,names:[myName,oppName],inMode:'single',outMode:'double'};
+  } else if(mode==='cricket'){
+    config={mode,names:[myName,oppName]};
+  } else if(mode==='elim'){
+    config={mode,goal:score||301,names:[myName,oppName]};
+  } else if(mode==='shanghai'){
+    config={mode,names:[myName,oppName]};
+  }
+
+  // Send to opponent (they are player 1)
+  onlineState.socket.emit('game_start',{roomId:onlineState.roomId,config});
+  startOnlineGame(config,true);
+}
+
+function startOnlineGame(config,isCreator){
+  // isCreator = playerIdx 0. Names[0] = creator, names[1] = joiner.
+  // But joiner sees it mirrored: they are playerIdx 1.
+  // Both see the same names array (creator first).
+  updateOnlineBar();
+  switch(config.mode){
+    case 'x01':
+      x01State.names=config.names;
+      x01State.botPlayer=null;
+      x01State.inMode=config.inMode||'single';
+      x01State.outMode=config.outMode||'double';
+      x01State.opened=x01State.inMode==='single'?[true,true]:[false,false];
+      x01Init(config.score);show('x01');
+      break;
+    case 'cricket':
+      cricState={marks:[[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]],scores:[0,0],names:config.names,turn:0,dartCount:0,botPlayer:null,gameOver:false};
+      cricBotThinking=false;
+      gameStats.cricket.gamesPlayed+=2;saveStats();
+      show('cricket');cricRender();
+      break;
+    case 'elim':
+      elimState={scores:[0,0],names:config.names,turn:0,dartCount:0,goal:config.goal||301,active:true,gameOver:false};
+      elimBotThinking=false;
+      show('elimination');elimRender();
+      break;
+    case 'shanghai':
+      shanState={names:config.names,scores:new Array(config.names.length).fill(0),turn:0,round:1,dartCount:0,roundHits:{S:false,D:false,T:false},active:true,gameOver:false};
+      shanBotThinking=false;
+      show('shanghai');shanRender();
+      break;
+  }
+}
+
+// ── Online Bar ────────────────────────────────────────────────────────────────
+function updateOnlineBar(){
+  if(!onlineState.active) return;
+  const bar=document.getElementById('onlineBar');
+  bar.style.display='flex';
+  document.getElementById('obOpponent').innerText='vs '+onlineState.opponentName;
+  updateOnlineTurnLabel();
+}
+function updateOnlineTurnLabel(){
+  if(!onlineState.active) return;
+  const el=document.getElementById('obTurn');
+  const myTurn=isMyOnlineTurn(onlineState.gameMode);
+  el.innerText=myTurn?'Dein Wurf':'Gegner wirft…';
+  const bar=document.getElementById('onlineBar');
+  bar.className='online-bar '+(myTurn?'myturn':'oppturn');
+}
+
+// ── Turn Guard ────────────────────────────────────────────────────────────────
+function isMyOnlineTurn(mode){
+  if(!onlineState.active) return true;
+  const pi=onlineState.playerIdx;
+  switch(mode){
+    case 'x01': return x01State.turn===pi;
+    case 'cricket': return cricState.turn===pi;
+    case 'elim': return elimState.turn===pi;
+    case 'shanghai': return shanState.turn===pi;
+  }
+  return true;
+}
+
+// ── Send & Receive ────────────────────────────────────────────────────────────
+function sendOnlineAction(action){
+  if(onlineState.active&&onlineState.socket){
+    onlineState.socket.emit('game_action',{roomId:onlineState.roomId,action});
+  }
+}
+
+function receiveOnlineAction(action){
+  switch(action.mode){
+    case 'x01':
+      if(action.fn==='throw') x01ProcessThrow(...action.args);
+      else if(action.fn==='miss') x01ProcessThrow(1,0,0,'S');
+      break;
+    case 'cricket':
+      if(action.fn==='hit') cricHitNum(...action.args);
+      else if(action.fn==='miss'){cricLastState=JSON.parse(JSON.stringify(cricState));flashFeedback(false);cricNextDart();}
+      break;
+    case 'elim':
+      if(action.fn==='hit') elimProcessHit(action.args[0]);
+      else if(action.fn==='miss'){elimLastState=JSON.parse(JSON.stringify(elimState));elimNextDart();}
+      break;
+    case 'shanghai':
+      if(action.fn==='hit') shanHit(...action.args);
+      else if(action.fn==='miss'){shanLastState=JSON.parse(JSON.stringify(shanState));flashFeedback(false);shanNextDart();}
+      break;
+  }
+  updateOnlineTurnLabel();
+}
+
+// ── Game End Modal (replaces confirm()) ───────────────────────────────────────
+function showGameEnd(title,msg,onYes,onNo){
+  const m=document.getElementById('gameEndModal');
+  document.getElementById('gameEndTitle').innerText=title;
+  document.getElementById('gameEndMsg').innerText=msg;
+  document.getElementById('gameEndYes').onclick=()=>{m.classList.remove('active');if(onYes)onYes();};
+  document.getElementById('gameEndNo').onclick=()=>{m.classList.remove('active');if(onNo)onNo();};
+  m.classList.add('active');
+}
+
+// ── ATC BOT ───────────────────────────────────────────────────────────────────
+let atcBotThinking=false;
+
+function atcBotCheck(){
+  if(atcState.gameOver||!isBot(atcState.names[atcState.turn])||atcBotThinking) return;
+  atcBotThinking=true;
+  setTimeout(atcBotDart,700);
+}
+function atcBotDart(){
+  if(atcState.gameOver||!document.getElementById('atc').classList.contains('active')){atcBotThinking=false;return;}
+  if(!isBot(atcState.names[atcState.turn])){atcBotThinking=false;return;}
+  const target=atcTargetFor(atcState.turn);
+  if(target==='Bull'){
+    const r=botSimThrow(25,1);
+    if(r.num===0){atcMiss();}else{atcHit('B25',25,'B');}
+  } else {
+    const r=botSimThrow(target,1);
+    if(r.num===0||r.num!==target){atcMiss();}
+    else{atcHit('S'+target,target,'S');}
+  }
+  if(!atcState.gameOver&&isBot(atcState.names[atcState.turn])) setTimeout(atcBotDart,700);
+  else atcBotThinking=false;
+}
+</script>
+</body>
+</html>
