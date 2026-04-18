@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Darts Trainer V12.8</title>
+<title>Darts Trainer V16.0.1</title>
 <style>
 body { margin:0; font-family:sans-serif; background:#111; color:#fff; text-align:center; overflow-y:auto; }
 .screen { display:none; padding:20px; padding-bottom:80px; }
@@ -85,8 +85,25 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .game-end-box { background:#1e293b; padding:28px 24px; border-radius:16px; max-width:300px; width:90%; text-align:center; }
 .game-end-box h2 { margin:0 0 8px; font-size:24px; color:#E8681A; }
 .game-end-box p { margin:0 0 20px; font-size:15px; color:#94a3b8; }
+/* V14 — Chat */
+.chat-overlay { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:360px; height:60vh; background:#1e293b; border-radius:16px 16px 0 0; display:flex; flex-direction:column; z-index:400; transition:transform 300ms ease; box-shadow:0 -4px 24px rgba(0,0,0,0.5); }
+.chat-overlay.hidden { transform:translateX(-50%) translateY(100%); }
+.chat-header { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #334155; flex-shrink:0; }
+.chat-messages { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; }
+.chat-msg { max-width:75%; padding:8px 12px; border-radius:12px; font-size:14px; line-height:1.4; word-break:break-word; }
+.chat-msg.mine { background:#E8681A; color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
+.chat-msg.theirs { background:#334155; color:#fff; align-self:flex-start; border-bottom-left-radius:4px; }
+.chat-msg .msg-name { font-size:10px; opacity:0.7; margin-bottom:2px; }
+.chat-input-row { display:flex; gap:8px; padding:10px 12px; border-top:1px solid #334155; flex-shrink:0; }
+.chat-text-input { flex:1; background:#0f172a; color:#fff; border:1px solid #334155; border-radius:8px; padding:8px 12px; font-size:15px; outline:none; }
+.chat-text-input:focus { border-color:#E8681A; }
+.chat-badge { background:#E8681A; color:#fff; border-radius:50%; font-size:9px; font-weight:bold; padding:1px 4px; margin-left:2px; display:none; vertical-align:super; line-height:1; }
+.comm-icons { display:flex; gap:4px; align-items:center; }
+.comm-btn { background:none; border:none; color:#94a3b8; font-size:18px; padding:4px 6px; cursor:pointer; min-height:auto; margin:0; line-height:1; border-radius:6px; }
+.comm-btn:active { background:#334155; }
+.comm-btn.active { color:#27ae60; }
 </style>
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<!-- socket.io wird dynamisch nachgeladen beim ersten Klick auf "Online spielen" -->
 </head>
 <body>
 
@@ -210,20 +227,32 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="botDiffCard" style="display:none;">
       <div style="font-size:12px; color:#64748b; margin-bottom:6px;">Schwierigkeit</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">
-        <button class="toggle-btn" id="botDiffLv1" onclick="setBotDiff('lv1')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Couch-Profi<br><span style="font-size:9px;opacity:0.7;">Ø 20</span></button>
-        <button class="toggle-btn" id="botDiffLv2" onclick="setBotDiff('lv2')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Kneipenhocker<br><span style="font-size:9px;opacity:0.7;">Ø 30</span></button>
-        <button class="toggle-btn" id="botDiffLv3" onclick="setBotDiff('lv3')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Gelegenheitstäter<br><span style="font-size:9px;opacity:0.7;">Ø 40</span></button>
-        <button class="toggle-btn" id="botDiffLv4" onclick="setBotDiff('lv4')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobby-Held<br><span style="font-size:9px;opacity:0.7;">Ø 50</span></button>
-        <button class="toggle-btn" id="botDiffLv5" onclick="setBotDiff('lv5')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsmitglied<br><span style="font-size:9px;opacity:0.7;">Ø 60</span></button>
-        <button class="toggle-btn" id="botDiffLv6" onclick="setBotDiff('lv6')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Amateur<br><span style="font-size:9px;opacity:0.7;">Ø 70</span></button>
-        <button class="toggle-btn" id="botDiffLv7" onclick="setBotDiff('lv7')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Liga-Kämpfer<br><span style="font-size:9px;opacity:0.7;">Ø 78</span></button>
-        <button class="toggle-btn" id="botDiffLv8" onclick="setBotDiff('lv8')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtisch-König<br><span style="font-size:9px;opacity:0.7;">Ø 85</span></button>
-        <button class="toggle-btn" id="botDiffLv9" onclick="setBotDiff('lv9')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Fast Profi<br><span style="font-size:9px;opacity:0.7;">Ø 92</span></button>
-        <button class="toggle-btn" id="botDiffLv10" onclick="setBotDiff('lv10')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Semi-Legende<br><span style="font-size:9px;opacity:0.7;">Ø 98</span></button>
-        <button class="toggle-btn" id="botDiffLv11" onclick="setBotDiff('lv11')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Phil Taylor<br><span style="font-size:9px;opacity:0.7;">Ø 105</span></button>
+        <button class="toggle-btn" id="botDiffLv1" onclick="setBotDiff('lv1')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Couch-Profi<br><span style="font-size:9px;opacity:0.7;">Ø 27</span></button>
+        <button class="toggle-btn" id="botDiffLv2" onclick="setBotDiff('lv2')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Gelegenheitstäter<br><span style="font-size:9px;opacity:0.7;">Ø 33</span></button>
+        <button class="toggle-btn" id="botDiffLv3" onclick="setBotDiff('lv3')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Kneipenhocker<br><span style="font-size:9px;opacity:0.7;">Ø 37</span></button>
+        <button class="toggle-btn" id="botDiffLv4" onclick="setBotDiff('lv4')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobbyist<br><span style="font-size:9px;opacity:0.7;">Ø 43</span></button>
+        <button class="toggle-btn" id="botDiffLv5" onclick="setBotDiff('lv5')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsmitglied<br><span style="font-size:9px;opacity:0.7;">Ø 47</span></button>
+        <button class="toggle-btn" id="botDiffLv6" onclick="setBotDiff('lv6')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtisch<br><span style="font-size:9px;opacity:0.7;">Ø 53</span></button>
+        <button class="toggle-btn" id="botDiffLv7" onclick="setBotDiff('lv7')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobby-Held<br><span style="font-size:9px;opacity:0.7;">Ø 57</span></button>
+        <button class="toggle-btn" id="botDiffLv8" onclick="setBotDiff('lv8')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsspieler<br><span style="font-size:9px;opacity:0.7;">Ø 63</span></button>
+        <button class="toggle-btn" id="botDiffLv9" onclick="setBotDiff('lv9')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtischkönig<br><span style="font-size:9px;opacity:0.7;">Ø 67</span></button>
+        <button class="toggle-btn" id="botDiffLv10" onclick="setBotDiff('lv10')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Liga-Kämpfer<br><span style="font-size:9px;opacity:0.7;">Ø 72</span></button>
+        <button class="toggle-btn" id="botDiffLv11" onclick="setBotDiff('lv11')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Amateurgoat<br><span style="font-size:9px;opacity:0.7;">Ø 79</span></button>
+        <button class="toggle-btn" id="botDiffLv12" onclick="setBotDiff('lv12')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Bundesliga<br><span style="font-size:9px;opacity:0.7;">Ø 85</span></button>
+        <button class="toggle-btn" id="botDiffLv13" onclick="setBotDiff('lv13')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Fast Profi<br><span style="font-size:9px;opacity:0.7;">Ø 88</span></button>
+        <button class="toggle-btn" id="botDiffLv14" onclick="setBotDiff('lv14')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Pro<br><span style="font-size:9px;opacity:0.7;">Ø 92</span></button>
+        <button class="toggle-btn" id="botDiffLv15" onclick="setBotDiff('lv15')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stabil Pro<br><span style="font-size:9px;opacity:0.7;">Ø 97</span></button>
+        <button class="toggle-btn" id="botDiffLv16" onclick="setBotDiff('lv16')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Weltklasse<br><span style="font-size:9px;opacity:0.7;">Ø 101</span></button>
+        <button class="toggle-btn" id="botDiffLv17" onclick="setBotDiff('lv17')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Elite<br><span style="font-size:9px;opacity:0.7;">Ø 107</span></button>
+        <button class="toggle-btn" id="botDiffLv18" onclick="setBotDiff('lv18')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Semi-Legende (MVG)<br><span style="font-size:9px;opacity:0.7;">Ø 111</span></button>
+        <button class="toggle-btn" id="botDiffLv19" onclick="setBotDiff('lv19')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Legende (Gary)<br><span style="font-size:9px;opacity:0.7;">Ø 117</span></button>
+        <button class="toggle-btn" id="botDiffLv20" onclick="setBotDiff('lv20')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Phil<br><span style="font-size:9px;opacity:0.7;">Ø 121</span></button>
+        <button class="toggle-btn" id="botDiffLv21" onclick="setBotDiff('lv21')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Peter<br><span style="font-size:9px;opacity:0.7;">Ø 123,53</span></button>
+        <button class="toggle-btn" id="botDiffLv22" onclick="setBotDiff('lv22')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">GOAT<br><span style="font-size:9px;opacity:0.7;">Ø 127,11</span></button>
       </div>
     </div>
   </div>
+  <button onclick="mfOpen()" class="mfOpenBtn" style="background:#334155;color:#fff;width:100%;max-width:320px;margin-bottom:4px;border-radius:12px;padding:12px;font-size:15px;">Format: Einzelleg</button>
   <button class="primary" id="x01StartBtn">Spiel starten</button>
   <button onclick="show('start')" style="background:#333;color:#fff;">Abbrechen</button>
 </div>
@@ -246,6 +275,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     </div>
     <div class="info-row" id="x01Turn">Spieler 1 ist dran</div>
     <div class="info-row" id="x01OutMode"></div>
+    <div id="matchBarX01" style="display:none;font-size:12px;color:#E8681A;margin:3px 0;"></div>
   </div>
   <div class="card" style="max-width:320px; margin:10px auto;">
     <svg id="board-x01" class="game-board" viewBox="0 0 200 200"></svg>
@@ -274,19 +304,31 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="cricBotDiffCard" style="display:none; margin-bottom:8px;">
       <div style="font-size:12px; color:#64748b; margin-bottom:6px;">Schwierigkeit</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">
-        <button class="toggle-btn" id="cricBotDiffLv1" onclick="setBotDiff('lv1')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Couch-Profi<br><span style="font-size:9px;opacity:0.7;">Ø 20</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv2" onclick="setBotDiff('lv2')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Kneipenhocker<br><span style="font-size:9px;opacity:0.7;">Ø 30</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv3" onclick="setBotDiff('lv3')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Gelegenheitstäter<br><span style="font-size:9px;opacity:0.7;">Ø 40</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv4" onclick="setBotDiff('lv4')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobby-Held<br><span style="font-size:9px;opacity:0.7;">Ø 50</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv5" onclick="setBotDiff('lv5')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsmitglied<br><span style="font-size:9px;opacity:0.7;">Ø 60</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv6" onclick="setBotDiff('lv6')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Amateur<br><span style="font-size:9px;opacity:0.7;">Ø 70</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv7" onclick="setBotDiff('lv7')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Liga-Kämpfer<br><span style="font-size:9px;opacity:0.7;">Ø 78</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv8" onclick="setBotDiff('lv8')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtisch-König<br><span style="font-size:9px;opacity:0.7;">Ø 85</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv9" onclick="setBotDiff('lv9')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Fast Profi<br><span style="font-size:9px;opacity:0.7;">Ø 92</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv10" onclick="setBotDiff('lv10')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Semi-Legende<br><span style="font-size:9px;opacity:0.7;">Ø 98</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv11" onclick="setBotDiff('lv11')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Phil Taylor<br><span style="font-size:9px;opacity:0.7;">Ø 105</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv1" onclick="setBotDiff('lv1')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Couch-Profi<br><span style="font-size:9px;opacity:0.7;">Ø 27</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv2" onclick="setBotDiff('lv2')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Gelegenheitstäter<br><span style="font-size:9px;opacity:0.7;">Ø 33</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv3" onclick="setBotDiff('lv3')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Kneipenhocker<br><span style="font-size:9px;opacity:0.7;">Ø 37</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv4" onclick="setBotDiff('lv4')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobbyist<br><span style="font-size:9px;opacity:0.7;">Ø 43</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv5" onclick="setBotDiff('lv5')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsmitglied<br><span style="font-size:9px;opacity:0.7;">Ø 47</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv6" onclick="setBotDiff('lv6')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtisch<br><span style="font-size:9px;opacity:0.7;">Ø 53</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv7" onclick="setBotDiff('lv7')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobby-Held<br><span style="font-size:9px;opacity:0.7;">Ø 57</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv8" onclick="setBotDiff('lv8')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsspieler<br><span style="font-size:9px;opacity:0.7;">Ø 63</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv9" onclick="setBotDiff('lv9')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtischkönig<br><span style="font-size:9px;opacity:0.7;">Ø 67</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv10" onclick="setBotDiff('lv10')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Liga-Kämpfer<br><span style="font-size:9px;opacity:0.7;">Ø 72</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv11" onclick="setBotDiff('lv11')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Amateurgoat<br><span style="font-size:9px;opacity:0.7;">Ø 79</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv12" onclick="setBotDiff('lv12')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Bundesliga<br><span style="font-size:9px;opacity:0.7;">Ø 85</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv13" onclick="setBotDiff('lv13')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Fast Profi<br><span style="font-size:9px;opacity:0.7;">Ø 88</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv14" onclick="setBotDiff('lv14')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Pro<br><span style="font-size:9px;opacity:0.7;">Ø 92</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv15" onclick="setBotDiff('lv15')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stabil Pro<br><span style="font-size:9px;opacity:0.7;">Ø 97</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv16" onclick="setBotDiff('lv16')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Weltklasse<br><span style="font-size:9px;opacity:0.7;">Ø 101</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv17" onclick="setBotDiff('lv17')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Elite<br><span style="font-size:9px;opacity:0.7;">Ø 107</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv18" onclick="setBotDiff('lv18')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Semi-Legende (MVG)<br><span style="font-size:9px;opacity:0.7;">Ø 111</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv19" onclick="setBotDiff('lv19')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Legende (Gary)<br><span style="font-size:9px;opacity:0.7;">Ø 117</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv20" onclick="setBotDiff('lv20')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Phil<br><span style="font-size:9px;opacity:0.7;">Ø 121</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv21" onclick="setBotDiff('lv21')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Peter<br><span style="font-size:9px;opacity:0.7;">Ø 123,53</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv22" onclick="setBotDiff('lv22')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">GOAT<br><span style="font-size:9px;opacity:0.7;">Ø 127,11</span></button>
       </div>
     </div>
+    <button onclick="mfOpen()" class="mfOpenBtn" style="background:#334155;color:#fff;width:100%;border-radius:12px;padding:12px;font-size:15px;margin-bottom:4px;">Format: Einzelleg</button>
     <button class="primary" onclick="cricketStart()">Starten</button>
     <button onclick="document.getElementById('cricketSetupModal').classList.remove('active')" style="background:#333;color:#fff;">Abbrechen</button>
   </div>
@@ -299,10 +341,11 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="cricP1Name" style="font-weight:bold; font-size:16px;"></div>
     <div id="cricP2Name" style="font-weight:bold; font-size:16px;"></div>
   </div>
-  <div style="display:flex; justify-content:space-between; max-width:320px; margin:0 auto 8px;">
+  <div style="display:flex; justify-content:space-between; max-width:320px; margin:0 auto 4px;">
     <div style="font-size:28px; font-weight:bold;" id="cricP1Score">0</div>
     <div style="font-size:28px; font-weight:bold;" id="cricP2Score">0</div>
   </div>
+  <div id="matchBarCric" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:320px;"></div>
   <div id="cricketBoard" class="cricket-board"></div>
   <div class="card" style="max-width:320px; margin:10px auto;">
     <div class="info-row" id="cricTurn"></div>
@@ -338,6 +381,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
       <button class="toggle-btn" id="elimGoal501" onclick="elimSetGoal(501)">501</button>
     </div>
   </div>
+  <button onclick="mfOpen()" class="mfOpenBtn" style="background:#334155;color:#fff;width:100%;max-width:320px;margin-bottom:4px;border-radius:12px;padding:12px;font-size:15px;">Format: Einzelleg</button>
   <button class="primary" onclick="eliminationStart()">Spiel starten</button>
   <button onclick="show('start')" style="background:#333;color:#fff;">Abbrechen</button>
 </div>
@@ -346,6 +390,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 <div id="elimination" class="screen">
   <h2>Elimination</h2>
   <div class="info-row" id="elimGoalDisplay" style="margin-bottom:4px;"></div>
+  <div id="matchBarElim" style="display:none;font-size:12px;color:#E8681A;margin:3px 0;"></div>
   <div class="elim-players" id="elimPlayers"></div>
   <div class="card" style="max-width:320px; margin:8px auto;">
     <div class="info-row" id="elimTurn"></div>
@@ -375,6 +420,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <input id="shanName4" class="input-name" type="text" placeholder="Spieler 4 (opt.)" maxlength="12">
     <input id="shanName5" class="input-name" type="text" placeholder="Spieler 5 (opt.)" maxlength="12">
     <input id="shanName6" class="input-name" type="text" placeholder="Spieler 6 (opt.)" maxlength="12">
+    <button onclick="mfOpen()" class="mfOpenBtn" style="background:#334155;color:#fff;width:100%;border-radius:12px;padding:12px;font-size:15px;margin-bottom:4px;">Format: Einzelleg</button>
     <button class="primary" onclick="shanghaiStart()">Starten</button>
     <button onclick="document.getElementById('shanghaiSetupModal').classList.remove('active')" style="background:#333;color:#fff;">Abbrechen</button>
   </div>
@@ -391,6 +437,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="shanShanghai" class="info-row" style="color:#27ae60;"></div>
   </div>
   <div class="elim-players" id="shanPlayers"></div>
+  <div id="matchBarShan" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:320px;"></div>
   <div class="card" style="max-width:320px; margin:8px auto;">
     <svg id="board-shanghai" class="game-board" viewBox="0 0 200 200"></svg>
     <div style="display:flex; gap:8px; margin-top:6px;">
@@ -428,6 +475,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
       <button class="toggle-btn" id="atcBullNo" onclick="atcSetBull(false)">Nein</button>
     </div>
   </div>
+  <button onclick="mfOpen()" class="mfOpenBtn" style="background:#334155;color:#fff;width:100%;max-width:320px;margin-bottom:4px;border-radius:12px;padding:12px;font-size:15px;">Format: Einzelleg</button>
   <button class="primary" onclick="atcStart()">Spiel starten</button>
   <button onclick="show('start')" style="background:#333;color:#fff;">Abbrechen</button>
 </div>
@@ -437,6 +485,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <h2>Around the Clock</h2>
   <div class="round-indicator" id="atcDots"></div>
   <div id="atcPlayers" style="max-width:360px; margin:8px auto;"></div>
+  <div id="matchBarAtc" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:360px;"></div>
   <div class="card" style="max-width:320px; margin:8px auto;">
     <div id="atcTurn" class="info-row"></div>
     <div id="atcDart" class="info-row"></div>
@@ -551,7 +600,28 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <span class="ob-status" id="obStatus">●  Online</span>
   <span id="obOpponent"></span>
   <span class="ob-turn" id="obTurn"></span>
+  <div class="comm-icons">
+    <button class="comm-btn" id="voiceBtn" onclick="voiceToggle()" title="Mikrofon an">🎤</button>
+    <button class="comm-btn" onclick="chatToggle()" title="Chat">💬<span class="chat-badge" id="chatBadge"></span></button>
+  </div>
 </div>
+
+<!-- CHAT OVERLAY (V14) -->
+<div id="chatOverlay" class="chat-overlay hidden">
+  <div class="chat-header">
+    <span style="font-weight:bold;font-size:15px;">Chat</span>
+    <span id="chatOpponentName" style="font-size:12px;color:#64748b;"></span>
+    <button onclick="chatClose()" style="background:none;border:none;color:#94a3b8;font-size:22px;cursor:pointer;padding:4px;min-height:auto;margin:0;line-height:1;">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input-row">
+    <input class="chat-text-input" id="chatInput" type="text" placeholder="Nachricht…" maxlength="200" onkeydown="if(event.key==='Enter')chatSend()">
+    <button class="primary" onclick="chatSend()" style="padding:8px 16px;font-size:15px;min-height:auto;margin:0;border-radius:8px;">Senden</button>
+  </div>
+</div>
+
+<!-- Audio-Element für WebRTC Remote-Stream (V15) -->
+<audio id="remoteAudio" autoplay></audio>
 
 <!-- GAME END MODAL (replaces confirm() dialogs) -->
 <div id="gameEndModal" class="game-end-modal">
@@ -562,6 +632,48 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
       <button class="primary" id="gameEndYes" style="flex:1;">Nochmal</button>
       <button id="gameEndNo" style="flex:1;background:#334155;color:#fff;border-radius:12px;padding:15px;font-size:18px;">Beenden</button>
     </div>
+  </div>
+</div>
+
+<!-- LEG WON MODAL -->
+<div id="legWonModal" class="game-end-modal">
+  <div class="game-end-box">
+    <h2 id="legWonTitle" style="font-size:19px;margin:0 0 6px;">Leg gewonnen!</h2>
+    <p id="legWonMsg" style="white-space:pre-line;margin:0 0 16px;font-size:14px;color:#94a3b8;"></p>
+    <button class="primary" id="legWonNextBtn" style="width:100%;">Weiter →</button>
+    <button id="legWonEndBtn" style="width:100%;margin-top:8px;background:#334155;color:#fff;border-radius:12px;padding:15px;font-size:18px;">Beenden</button>
+  </div>
+</div>
+
+<!-- MATCH FORMAT MODAL -->
+<div id="matchFmtModal" class="modal">
+  <div class="modal-box">
+    <h3 style="margin:0 0 12px;">Spielformat</h3>
+    <div style="display:flex; gap:6px; margin-bottom:14px;">
+      <button class="toggle-btn" id="mfBtnSingle" onclick="mfSetMode('single')" style="font-size:12px;min-height:38px;">Einzelleg</button>
+      <button class="toggle-btn" id="mfBtnLegs" onclick="mfSetMode('legs')" style="font-size:12px;min-height:38px;">Legs</button>
+      <button class="toggle-btn" id="mfBtnSets" onclick="mfSetMode('sets')" style="font-size:12px;min-height:38px;">Sets</button>
+    </div>
+    <div id="mfLegsRow" style="display:none; margin-bottom:14px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <span id="mfLegsLabel" style="font-size:13px; color:#64748b;">Legs</span>
+        <button id="mfDisplayBtn" onclick="mfToggleDisplay()" style="font-size:11px; color:#E8681A; background:#0f172a; border:1px solid #334155; border-radius:6px; padding:4px 10px; cursor:pointer; min-height:auto;">Best of ⇄ First to</button>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; justify-content:center;">
+        <button onclick="mfLegsDown()" style="background:#0f172a;color:#fff;border:1px solid #334155;border-radius:8px;font-size:22px;min-width:48px;min-height:48px;cursor:pointer;padding:0;">−</button>
+        <div id="mfLegsVal" style="font-size:20px; font-weight:bold; min-width:130px; text-align:center;">Best of 3</div>
+        <button onclick="mfLegsUp()" style="background:#0f172a;color:#fff;border:1px solid #334155;border-radius:8px;font-size:22px;min-width:48px;min-height:48px;cursor:pointer;padding:0;">+</button>
+      </div>
+    </div>
+    <div id="mfSetsRow" style="display:none; margin-bottom:14px;">
+      <div style="font-size:13px; color:#64748b; margin-bottom:8px;">Sätze gewinnen (First to)</div>
+      <div style="display:flex; align-items:center; gap:12px; justify-content:center;">
+        <button onclick="mfSetsDown()" style="background:#0f172a;color:#fff;border:1px solid #334155;border-radius:8px;font-size:22px;min-width:48px;min-height:48px;cursor:pointer;padding:0;">−</button>
+        <div id="mfSetsVal" style="font-size:20px; font-weight:bold; min-width:80px; text-align:center;">3 Sätze</div>
+        <button onclick="mfSetsUp()" style="background:#0f172a;color:#fff;border:1px solid #334155;border-radius:8px;font-size:22px;min-width:48px;min-height:48px;cursor:pointer;padding:0;">+</button>
+      </div>
+    </div>
+    <button class="primary" onclick="mfClose()" style="width:100%;">OK</button>
   </div>
 </div>
 
@@ -629,6 +741,27 @@ function pointsForId(boardId){
   if(t==='D') return n*2;
   if(t==='T') return n*3;
   return n;
+}
+// Entscheidet, ob ein Sieg als "meiner" gewertet wird (fuer gamesWon-Stats).
+// Verwendet von X01, Cricket, Elimination, Shanghai.
+function isMyWin(winnerIdx, gstate){
+  // Online-Modus: nur wenn ich der Gewinner bin
+  if(typeof onlineState!=='undefined' && onlineState.active){
+    return winnerIdx === onlineState.playerIdx;
+  }
+  // Bot-Spiel (X01, Cricket): botPlayer ist gesetzt - Bot-Sieg zaehlt nicht
+  if(gstate && gstate.botPlayer!==null && gstate.botPlayer!==undefined){
+    return winnerIdx !== gstate.botPlayer;
+  }
+  // Elim/Shanghai: Bot wird ueber Namen erkannt
+  if(gstate && gstate.names && gstate.names.length>0){
+    const winnerName = gstate.names[winnerIdx];
+    if(typeof isBot==='function' && isBot(winnerName)) return false;
+    // Irgendein Bot unter den Spielern? Dann zaehlt jeder Nicht-Bot-Sieg als "meiner"
+    if(typeof isBot==='function' && gstate.names.some(n=>isBot(n))) return true;
+  }
+  // Reines Hotseat (2+ Menschen, kein Bot): P1 = ich
+  return winnerIdx === 0;
 }
 function flashFeedback(isHit){
   const f=document.getElementById('flash');
@@ -1016,7 +1149,7 @@ function phoenixRender(){
 }
 
 // ── X01 ────────────────────────────────────────────────────────────────────────
-let x01State={scores:[501,501],names:['Spieler 1','Spieler 2'],turn:0,startScore:501,dartCount:0,log:[],outMode:'double',inMode:'single',opened:[true,true],currentTurnPoints:0,currentTurnDarts:0,botPlayer:null,gameOver:false};
+let x01State={scores:[501,501],names:['Spieler 1','Spieler 2'],turn:0,startScore:501,dartCount:0,log:[],outMode:'double',inMode:'single',opened:[true,true],currentTurnPoints:0,currentTurnDarts:0,botPlayer:null,gameOver:false,turnHadCheckoutChance:false};
 let x01LastState=null;
 
 function x01SetIn(mode){
@@ -1054,6 +1187,7 @@ function x01Setup(startScore){
     let n2=x01BotEnabled?'Bot':(document.getElementById('nameP2').value.trim()||'Spieler 2');
     x01State.names=[n1,n2];
     x01State.botPlayer=x01BotEnabled?1:null;
+    matchInit();
     x01Init(startScore);show('x01');
   };
   show('x01Setup');
@@ -1070,7 +1204,15 @@ function x01Init(startScore){
   x01State.opened=x01State.inMode==='single'?[true,true]:[false,false];
   x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
   x01State.gameOver=false;x01BotThinking=false;
+  x01State.turnHadCheckoutChance=false;
+  x01UpdateCheckoutChance();
   x01Render();
+}
+// Setzt turnHadCheckoutChance basierend auf aktuellem Turn-Start.
+// Muss nach jedem Turn-Wechsel aufgerufen werden.
+function x01UpdateCheckoutChance(){
+  const p=x01State.turn;
+  x01State.turnHadCheckoutChance = (x01State.outMode!=='single' && x01State.scores[p]<=170 && x01State.scores[p]>0);
 }
 function x01Render(){
   document.getElementById('x01Title').innerText=x01State.startScore;
@@ -1090,6 +1232,7 @@ function x01Render(){
   }
   let logEl=document.getElementById('x01Log');
   if(logEl) logEl.innerHTML=x01State.log.slice(0,5).map(l=>'<div>'+l+'</div>').join('');
+  matchScoreRender('matchBarX01',x01State.names);
   x01DrawBoard();
 }
 function x01DrawBoard(){
@@ -1142,9 +1285,13 @@ function x01ProcessThrow(mult,num,points,type){
       flashFeedback(false);
       x01State.dartCount++;x01State.currentTurnDarts++;
       if(x01State.dartCount>=3){
+        if(x01State.outMode!=='single' && x01State.turnHadCheckoutChance){
+          gameStats.x01.checkoutAttempts++;
+        }
         x01RecordTurn();
         x01State.dartCount=0;x01State.turn=x01State.turn===0?1:0;
         x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
+        x01UpdateCheckoutChance();
       }
       x01Render();return;
     }
@@ -1163,9 +1310,13 @@ function x01ProcessThrow(mult,num,points,type){
     x01State.log.unshift(x01State.names[player]+': BUST (bleibt bei '+current+')');
     x01State.dartCount++;x01State.currentTurnDarts++;
     if(x01State.dartCount>=3){
+      if(x01State.outMode!=='single' && x01State.turnHadCheckoutChance){
+        gameStats.x01.checkoutAttempts++;
+      }
       x01RecordTurn();
       x01State.dartCount=0;x01State.turn=x01State.turn===0?1:0;
       x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
+      x01UpdateCheckoutChance();
     }
     x01Render();return;
   }
@@ -1181,36 +1332,36 @@ function x01ProcessThrow(mult,num,points,type){
   }
 
   if(newScore===0){
-    // Win: track checkout
-    if(x01State.outMode!=='single'){
+    // Win: track checkout (nur 1x pro Turn, nur wenn Checkout-Chance bestand)
+    if(x01State.outMode!=='single' && x01State.turnHadCheckoutChance){
       gameStats.x01.checkoutAttempts++;
       gameStats.x01.checkoutHits++;
     }
     gameStats.x01.gamesPlayed++;
-    gameStats.x01.gamesWon++;
+    if(isMyWin(player,x01State)) gameStats.x01.gamesWon++;
     gameStats.x01.totalPoints+=x01State.currentTurnPoints;
     gameStats.x01.totalDarts+=x01State.currentTurnDarts;
     saveStats();
     x01State.log.unshift(x01State.names[player]+' GEWINNT!');
     x01State.gameOver=true;x01BotThinking=false;
     x01Render();
-    showGameEnd(x01State.names[player]+' gewinnt!','',
-      ()=>{if(onlineState.active)onlineCancel();x01Init(x01State.startScore);show('x01');},
-      ()=>{if(onlineState.active)onlineCancel();show('start');}
-    );
+    matchLegWon(player,{
+      names:x01State.names,
+      nextLeg:()=>{if(onlineState.active)onlineCancel();x01Init(x01State.startScore);}
+    });
     return;
   }
 
-  // Track checkout attempts (last dart before 170+)
-  if(x01State.outMode!=='single'&&newScore<=170){
-    gameStats.x01.checkoutAttempts++;
-  }
 
   x01State.dartCount++;
   if(x01State.dartCount>=3){
+    if(x01State.outMode!=='single' && x01State.turnHadCheckoutChance){
+      gameStats.x01.checkoutAttempts++;
+    }
     x01RecordTurn();
     x01State.dartCount=0;x01State.turn=x01State.turn===0?1:0;
     x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
+    x01UpdateCheckoutChance();
   }
   x01Render();
 }
@@ -1257,8 +1408,7 @@ function cricketStart(){
   document.getElementById('cricketSetupModal').classList.remove('active');
   cricState={marks:[[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]],scores:[0,0],names:[n1,n2],turn:0,dartCount:0,botPlayer:cricBotEnabled?1:null,gameOver:false};
   cricBotThinking=false;
-  gameStats.cricket.gamesPlayed+=2;
-  saveStats();
+  matchInit();
   show('cricket');cricRender();
 }
 function cricHitNum(num,mult,fromOnline){
@@ -1298,15 +1448,22 @@ function cricNextDart(){
 function cricCheckWin(){
   for(let p=0;p<2;p++){
     if(cricState.marks[p].every(m=>m>=3)&&cricState.scores[p]>=cricState.scores[p===0?1:0]){
-      gameStats.cricket.gamesWon++;
+      gameStats.cricket.gamesPlayed++;
+      if(isMyWin(p,cricState)) gameStats.cricket.gamesWon++;
       saveStats();
       cricState.gameOver=true;cricBotThinking=false;
       setTimeout(()=>{
-        showGameEnd(cricState.names[p]+' gewinnt!','',
-          ()=>{if(onlineState.active)onlineCancel();cricketSetup();},
-          ()=>{if(onlineState.active)onlineCancel();show('start');}
-        );
+        matchLegWon(p,{
+          names:cricState.names,
+          nextLeg:()=>{
+            if(onlineState.active)onlineCancel();
+            const bot=cricState.botPlayer;const names=[...cricState.names];
+            cricState={marks:[[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]],scores:[0,0],names,turn:0,dartCount:0,botPlayer:bot,gameOver:false};
+            cricBotThinking=false;cricRender();
+          }
+        });
       },100);
+      return;
     }
   }
 }
@@ -1332,6 +1489,7 @@ function cricRender(){
   },(id,type,num)=>{
     return CRICKET_NUMS.includes(num)||(id==='B25'||id==='B50');
   });
+  matchScoreRender('matchBarCric',cricState.names);
   cricBotCheck();
 }
 
@@ -1350,6 +1508,7 @@ function eliminationStart(){
   for(let i=1;i<=6;i++){let v=document.getElementById('elimName'+i).value.trim();if(v)names.push(v);}
   if(names.length<2){alert('Mindestens 2 Spieler!');return;}
   elimState={scores:new Array(names.length).fill(0),names:names,turn:0,dartCount:0,goal:elimGoalVal,active:true,gameOver:false};elimBotThinking=false;
+  matchInit();
   show('elimination');elimRender();
 }
 function elimBullHit(pts,fromOnline){
@@ -1381,15 +1540,20 @@ function elimProcessHit(points){
   }
   if(elimState.scores[p]>=elimState.goal){
     gameStats.elimination.gamesPlayed++;
-    gameStats.elimination.gamesWon++;
+    if(isMyWin(p,elimState)) gameStats.elimination.gamesWon++;
     saveStats();
     elimState.gameOver=true;elimBotThinking=false;
     elimRender();
     setTimeout(()=>{
-      showGameEnd(elimState.names[p]+' gewinnt!','Score: '+elimState.scores[p],
-        ()=>{if(onlineState.active)onlineCancel();eliminationSetup();},
-        ()=>{if(onlineState.active)onlineCancel();show('start');}
-      );
+      matchLegWon(p,{
+        names:elimState.names,
+        nextLeg:()=>{
+          if(onlineState.active)onlineCancel();
+          const names=[...elimState.names];const goal=elimState.goal;
+          elimState={scores:new Array(names.length).fill(0),names,turn:0,dartCount:0,goal,active:true,gameOver:false};
+          elimBotThinking=false;elimRender();
+        }
+      });
     },100);return;
   }
   flashFeedback(true);elimNextDart();
@@ -1419,6 +1583,7 @@ function elimRender(){
     elimProcessHit(pts);
     updateOnlineTurnLabel();
   },null);
+  matchScoreRender('matchBarElim',elimState.names);
   elimBotCheck();
 }
 
@@ -1433,6 +1598,7 @@ function shanghaiStart(){
   if(names.length<2){alert('Mindestens 2 Spieler!');return;}
   document.getElementById('shanghaiSetupModal').classList.remove('active');
   shanState={names:names,scores:new Array(names.length).fill(0),turn:0,round:1,dartCount:0,roundHits:{S:false,D:false,T:false},active:true,gameOver:false};shanBotThinking=false;
+  matchInit();
   show('shanghai');shanRender();
 }
 function shanHit(id,num,type,fromOnline){
@@ -1455,15 +1621,21 @@ function shanHit(id,num,type,fromOnline){
   // Shanghai check: S + D + T all hit this round
   if(shanState.roundHits.S&&shanState.roundHits.D&&shanState.roundHits.T){
     gameStats.shanghai.gamesPlayed++;
-    gameStats.shanghai.gamesWon++;
+    if(isMyWin(shanState.turn,shanState)) gameStats.shanghai.gamesWon++;
     saveStats();
     shanState.dartCount++;shanState.gameOver=true;shanBotThinking=false;
     shanRender();
     setTimeout(()=>{
-      showGameEnd('SHANGHAI!',shanState.names[shanState.turn]+' — Sofortiger Sieg!',
-        ()=>{if(onlineState.active)onlineCancel();show('start');},
-        ()=>{if(onlineState.active)onlineCancel();show('start');}
-      );
+      const w=shanState.turn;const wName=shanState.names[w];
+      matchLegWon(w,{
+        names:shanState.names,
+        nextLeg:()=>{
+          if(onlineState.active)onlineCancel();
+          const names=[...shanState.names];
+          shanState={names,scores:new Array(names.length).fill(0),turn:0,round:1,dartCount:0,roundHits:{S:false,D:false,T:false},active:true,gameOver:false};
+          shanBotThinking=false;shanRender();
+        }
+      });
     },100);return;
   }
   shanNextDart();
@@ -1494,16 +1666,30 @@ function shanNextDart(){
         // Game end — highest score wins
         let maxScore=Math.max(...shanState.scores);
         let winners=shanState.names.filter((_,i)=>shanState.scores[i]===maxScore);
+        const shanWinnerIdx=shanState.scores.indexOf(maxScore);
         gameStats.shanghai.gamesPlayed++;
-        if(winners.length===1) gameStats.shanghai.gamesWon++;
+        if(winners.length===1 && isMyWin(shanWinnerIdx,shanState)) gameStats.shanghai.gamesWon++;
         saveStats();
         shanState.gameOver=true;shanBotThinking=false;
         shanRender();
         setTimeout(()=>{
-          showGameEnd('Spielende!','Sieger: '+winners.join(', ')+' ('+maxScore+' Pkt)',
-            ()=>{if(onlineState.active)onlineCancel();show('start');},
-            ()=>{if(onlineState.active)onlineCancel();show('start');}
-          );
+          const winnerIdx=shanState.scores.indexOf(maxScore);
+          if(winners.length===1&&winnerIdx>=0){
+            matchLegWon(winnerIdx,{
+              names:shanState.names,
+              nextLeg:()=>{
+                if(onlineState.active)onlineCancel();
+                const names=[...shanState.names];
+                shanState={names,scores:new Array(names.length).fill(0),turn:0,round:1,dartCount:0,roundHits:{S:false,D:false,T:false},active:true,gameOver:false};
+                shanBotThinking=false;shanRender();
+              }
+            });
+          } else {
+            showGameEnd('Spielende!','Sieger: '+winners.join(', ')+' ('+maxScore+' Pkt)',
+              ()=>{if(onlineState.active)onlineCancel();show('start');},
+              ()=>{if(onlineState.active)onlineCancel();show('start');}
+            );
+          }
         },100);return;
       }
     }
@@ -1542,6 +1728,7 @@ function shanRender(){
   buildBoard(document.getElementById('board-shanghai'),(id,num,type)=>shanHit(id,num,type),(id,type,num)=>{
     return num===shanState.round;
   });
+  matchScoreRender('matchBarShan',shanState.names);
   shanBotCheck();
 }
 
@@ -1569,6 +1756,7 @@ function atcStart(){
   if(names.length<1){alert('Mindestens 1 Spieler!');return;}
   atcState={names:names,progress:new Array(names.length).fill(0),turn:0,dartCount:0,
     variant:atcState.variant,includeBull:atcState.includeBull,active:true,gameOver:false};atcBotThinking=false;
+  matchInit();
   show('atc');atcRender();
 }
 function atcTargetFor(playerIdx){
@@ -1598,8 +1786,15 @@ function atcHit(id,num,type){
       atcState.gameOver=true;atcBotThinking=false;
       atcRender();
       setTimeout(()=>{
-        alert(atcState.names[atcState.turn]+' gewinnt! Alle Felder getroffen!');
-        show('start');
+        const w=atcState.turn;
+        matchLegWon(w,{
+          names:atcState.names,
+          nextLeg:()=>{
+            const names=[...atcState.names];const v=atcState.variant;const b=atcState.includeBull;
+            atcState={names,progress:new Array(names.length).fill(0),turn:0,dartCount:0,variant:v,includeBull:b,active:true,gameOver:false};
+            atcBotThinking=false;atcRender();
+          }
+        });
       },100);return;
     }
   }
@@ -1653,6 +1848,7 @@ function atcRender(){
     if(atcState.variant==='triple') return id==='T'+target;
     return false;
   });
+  matchScoreRender('matchBarAtc',atcState.names);
   atcBotCheck();
 }
 
@@ -1879,18 +2075,35 @@ let gameStats={
 function saveStats(){localStorage.setItem('dartsV12_stats',JSON.stringify(gameStats));}
 function loadStats(){let d=localStorage.getItem('dartsV12_stats');if(d){let s=JSON.parse(d);Object.keys(gameStats).forEach(k=>{if(s[k])gameStats[k]=Object.assign(gameStats[k],s[k]);});}}
 
+// ── MATCH FORMAT v1.0 ─────────────────────────────────────────────────────────
+// legsFirstTo: Anzahl Legs die ein Satz/Match gewinnt. 1-27 (= Best of 1-53)
+// setsFirstTo: Anzahl Sätze die ein Match gewinnt. 1-11
+// (V16.0.1: vorgezogen, damit mfSetMode('single') beim Init nicht in TDZ läuft)
+
+let matchConfig={
+  mode:'single',       // 'single' | 'legs' | 'sets'
+  legsFirstTo:2,       // First to X Legs (Default BO3=FT2)
+  setsFirstTo:3,       // First to X Sätze
+  displayAs:'bestof'   // 'bestof' | 'firstto'
+};
+let matchState={
+  legsWon:[0,0],
+  setsWon:[0,0]
+};
+
 load();loadStats();render();
+mfSetMode('single');
 
 // ── BOT MODULE v1.0 ────────────────────────────────────────────────────────────
 // Shared difficulty: 'easy' | 'medium' | 'hard'
 // Kalibriert auf 3-Dart-Average: acc = (avg - 4) / 176
 // lv1=Ø20 lv2=Ø30 lv3=Ø40 lv4=Ø50 lv5=Ø60 lv6=Ø70 lv7=Ø78 lv8=Ø85 lv9=Ø92 lv10=Ø98 lv11=Ø105
-const BOT_ACC={lv1:0.09,lv2:0.15,lv3:0.20,lv4:0.26,lv5:0.32,lv6:0.37,lv7:0.42,lv8:0.46,lv9:0.50,lv10:0.53,lv11:0.57};
+const BOT_ACC={lv1:0.1307,lv2:0.1648,lv3:0.1875,lv4:0.2216,lv5:0.2443,lv6:0.2784,lv7:0.3011,lv8:0.3352,lv9:0.358,lv10:0.3864,lv11:0.4261,lv12:0.4602,lv13:0.4773,lv14:0.5,lv15:0.5284,lv16:0.5511,lv17:0.5852,lv18:0.608,lv19:0.642,lv20:0.6648,lv21:0.6791,lv22:0.6995};
 let botDiff='lv6';
 
 function setBotDiff(d){
   botDiff=d;
-  ['lv1','lv2','lv3','lv4','lv5','lv6','lv7','lv8','lv9','lv10','lv11'].forEach(x=>{
+  ['lv1','lv2','lv3','lv4','lv5','lv6','lv7','lv8','lv9','lv10','lv11','lv12','lv13','lv14','lv15','lv16','lv17','lv18','lv19','lv20','lv21','lv22'].forEach(x=>{
     const cap=x.charAt(0).toUpperCase()+x.slice(1);
     const el=document.getElementById('botDiff'+cap);if(el)el.classList.toggle('active',x===d);
     const cel=document.getElementById('cricBotDiff'+cap);if(cel)cel.classList.toggle('active',x===d);
@@ -2030,9 +2243,215 @@ function shanBotDart(){
   else shanBotThinking=false;
 }
 
+// ── CHAT (V14) ────────────────────────────────────────────────────────────────
+let chatState={open:false,unread:0};
+
+function chatToggle(){chatState.open?chatClose():chatOpen();}
+
+function chatOpen(){
+  chatState.open=true;
+  chatState.unread=0;
+  chatBadgeUpdate();
+  const overlay=document.getElementById('chatOverlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('chatOpponentName').innerText=onlineState.opponentName?'mit '+onlineState.opponentName:'';
+  setTimeout(()=>document.getElementById('chatInput').focus(),320);
+  const msgs=document.getElementById('chatMessages');
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function chatClose(){
+  chatState.open=false;
+  document.getElementById('chatOverlay').classList.add('hidden');
+}
+
+function chatSend(){
+  const input=document.getElementById('chatInput');
+  const text=input.value.trim();
+  if(!text||!onlineState.socket||!onlineState.active) return;
+  onlineState.socket.emit('chat_message',{roomId:onlineState.roomId,text,playerName:onlineState.myName});
+  chatAddMessage(text,onlineState.myName,true);
+  input.value='';
+}
+
+function chatAddMessage(text,name,isMine){
+  const container=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  div.className='chat-msg '+(isMine?'mine':'theirs');
+  div.innerHTML=(isMine?'':'<div class="msg-name">'+name+'</div>')+escapeHtml(text);
+  container.appendChild(div);
+  container.scrollTop=container.scrollHeight;
+  if(!isMine&&!chatState.open){
+    chatState.unread++;
+    chatBadgeUpdate();
+  }
+}
+
+function chatBadgeUpdate(){
+  const badge=document.getElementById('chatBadge');
+  if(!badge) return;
+  if(chatState.unread>0){badge.style.display='inline';badge.innerText=chatState.unread>9?'9+':chatState.unread;}
+  else{badge.style.display='none';}
+}
+
+function chatReset(){
+  chatState={open:false,unread:0};
+  const msgs=document.getElementById('chatMessages');
+  if(msgs) msgs.innerHTML='';
+  document.getElementById('chatOverlay').classList.add('hidden');
+  chatBadgeUpdate();
+}
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── WebRTC + Voice (V15) ──────────────────────────────────────────────────────
+const RTC_CONFIG={iceServers:[{urls:'stun:stun.l.google.com:19302'}]};
+let rtcPeer=null;
+
+function rtcInit(){
+  if(rtcPeer){rtcPeer.close();rtcPeer=null;}
+  rtcPeer=new RTCPeerConnection(RTC_CONFIG);
+  rtcPeer.onicecandidate=({candidate})=>{
+    if(candidate&&onlineState.socket&&onlineState.roomId){
+      onlineState.socket.emit('rtc_ice',{roomId:onlineState.roomId,candidate});
+    }
+  };
+  rtcPeer.onconnectionstatechange=()=>{
+    console.log('[WebRTC] connectionState:',rtcPeer.connectionState);
+  };
+  // V15 — Audio-Track vom Gegenüber empfangen
+  rtcPeer.ontrack=({streams})=>{
+    const audio=document.getElementById('remoteAudio');
+    if(audio&&streams[0]) audio.srcObject=streams[0];
+    console.log('[WebRTC] Remote-Audio-Track empfangen');
+  };
+}
+
+function rtcCreateOffer(){
+  if(!rtcPeer) rtcInit();
+  rtcPeer.createOffer()
+    .then(offer=>rtcPeer.setLocalDescription(offer))
+    .then(()=>{
+      onlineState.socket.emit('rtc_offer',{roomId:onlineState.roomId,sdp:rtcPeer.localDescription});
+    })
+    .catch(err=>console.warn('[WebRTC] offer error:',err));
+}
+
+function rtcHandleOffer(sdp){
+  if(!rtcPeer) rtcInit();
+  rtcPeer.setRemoteDescription(new RTCSessionDescription(sdp))
+    .then(()=>rtcPeer.createAnswer())
+    .then(answer=>rtcPeer.setLocalDescription(answer))
+    .then(()=>{
+      onlineState.socket.emit('rtc_answer',{roomId:onlineState.roomId,sdp:rtcPeer.localDescription});
+    })
+    .catch(err=>console.warn('[WebRTC] answer error:',err));
+}
+
+function rtcHandleAnswer(sdp){
+  if(!rtcPeer) return;
+  rtcPeer.setRemoteDescription(new RTCSessionDescription(sdp))
+    .catch(err=>console.warn('[WebRTC] setRemoteDesc error:',err));
+}
+
+function rtcHandleIce(candidate){
+  if(!rtcPeer) return;
+  rtcPeer.addIceCandidate(new RTCIceCandidate(candidate))
+    .catch(err=>console.warn('[WebRTC] ICE error:',err));
+}
+
+function rtcClose(){
+  voiceStop();
+  if(rtcPeer){rtcPeer.close();rtcPeer=null;}
+}
+
+// ── V15 — Voice / Headset ─────────────────────────────────────────────────────
+const voiceState={active:false,localStream:null};
+
+function voiceToggle(){
+  if(voiceState.active) voiceStop();
+  else voiceStart();
+}
+
+async function voiceStart(){
+  if(!rtcPeer){alert('Keine WebRTC-Verbindung aktiv. Starte zuerst ein Online-Spiel.');return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    voiceState.localStream=stream;
+    stream.getTracks().forEach(track=>rtcPeer.addTrack(track,stream));
+    voiceState.active=true;
+    voiceRenderBtn();
+    // Renegotiation: neues Offer mit Audio-Track an Gegner senden
+    const offer=await rtcPeer.createOffer();
+    await rtcPeer.setLocalDescription(offer);
+    onlineState.socket.emit('rtc_offer',{roomId:onlineState.roomId,sdp:rtcPeer.localDescription});
+    console.log('[Voice] Mikrofon aktiv, Renegotiation gesendet');
+  }catch(e){
+    console.warn('[Voice] Fehler:',e);
+    alert('Mikrofon-Zugriff nicht möglich: '+e.message);
+  }
+}
+
+function voiceStop(){
+  if(voiceState.localStream){
+    voiceState.localStream.getTracks().forEach(t=>t.stop());
+    voiceState.localStream=null;
+  }
+  voiceState.active=false;
+  voiceRenderBtn();
+}
+
+function voiceRenderBtn(){
+  const btn=document.getElementById('voiceBtn');
+  if(!btn) return;
+  btn.classList.toggle('active',voiceState.active);
+  btn.title=voiceState.active?'Mikrofon aus':'Mikrofon an';
+}
+
 // ── ONLINE MODULE ─────────────────────────────────────────────────────────────
+// ── Dynamic Script Loader (V16.0) ─────────────────────────────────────────────
+// Laedt ein externes JS-Skript erst bei Bedarf. Liefert ein Promise.
+// Verhindert, dass socket.io beim Seitenaufruf einen 404 produziert.
+let scriptLoadPromises = {};
+function loadScript(url, timeoutMs){
+  timeoutMs = timeoutMs || 5000;
+  if(scriptLoadPromises[url]) return scriptLoadPromises[url];
+  scriptLoadPromises[url] = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = url;
+    s.async = true;
+    const tm = setTimeout(()=>{
+      s.remove();
+      delete scriptLoadPromises[url];
+      reject(new Error('Script timeout: '+url));
+    }, timeoutMs);
+    s.onload = ()=>{ clearTimeout(tm); resolve(true); };
+    s.onerror = ()=>{
+      clearTimeout(tm);
+      s.remove();
+      delete scriptLoadPromises[url];
+      reject(new Error('Script load failed: '+url));
+    };
+    document.head.appendChild(s);
+  });
+  return scriptLoadPromises[url];
+}
+
 // Auto-detect: file:// → local dev, everything else → same origin (works on Render)
 const SERVER_URL = location.protocol === 'file:' ? 'http://localhost:3000' : location.origin;
+
+// Prueft, ob socket.io verfuegbar ist. Laedt bei Bedarf.
+// Wirft bei Fehler -- Aufrufer muss den Fehler behandeln.
+async function ensureSocketIoLoaded(){
+  if(typeof io !== 'undefined') return true;
+  await loadScript(SERVER_URL + '/socket.io/socket.io.js', 5000);
+  if(typeof io === 'undefined'){
+    throw new Error('socket.io wurde geladen, aber "io" ist nicht verfuegbar.');
+  }
+  return true;
+}
 
 let onlineState={
   active:false, roomId:null, playerIdx:null,
@@ -2056,20 +2475,45 @@ function onlineCancel(){
     document.getElementById(id).classList.remove('active');
   });
   document.getElementById('onlineBar').style.display='none';
+  chatReset();
+  rtcClose();
 }
 
 function getOnlineName(){
   return document.getElementById('onlineName').value.trim()||'Spieler';
 }
 
-function ensureSocket(cb){
+async function ensureSocket(cb){
   if(onlineState.socket&&onlineState.socket.connected){cb();return;}
   if(onlineState.socket){onlineState.socket.disconnect();}
-  const sock=io(SERVER_URL,{transports:['websocket','polling']});
+
+  // V16.0: socket.io erst bei Bedarf laden
+  try {
+    await ensureSocketIoLoaded();
+  } catch(e) {
+    alert('Online-Modus nicht verfügbar.\n\nDer Server unter '+SERVER_URL+' ist nicht erreichbar.\n\nDie App läuft weiter im Offline-Modus — du kannst alle Solo-, Bot- und lokalen Multiplayer-Spiele normal nutzen.');
+    onlineCancel();
+    return;
+  }
+
+  const sock=io(SERVER_URL,{transports:['websocket','polling'],timeout:5000});
   onlineState.socket=sock;
-  sock.on('connect',()=>cb());
-  sock.on('connect_error',()=>{
-    alert('Kein Server erreichbar. Ist der Server gestartet?\n\n'+SERVER_URL);
+  let connected=false;
+  const timeout=setTimeout(()=>{
+    if(!connected){
+      sock.disconnect();
+      alert('Verbindung zum Server fehlgeschlagen (Timeout).\n\nServer läuft auf: '+SERVER_URL+'\nBitte Terminal prüfen.');
+      onlineCancel();
+    }
+  },6000);
+  sock.on('connect',()=>{
+    connected=true;
+    clearTimeout(timeout);
+    cb();
+  });
+  sock.on('connect_error',(err)=>{
+    clearTimeout(timeout);
+    alert('Kein Server erreichbar.\n\n'+SERVER_URL+'\n\nFehler: '+err.message);
     onlineCancel();
   });
   setupSocketListeners(sock);
@@ -2107,6 +2551,7 @@ function setupSocketListeners(sock){
   sock.on('room_joined',({playerIdx,opponentName})=>{
     onlineState.playerIdx=playerIdx;onlineState.opponentName=opponentName;
     document.getElementById('onlineWaitModal').classList.remove('active');
+    rtcInit(); // WebRTC: Verbindung vorbereiten (Joiner wartet auf Offer)
     // Player 1: wait for creator to pick game
     const rm=document.getElementById('onlineReadyModal');
     document.getElementById('onlineReadyTitle').innerText='Verbunden!';
@@ -2118,6 +2563,7 @@ function setupSocketListeners(sock){
   sock.on('opponent_joined',({opponentName})=>{
     onlineState.opponentName=opponentName;
     document.getElementById('onlineWaitModal').classList.remove('active');
+    rtcInit(); // WebRTC: Verbindung vorbereiten (Creator schickt Offer nach Spielstart)
     // Player 0: pick game
     const rm=document.getElementById('onlineReadyModal');
     document.getElementById('onlineReadyTitle').innerText=opponentName+' ist da!';
@@ -2147,6 +2593,16 @@ function setupSocketListeners(sock){
     showGameEnd(playerName+' hat die Verbindung getrennt.','',()=>{onlineCancel();show('start');},()=>{onlineCancel();show('start');});
     onlineCancel();
   });
+
+  // V14 — Chat
+  sock.on('chat_message',({text,playerName})=>{
+    chatAddMessage(text,playerName,false);
+  });
+
+  // V14 — WebRTC Signaling
+  sock.on('rtc_offer', ({sdp})=>{ rtcHandleOffer(sdp); });
+  sock.on('rtc_answer',({sdp})=>{ rtcHandleAnswer(sdp); });
+  sock.on('rtc_ice',   ({candidate})=>{ rtcHandleIce(candidate); });
 }
 
 // ── Game Start ────────────────────────────────────────────────────────────────
@@ -2172,6 +2628,8 @@ function onlinePickGame(mode,score){
   // Send to opponent (they are player 1)
   onlineState.socket.emit('game_start',{roomId:onlineState.roomId,config});
   startOnlineGame(config,true);
+  // WebRTC: Creator schickt Offer nachdem Spiel gestartet
+  setTimeout(rtcCreateOffer,500);
 }
 
 function startOnlineGame(config,isCreator){
@@ -2191,7 +2649,6 @@ function startOnlineGame(config,isCreator){
     case 'cricket':
       cricState={marks:[[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]],scores:[0,0],names:config.names,turn:0,dartCount:0,botPlayer:null,gameOver:false};
       cricBotThinking=false;
-      gameStats.cricket.gamesPlayed+=2;saveStats();
       show('cricket');cricRender();
       break;
     case 'elim':
@@ -2274,6 +2731,145 @@ function showGameEnd(title,msg,onYes,onNo){
   document.getElementById('gameEndYes').onclick=()=>{m.classList.remove('active');if(onYes)onYes();};
   document.getElementById('gameEndNo').onclick=()=>{m.classList.remove('active');if(onNo)onNo();};
   m.classList.add('active');
+}
+
+function mfOpen(){document.getElementById('matchFmtModal').classList.add('active');}
+function mfClose(){
+  document.getElementById('matchFmtModal').classList.remove('active');
+  // Update all format buttons with current label
+  const lbl=mfFormatLabel();
+  document.querySelectorAll('.mfOpenBtn').forEach(b=>b.innerText='Format: '+lbl);
+}
+function mfFormatLabel(){
+  if(matchConfig.mode==='single') return 'Einzelleg';
+  if(matchConfig.mode==='legs'){
+    return matchConfig.displayAs==='bestof'
+      ?'Best of '+(matchConfig.legsFirstTo*2-1)
+      :'First to '+matchConfig.legsFirstTo;
+  }
+  // sets
+  return matchConfig.setsFirstTo+' Sätze / '
+    +(matchConfig.displayAs==='bestof'?'BO '+(matchConfig.legsFirstTo*2-1):'FT '+matchConfig.legsFirstTo)+'/Satz';
+}
+
+function mfSetMode(mode){
+  matchConfig.mode=mode;
+  ['single','legs','sets'].forEach(m=>{
+    const el=document.getElementById('mfBtn'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(el) el.classList.toggle('active',m===mode);
+  });
+  const lr=document.getElementById('mfLegsRow');
+  const sr=document.getElementById('mfSetsRow');
+  const ll=document.getElementById('mfLegsLabel');
+  if(lr) lr.style.display=(mode!=='single')?'block':'none';
+  if(sr) sr.style.display=(mode==='sets')?'block':'none';
+  if(ll) ll.innerText=(mode==='sets')?'Legs pro Satz':'Legs';
+  mfRefreshLabels();
+}
+function mfToggleDisplay(){
+  matchConfig.displayAs=matchConfig.displayAs==='bestof'?'firstto':'bestof';
+  mfRefreshLabels();
+}
+function mfLegsDown(){if(matchConfig.legsFirstTo>1)matchConfig.legsFirstTo--;mfRefreshLabels();}
+function mfLegsUp(){if(matchConfig.legsFirstTo<27)matchConfig.legsFirstTo++;mfRefreshLabels();}
+function mfSetsDown(){if(matchConfig.setsFirstTo>1)matchConfig.setsFirstTo--;mfRefreshLabels();}
+function mfSetsUp(){if(matchConfig.setsFirstTo<11)matchConfig.setsFirstTo++;mfRefreshLabels();}
+function mfRefreshLabels(){
+  const lv=document.getElementById('mfLegsVal');
+  const sv=document.getElementById('mfSetsVal');
+  const db=document.getElementById('mfDisplayBtn');
+  if(lv){
+    lv.innerText=matchConfig.displayAs==='bestof'
+      ?'Best of '+(matchConfig.legsFirstTo*2-1)
+      :'First to '+matchConfig.legsFirstTo;
+  }
+  if(sv) sv.innerText='First to '+matchConfig.setsFirstTo;
+  if(db) db.innerText=matchConfig.displayAs==='bestof'?'Best of ⇄ First to':'First to ⇄ Best of';
+}
+
+// Initialisiert Match-State (bei Spielstart oder Rematch)
+function matchInit(){
+  matchState.legsWon=[0,0];
+  matchState.setsWon=[0,0];
+}
+
+// Rendert Match-Score in ein Element (unsichtbar wenn 'single')
+function matchScoreRender(elId,names){
+  const el=document.getElementById(elId);
+  if(!el) return;
+  if(matchConfig.mode==='single'){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='block';
+  const disp=matchConfig.displayAs==='bestof'
+    ?'BO '+(matchConfig.legsFirstTo*2-1)
+    :'FT '+matchConfig.legsFirstTo;
+  if(matchConfig.mode==='legs'){
+    el.innerHTML=names[0]+': '+matchState.legsWon[0]+' | '+names[1]+': '+matchState.legsWon[1]+' Legs ['+disp+']';
+  } else {
+    const sDisp='FT '+matchConfig.setsFirstTo+' Sets';
+    el.innerHTML='Sets: '+names[0]+' '+matchState.setsWon[0]+' : '+matchState.setsWon[1]+' '+names[1]
+      +' | Legs/Satz: '+matchState.legsWon[0]+':'+matchState.legsWon[1]+' ['+disp+', '+sDisp+']';
+  }
+}
+
+// Wird aufgerufen wenn ein Leg/Spiel gewonnen wurde.
+// gameCtx = { names:[...], nextLeg:fn }
+function matchLegWon(winnerIdx,gameCtx){
+  if(matchConfig.mode==='single'){
+    showGameEnd(
+      gameCtx.names[winnerIdx]+' gewinnt!','',
+      ()=>gameCtx.nextLeg(),
+      ()=>show('start')
+    );
+    return;
+  }
+
+  matchState.legsWon[winnerIdx]++;
+  let isSetWin=false,isMatchWin=false;
+
+  if(matchConfig.mode==='sets'){
+    if(matchState.legsWon[winnerIdx]>=matchConfig.legsFirstTo){
+      matchState.setsWon[winnerIdx]++;
+      matchState.legsWon=[0,0];
+      isSetWin=true;
+      if(matchState.setsWon[winnerIdx]>=matchConfig.setsFirstTo) isMatchWin=true;
+    }
+  } else if(matchConfig.mode==='legs'){
+    if(matchState.legsWon[winnerIdx]>=matchConfig.legsFirstTo) isMatchWin=true;
+  }
+
+  const w=gameCtx.names[winnerIdx];
+  const n=gameCtx.names;
+
+  if(isMatchWin){
+    let scoreStr=matchConfig.mode==='sets'
+      ?'Sets: '+n[0]+' '+matchState.setsWon[0]+' : '+matchState.setsWon[1]+' '+n[1]
+      :'Legs: '+n[0]+' '+matchState.legsWon[0]+' : '+matchState.legsWon[1]+' '+n[1];
+    showGameEnd('🏆 '+w+' gewinnt das Match!',scoreStr,
+      ()=>{matchInit();gameCtx.nextLeg();},
+      ()=>show('start')
+    );
+    return;
+  }
+
+  // Leg oder Satz gewonnen — Match läuft weiter
+  let title,msg;
+  if(isSetWin){
+    title=w+' gewinnt Satz '+matchState.setsWon[winnerIdx]+'!';
+    msg='Sets: '+n[0]+' '+matchState.setsWon[0]+' : '+matchState.setsWon[1]+' '+n[1];
+  } else {
+    const legNum=matchState.legsWon[0]+matchState.legsWon[1];
+    title=w+' gewinnt Leg '+legNum+'!';
+    msg=matchConfig.mode==='sets'
+      ?'Legs im Satz: '+n[0]+' '+matchState.legsWon[0]+' : '+matchState.legsWon[1]+' '+n[1]
+       +'\nSets: '+matchState.setsWon[0]+' : '+matchState.setsWon[1]
+      :'Legs: '+n[0]+' '+matchState.legsWon[0]+' : '+matchState.legsWon[1]+' '+n[1];
+  }
+  const modal=document.getElementById('legWonModal');
+  document.getElementById('legWonTitle').innerText=title;
+  document.getElementById('legWonMsg').innerText=msg;
+  document.getElementById('legWonNextBtn').onclick=()=>{modal.classList.remove('active');gameCtx.nextLeg();};
+  document.getElementById('legWonEndBtn').onclick=()=>{modal.classList.remove('active');show('start');};
+  modal.classList.add('active');
 }
 
 // ── ATC BOT ───────────────────────────────────────────────────────────────────
