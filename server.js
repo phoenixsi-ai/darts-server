@@ -1,132 +1,144 @@
-const express = require('express');
-const http = require('http');
-const path = require('path');
-const { Server } = require('socket.io');
+/**
+ * Darts Trainer Server — V16.2
+ * Node.js + Express + Socket.io
+ *
+ * Start: node server.js
+ * Dev:   npx nodemon server.js
+ * Port:  3000 (lokal) | process.env.PORT (Render / Cloud)
+ */
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: '*', methods: ['GET', 'POST'] }
+const express   = require('express');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const path      = require('path');
+
+const app        = express();
+const httpServer = createServer(app);
+const io         = new Server(httpServer, {
+  cors: { origin: '*', methods: ['GET', 'POST'] },
+  pingTimeout:  60000,
+  pingInterval: 25000
 });
 
+const PORT = process.env.PORT || 3000;
+
 // ── Static Files ──────────────────────────────────────────────────────────────
-// Serves public/index.html — the Darts App
 app.use(express.static(path.join(__dirname, 'public')));
 
-// rooms: { roomId → { players: [{id, name}], gameStarted: bool, createdAt: timestamp } }
-const rooms = {};
+// Root → aktuelle App-Version
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-// Clean up rooms older than 4 hours (abandoned)
-setInterval(() => {
-  const cutoff = Date.now() - 4 * 60 * 60 * 1000;
-  for (const [id, room] of Object.entries(rooms)) {
-    if (room.createdAt < cutoff) { delete rooms[id]; }
-  }
-}, 30 * 60 * 1000);
+// Health-Check (für Uptime-Monitoring / Cron-Ping)
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', version: '16.2', uptime: process.uptime() });
+});
 
-function genCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
-  return code;
+// ── Room Management ───────────────────────────────────────────────────────────
+const rooms = new Map();
+
+const ROOM_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function genRoomId() {
+  let id;
+  do {
+    id = Array.from({ length: 5 }, () =>
+      ROOM_CHARS[Math.floor(Math.random() * ROOM_CHARS.length)]
+    ).join('');
+  } while (rooms.has(id));
+  return id;
 }
 
-function findRoomBySocket(socketId) {
-  for (const [roomId, room] of Object.entries(rooms)) {
-    if (room.players.some(p => p.id === socketId)) return { roomId, room };
-  }
-  return null;
-}
-
+// ── Socket.io ─────────────────────────────────────────────────────────────────
 io.on('connection', (socket) => {
-  // ── Create Room ──────────────────────────────────────────────────────────────
+  let currentRoom = null;
+  let playerIdx   = null;
+
+  // ── Raum erstellen (Spieler 0) ────────────────────────────────────────────
   socket.on('create_room', ({ playerName }) => {
-    let roomId;
-    do { roomId = genCode(); } while (rooms[roomId]);
-
-    rooms[roomId] = {
-      players: [{ id: socket.id, name: playerName }],
-      gameStarted: false,
-      createdAt: Date.now()
-    };
-
+    const roomId = genRoomId();
+    rooms.set(roomId, {
+      players: [socket, null],
+      names:   [playerName || 'Spieler 1', '']
+    });
+    currentRoom = roomId;
+    playerIdx   = 0;
     socket.join(roomId);
     socket.emit('room_created', { roomId, playerIdx: 0 });
-    console.log(`[${roomId}] Created by ${playerName}`);
+    console.log(`[${roomId}] Erstellt von "${playerName}"`);
   });
 
-  // ── Join Room ─────────────────────────────────────────────────────────────────
+  // ── Raum beitreten (Spieler 1) ────────────────────────────────────────────
   socket.on('join_room', ({ roomId, playerName }) => {
-    const room = rooms[roomId];
-
+    const room = rooms.get(roomId);
     if (!room) {
-      socket.emit('join_error', 'Raum nicht gefunden. Code richtig?');
+      socket.emit('join_error', 'Raum nicht gefunden.');
       return;
     }
-    if (room.players.length >= 2) {
+    if (room.players[1]) {
       socket.emit('join_error', 'Raum ist bereits voll.');
       return;
     }
-    if (room.gameStarted) {
-      socket.emit('join_error', 'Spiel läuft bereits.');
-      return;
-    }
 
-    room.players.push({ id: socket.id, name: playerName });
+    room.players[1] = socket;
+    room.names[1]   = playerName || 'Spieler 2';
+    currentRoom     = roomId;
+    playerIdx       = 1;
     socket.join(roomId);
 
     socket.emit('room_joined', {
-      roomId,
-      playerIdx: 1,
-      opponentName: room.players[0].name
+      playerIdx:    1,
+      opponentName: room.names[0]
     });
-
-    socket.to(roomId).emit('opponent_joined', { opponentName: playerName });
-    console.log(`[${roomId}] ${playerName} joined`);
+    room.players[0].emit('opponent_joined', {
+      opponentName: room.names[1]
+    });
+    console.log(`[${roomId}] "${playerName}" beigetreten. Raum voll.`);
   });
 
-  // ── Game Start ────────────────────────────────────────────────────────────────
+  // ── Spielstart + Spielzüge ────────────────────────────────────────────────
   socket.on('game_start', ({ roomId, config }) => {
-    const room = rooms[roomId];
-    if (!room) return;
-    room.gameStarted = true;
     socket.to(roomId).emit('game_start', config);
-    console.log(`[${roomId}] Game started: ${config.mode}`);
   });
 
-  // ── Game Action relay ─────────────────────────────────────────────────────────
   socket.on('game_action', ({ roomId, action }) => {
     socket.to(roomId).emit('game_action', action);
   });
 
-  // ── Disconnect ────────────────────────────────────────────────────────────────
+  // ── Chat ─────────────────────────────────────────────────────────────────
+  socket.on('chat_message', ({ roomId, text, playerName }) => {
+    socket.to(roomId).emit('chat_message', { text, playerName });
+  });
+
+  // ── WebRTC Signaling ──────────────────────────────────────────────────────
+  socket.on('rtc_offer',  ({ roomId, sdp })       =>
+    socket.to(roomId).emit('rtc_offer',  { sdp }));
+  socket.on('rtc_answer', ({ roomId, sdp })       =>
+    socket.to(roomId).emit('rtc_answer', { sdp }));
+  socket.on('rtc_ice',    ({ roomId, candidate }) =>
+    socket.to(roomId).emit('rtc_ice',    { candidate }));
+
+  // ── Disconnect ────────────────────────────────────────────────────────────
   socket.on('disconnect', () => {
-    const found = findRoomBySocket(socket.id);
-    if (found) {
-      const { roomId, room } = found;
-      const player = room.players.find(p => p.id === socket.id);
-      io.to(roomId).emit('player_disconnected', {
-        playerName: player ? player.name : 'Gegner'
-      });
-      delete rooms[roomId];
-      console.log(`[${roomId}] Closed — ${player?.name} disconnected`);
+    if (!currentRoom) return;
+    const room = rooms.get(currentRoom);
+    if (!room) return;
+
+    const opponentIdx    = 1 - playerIdx;
+    const opponentSocket = room.players[opponentIdx];
+    const myName         = room.names[playerIdx] || 'Gegner';
+
+    if (opponentSocket && opponentSocket.connected) {
+      opponentSocket.emit('player_disconnected', { playerName: myName });
     }
+    rooms.delete(currentRoom);
+    console.log(`[${currentRoom}] "${myName}" getrennt. Raum gelöscht.`);
   });
 });
 
-// ── Health check ──────────────────────────────────────────────────────────────
-app.get('/status', (req, res) => {
-  res.json({
-    status: 'ok',
-    rooms: Object.keys(rooms).length,
-    players: Object.values(rooms).reduce((s, r) => s + r.players.length, 0),
-    uptime: Math.floor(process.uptime()) + 's'
-  });
-});
-
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Darts Server running on port ${PORT}`);
-  console.log(`App: http://localhost:${PORT}`);
-  console.log(`Status: http://localhost:${PORT}/status`);
+// ── Start ─────────────────────────────────────────────────────────────────────
+httpServer.listen(PORT, () => {
+  console.log(`Darts Trainer Server V16.2 — Port ${PORT}`);
+  console.log(`Lokal: http://localhost:${PORT}`);
 });

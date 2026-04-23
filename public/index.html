@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Darts Trainer V16.0.1</title>
+<title>Darts Trainer V16.1</title>
 <style>
 body { margin:0; font-family:sans-serif; background:#111; color:#fff; text-align:center; overflow-y:auto; }
 .screen { display:none; padding:20px; padding-bottom:80px; }
@@ -39,7 +39,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .bull-row { display:flex; gap:6px; margin:6px 0; }
 .bull-btn { flex:1; background:#0f172a; color:#fff; border:1px solid #334155; border-radius:8px; font-size:15px; font-weight:bold; min-height:44px; padding:0; margin:0; cursor:pointer; }
 /* Shared */
-.game-board { width:320px; max-width:90vw; margin:8px auto; display:block; }
+.game-board { width:360px; max-width:95vw; margin:8px auto; display:block; }
 .round-indicator { display:flex; justify-content:center; gap:5px; margin:6px auto; flex-wrap:wrap; max-width:320px; }
 .round-dot { width:10px; height:10px; border-radius:50%; background:#334155; display:inline-block; }
 .round-dot.active { background:#E8681A; }
@@ -102,6 +102,42 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .comm-btn { background:none; border:none; color:#94a3b8; font-size:18px; padding:4px 6px; cursor:pointer; min-height:auto; margin:0; line-height:1; border-radius:6px; }
 .comm-btn:active { background:#334155; }
 .comm-btn.active { color:#27ae60; }
+/* Input mode toggle */
+.input-mode-row { display:flex; gap:0; max-width:320px; margin:8px auto 0; border-radius:10px; overflow:hidden; border:1px solid #334155; }
+.input-mode-btn { flex:1; background:#0f172a; color:#94a3b8; border:none; font-size:13px; font-weight:bold; min-height:40px; cursor:pointer; margin:0; padding:0; }
+.input-mode-btn.active { background:#E8681A; color:#fff; }
+/* Numpad */
+.numpad-display { font-size:36px; font-weight:bold; color:#E8681A; background:#0f172a; border-radius:8px; padding:8px 12px; margin:0 0 8px; text-align:right; min-height:56px; letter-spacing:2px; line-height:56px; }
+.numpad-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:8px; }
+.np-btn { background:#1e293b; color:#fff; border:1px solid #334155; border-radius:10px; font-size:22px; font-weight:bold; min-height:54px; cursor:pointer; margin:0; padding:0; }
+.np-btn:active { background:#334155; }
+.np-ok { background:#E8681A; border-color:#E8681A; }
+.np-del { color:#94a3b8; font-size:18px; }
+.np-quick { display:flex; flex-wrap:wrap; gap:4px; justify-content:center; margin-bottom:8px; }
+.np-quick-btn { background:#334155; color:#fff; border:1px solid #475569; border-radius:8px; font-size:13px; font-weight:bold; padding:6px 10px; cursor:pointer; min-height:36px; margin:0; }
+/* Individual mode */
+.indiv-seg-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:4px; margin-bottom:6px; }
+.indiv-seg-btn { background:#1e293b; color:#fff; border:1px solid #334155; border-radius:6px; font-size:15px; font-weight:bold; min-height:48px; cursor:pointer; margin:0; padding:0; }
+.indiv-seg-btn:active { background:#334155; }
+.indiv-dart-log { font-size:12px; color:#64748b; margin:6px 0; text-align:left; min-height:36px; }
+/* Checkout display */
+.checkout-box { background:#0f172a; border:1px solid #27ae60; border-radius:8px; padding:6px 10px; margin:0 0 8px; text-align:left; }
+.checkout-box .co-label { font-size:10px; color:#64748b; margin-bottom:2px; }
+.checkout-box .co-way { font-size:13px; font-weight:bold; color:#27ae60; }
+/* Hybrid switch */
+.hybrid-switch { display:flex; gap:4px; justify-content:flex-end; margin-bottom:6px; }
+.hybrid-switch-btn { background:#334155; color:#94a3b8; border:none; border-radius:6px; font-size:11px; padding:4px 8px; cursor:pointer; margin:0; min-height:auto; }
+.hybrid-switch-btn.active { background:#E8681A; color:#fff; }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* Simple Numpad Alternative */
+.input-toggle { display:flex; justify-content:center; margin:4px auto; max-width:360px; }
+.input-toggle button { background:none; border:1px solid #334155; color:#64748b; font-size:12px; padding:6px 14px; cursor:pointer; border-radius:6px; min-height:auto; margin:2px; }
+.input-toggle button.active { background:#E8681A; color:#fff; border-color:#E8681A; }
+.snp-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:5px; margin:6px auto; max-width:360px; }
+.snp-btn { background:#0f172a; color:#fff; border:1px solid #334155; border-radius:8px; padding:0; font-size:17px; font-weight:bold; min-height:48px; cursor:pointer; margin:0; width:100%; }
+.snp-btn:active { background:#1e40af; }
+.numpad-mult { display:flex; gap:6px; margin:6px auto; max-width:360px; }
+.numpad-mult button { flex:1; }
 </style>
 <!-- socket.io wird dynamisch nachgeladen beim ersten Klick auf "Online spielen" -->
 </head>
@@ -146,8 +182,10 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 <!-- CLASSIC -->
 <div id="classic" class="screen">
   <h2>Classic</h2>
+  <div id="inputToggle-classic"></div>
   <svg id="board-classic" class="game-board" viewBox="0 0 200 200"></svg>
-  <button class="miss" onclick="miss()">MISS</button>
+  <div id="numpad-classic" style="display:none;"></div>
+  <button class="miss" id="missBtn-classic" onclick="miss()">MISS</button>
   <div id="info"></div>
   <div class="session" id="sessionInfo"></div>
   <div class="coach" id="coach"></div>
@@ -156,8 +194,10 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 <!-- FLOW -->
 <div id="flow" class="screen">
   <div class="micro" id="micro"></div>
+  <div id="inputToggle-flow"></div>
   <svg id="board-flow" class="game-board" viewBox="0 0 200 200"></svg>
-  <button class="miss" onclick="miss()">MISS</button>
+  <div id="numpad-flow" style="display:none;"></div>
+  <button class="miss" id="missBtn-flow" onclick="miss()">MISS</button>
 </div>
 
 <!-- SPLITSCORE CLASSIC -->
@@ -172,8 +212,10 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="ssHits" class="info-row" style="color:#27ae60;"></div>
     <div id="ssRoundPts" class="info-row"></div>
   </div>
+  <div id="inputToggle-splitscore"></div>
   <svg id="board-splitscore" class="game-board" viewBox="0 0 200 200"></svg>
-  <button class="miss" onclick="ssMiss()">MISS</button>
+  <div id="numpad-splitscore" style="display:none;"></div>
+  <button class="miss" id="missBtn-splitscore" onclick="ssMiss()">MISS</button>
   <div id="ssCoach" class="info-row" style="margin-top:6px;"></div>
 </div>
 
@@ -190,8 +232,10 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="pHits" class="info-row" style="color:#27ae60;"></div>
     <div id="pRoundScore" class="info-row"></div>
   </div>
+  <div id="inputToggle-phoenix"></div>
   <svg id="board-phoenix" class="game-board" viewBox="0 0 200 200"></svg>
-  <button class="miss" onclick="phoenixMiss()">MISS</button>
+  <div id="numpad-phoenix" style="display:none;"></div>
+  <button class="miss" id="missBtn-phoenix" onclick="phoenixMiss()">MISS</button>
   <div id="pCoach" class="info-row" style="margin-top:6px;"></div>
 </div>
 
@@ -252,6 +296,14 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
       </div>
     </div>
   </div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div style="font-size:13px; color:#64748b; margin-bottom:6px;">Eingabe-Modus</div>
+    <div class="input-mode-row">
+      <button class="input-mode-btn" id="x01SetupModeBoard" onclick="setInputMode('board')">Board</button>
+      <button class="input-mode-btn" id="x01SetupModeNumpad" onclick="setInputMode('numpad')">Numpad</button>
+      <button class="input-mode-btn" id="x01SetupModeHybrid" onclick="setInputMode('hybrid')">Hybrid</button>
+    </div>
+  </div>
   <button onclick="mfOpen()" class="mfOpenBtn" style="background:#334155;color:#fff;width:100%;max-width:320px;margin-bottom:4px;border-radius:12px;padding:12px;font-size:15px;">Format: Einzelleg</button>
   <button class="primary" id="x01StartBtn">Spiel starten</button>
   <button onclick="show('start')" style="background:#333;color:#fff;">Abbrechen</button>
@@ -278,14 +330,76 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="matchBarX01" style="display:none;font-size:12px;color:#E8681A;margin:3px 0;"></div>
   </div>
   <div class="card" style="max-width:320px; margin:10px auto;">
-    <svg id="board-x01" class="game-board" viewBox="0 0 200 200"></svg>
-    <div class="bull-row" style="max-width:300px; margin:4px auto;">
-      <button class="bull-btn" onclick="x01BoardHit(25,'S')">Bull 25</button>
-      <button class="bull-btn" onclick="x01BoardHit(50,'B')">Bull 50</button>
+    <!-- Hybrid override -->
+    <div id="x01HybridSwitch" class="hybrid-switch" style="display:none;">
+      <button class="hybrid-switch-btn" id="x01HybridBoard" onclick="x01HybridOverride('board')">Board</button>
+      <button class="hybrid-switch-btn" id="x01HybridNumpad" onclick="x01HybridOverride('numpad')">Numpad</button>
     </div>
-    <div style="display:flex; gap:8px; margin-top:6px;">
-      <button class="miss" onclick="x01MissHit()" style="flex:2;">MISS</button>
-      <button onclick="x01Undo()" style="flex:1;background:#334155;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+    <!-- Checkout suggestion -->
+    <div id="x01CheckoutBox" class="checkout-box" style="display:none;">
+      <div class="co-label">Checkout</div>
+      <div class="co-way" id="x01CheckoutWay"></div>
+    </div>
+    <!-- Board area -->
+    <div id="x01BoardArea">
+      <svg id="board-x01" class="game-board" viewBox="0 0 200 200"></svg>
+      <div class="bull-row" style="max-width:300px; margin:4px auto;">
+        <button class="bull-btn" onclick="x01BoardHit(25,'S')">Bull 25</button>
+        <button class="bull-btn" onclick="x01BoardHit(50,'B')">Bull 50</button>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:6px;">
+        <button class="miss" onclick="x01MissHit()" style="flex:2;">MISS</button>
+        <button onclick="x01Undo()" style="flex:1;background:#334155;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+      </div>
+    </div>
+    <!-- Numpad area -->
+    <div id="x01NumpadArea" style="display:none;">
+      <div style="display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid #334155;margin-bottom:8px;">
+        <button id="x01NpModeTotal" class="input-mode-btn active" onclick="x01SetNpMode('total')" style="min-height:34px;font-size:12px;">Aufnahme</button>
+        <button id="x01NpModeIndiv" class="input-mode-btn" onclick="x01SetNpMode('indiv')" style="min-height:34px;font-size:12px;">Einzeln</button>
+      </div>
+      <!-- Total score numpad -->
+      <div id="x01NpTotal">
+        <div class="numpad-display" id="x01NpDisplay">—</div>
+        <div class="numpad-grid">
+          <button class="np-btn" onclick="x01NpPress('7')">7</button>
+          <button class="np-btn" onclick="x01NpPress('8')">8</button>
+          <button class="np-btn" onclick="x01NpPress('9')">9</button>
+          <button class="np-btn" onclick="x01NpPress('4')">4</button>
+          <button class="np-btn" onclick="x01NpPress('5')">5</button>
+          <button class="np-btn" onclick="x01NpPress('6')">6</button>
+          <button class="np-btn" onclick="x01NpPress('1')">1</button>
+          <button class="np-btn" onclick="x01NpPress('2')">2</button>
+          <button class="np-btn" onclick="x01NpPress('3')">3</button>
+          <button class="np-btn np-del" onclick="x01NpDelete()">⌫</button>
+          <button class="np-btn" onclick="x01NpPress('0')">0</button>
+          <button class="np-btn np-ok" onclick="x01NpOK()">OK</button>
+        </div>
+        <div class="np-quick">
+          <button class="np-quick-btn" onclick="x01NpQuick(180)">180</button>
+          <button class="np-quick-btn" onclick="x01NpQuick(140)">140</button>
+          <button class="np-quick-btn" onclick="x01NpQuick(100)">100</button>
+          <button class="np-quick-btn" onclick="x01NpQuick(60)">60</button>
+          <button class="np-quick-btn" onclick="x01NpQuick(26)">26</button>
+          <button class="np-quick-btn" onclick="x01NpQuick(0)">0</button>
+        </div>
+      </div>
+      <!-- Individual dart mode -->
+      <div id="x01NpIndiv" style="display:none;">
+        <div style="display:flex;gap:6px;margin-bottom:6px;">
+          <button class="toggle-btn active" id="x01IndivS" onclick="x01IndivSetMult('S')" style="font-size:14px;min-height:40px;">S</button>
+          <button class="toggle-btn" id="x01IndivD" onclick="x01IndivSetMult('D')" style="font-size:14px;min-height:40px;">D</button>
+          <button class="toggle-btn" id="x01IndivT" onclick="x01IndivSetMult('T')" style="font-size:14px;min-height:40px;">T</button>
+        </div>
+        <div class="indiv-seg-grid" id="x01IndivSegGrid"></div>
+        <div style="display:flex;gap:6px;margin-bottom:6px;">
+          <button class="np-btn" onclick="x01IndivHit(25,'S')" style="flex:1;font-size:13px;min-height:44px;">Bull 25</button>
+          <button class="np-btn" onclick="x01IndivHit(50,'D')" style="flex:1;font-size:13px;min-height:44px;">Bull 50</button>
+          <button class="np-btn" style="flex:1;font-size:13px;min-height:44px;background:#ff4444;border-color:#ff4444;" onclick="x01IndivMiss()">Miss</button>
+        </div>
+        <div class="indiv-dart-log" id="x01IndivLog"></div>
+      </div>
+      <button onclick="x01Undo()" style="width:100%;background:#334155;color:#fff;border-radius:12px;margin-top:4px;font-size:14px;min-height:40px;">↩ Zurück</button>
     </div>
   </div>
   <div class="card" style="max-width:320px;margin:10px auto;font-size:13px;color:#64748b;" id="x01Log"></div>
@@ -350,9 +464,11 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div class="card" style="max-width:320px; margin:10px auto;">
     <div class="info-row" id="cricTurn"></div>
     <div class="info-row" id="cricDart"></div>
+    <div id="inputToggle-cricket"></div>
     <svg id="board-cricket" class="game-board" viewBox="0 0 200 200" style="margin-top:8px;"></svg>
+    <div id="numpad-cricket" style="display:none;"></div>
     <div style="display:flex; gap:8px; margin-top:6px;">
-      <button class="miss" onclick="cricMiss()" style="flex:2;">MISS</button>
+      <button class="miss" id="missBtn-cricket" onclick="cricMiss()" style="flex:2;">MISS</button>
       <button onclick="cricUndo()" style="flex:1;background:#334155;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
     </div>
   </div>
@@ -381,6 +497,37 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
       <button class="toggle-btn" id="elimGoal501" onclick="elimSetGoal(501)">501</button>
     </div>
   </div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div style="font-size:13px; color:#64748b; margin-bottom:8px;">Einstieg</div>
+    <div style="display:flex; gap:8px;">
+      <button class="toggle-btn" id="elimInSingle" onclick="elimSetIn('single')">Single</button>
+      <button class="toggle-btn" id="elimInDouble" onclick="elimSetIn('double')">Double</button>
+      <button class="toggle-btn" id="elimInMaster" onclick="elimSetIn('master')">Master</button>
+    </div>
+  </div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div style="font-size:13px; color:#64748b; margin-bottom:8px;">Abschluss</div>
+    <div style="display:flex; gap:8px;">
+      <button class="toggle-btn" id="elimOutSingle" onclick="elimSetOut('single')">Single</button>
+      <button class="toggle-btn" id="elimOutDouble" onclick="elimSetOut('double')">Double</button>
+      <button class="toggle-btn" id="elimOutMaster" onclick="elimSetOut('master')">Master</button>
+    </div>
+  </div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div style="font-size:13px; color:#64748b; margin-bottom:8px;">Re-Open (Eliminierte müssen sich neu eröffnen)</div>
+    <div style="display:flex; gap:8px;">
+      <button class="toggle-btn" id="elimReOpenNo" onclick="elimSetReOpen(false)">Nein</button>
+      <button class="toggle-btn" id="elimReOpenYes" onclick="elimSetReOpen(true)">Ja</button>
+    </div>
+  </div>
+  <div class="card" style="max-width:320px; margin:10px auto;">
+    <div style="font-size:13px; color:#64748b; margin-bottom:6px;">Eingabe-Modus</div>
+    <div class="input-mode-row">
+      <button class="input-mode-btn" id="elimSetupModeBoard" onclick="setInputMode('board')">Board</button>
+      <button class="input-mode-btn" id="elimSetupModeNumpad" onclick="setInputMode('numpad')">Numpad</button>
+      <button class="input-mode-btn" id="elimSetupModeHybrid" onclick="setInputMode('hybrid')">Hybrid</button>
+    </div>
+  </div>
   <button onclick="mfOpen()" class="mfOpenBtn" style="background:#334155;color:#fff;width:100%;max-width:320px;margin-bottom:4px;border-radius:12px;padding:12px;font-size:15px;">Format: Einzelleg</button>
   <button class="primary" onclick="eliminationStart()">Spiel starten</button>
   <button onclick="show('start')" style="background:#333;color:#fff;">Abbrechen</button>
@@ -390,19 +537,72 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 <div id="elimination" class="screen">
   <h2>Elimination</h2>
   <div class="info-row" id="elimGoalDisplay" style="margin-bottom:4px;"></div>
+  <div class="info-row" id="elimModeDisplay" style="font-size:12px;color:#64748b;margin-bottom:4px;"></div>
   <div id="matchBarElim" style="display:none;font-size:12px;color:#E8681A;margin:3px 0;"></div>
   <div class="elim-players" id="elimPlayers"></div>
   <div class="card" style="max-width:320px; margin:8px auto;">
     <div class="info-row" id="elimTurn"></div>
     <div class="info-row" id="elimDart"></div>
-    <svg id="board-elimination" class="game-board" viewBox="0 0 200 200" style="margin-top:6px;"></svg>
-    <div class="bull-row" style="max-width:300px; margin:4px auto;">
-      <button class="bull-btn" onclick="elimBullHit(25)">Bull 25</button>
-      <button class="bull-btn" onclick="elimBullHit(50)">Bull 50</button>
+    <!-- Board area -->
+    <div id="elimBoardArea">
+      <svg id="board-elimination" class="game-board" viewBox="0 0 200 200" style="margin-top:6px;"></svg>
+      <div class="bull-row" style="max-width:300px; margin:4px auto;">
+        <button class="bull-btn" onclick="elimBullHit(25,'S',25)">Bull 25</button>
+        <button class="bull-btn" onclick="elimBullHit(50,'D',25)">Bull 50</button>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:6px;">
+        <button class="miss" onclick="elimMiss()" style="flex:2;">MISS</button>
+        <button onclick="elimUndo()" style="flex:1;background:#334155;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+      </div>
     </div>
-    <div style="display:flex; gap:8px; margin-top:6px;">
-      <button class="miss" onclick="elimMiss()" style="flex:2;">MISS</button>
-      <button onclick="elimUndo()" style="flex:1;background:#334155;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+    <!-- Numpad area -->
+    <div id="elimNumpadArea" style="display:none;margin-top:6px;">
+      <div style="display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid #334155;margin-bottom:8px;">
+        <button id="elimNpModeTotal" class="input-mode-btn active" onclick="elimSetNpMode('total')" style="min-height:34px;font-size:12px;">Aufnahme</button>
+        <button id="elimNpModeIndiv" class="input-mode-btn" onclick="elimSetNpMode('indiv')" style="min-height:34px;font-size:12px;">Einzeln</button>
+      </div>
+      <!-- Total numpad -->
+      <div id="elimNpTotal">
+        <div class="numpad-display" id="elimNpDisplay">—</div>
+        <div class="numpad-grid">
+          <button class="np-btn" onclick="elimNpPress('7')">7</button>
+          <button class="np-btn" onclick="elimNpPress('8')">8</button>
+          <button class="np-btn" onclick="elimNpPress('9')">9</button>
+          <button class="np-btn" onclick="elimNpPress('4')">4</button>
+          <button class="np-btn" onclick="elimNpPress('5')">5</button>
+          <button class="np-btn" onclick="elimNpPress('6')">6</button>
+          <button class="np-btn" onclick="elimNpPress('1')">1</button>
+          <button class="np-btn" onclick="elimNpPress('2')">2</button>
+          <button class="np-btn" onclick="elimNpPress('3')">3</button>
+          <button class="np-btn np-del" onclick="elimNpDelete()">⌫</button>
+          <button class="np-btn" onclick="elimNpPress('0')">0</button>
+          <button class="np-btn np-ok" onclick="elimNpOK()">OK</button>
+        </div>
+        <div class="np-quick">
+          <button class="np-quick-btn" onclick="elimNpQuick(180)">180</button>
+          <button class="np-quick-btn" onclick="elimNpQuick(140)">140</button>
+          <button class="np-quick-btn" onclick="elimNpQuick(100)">100</button>
+          <button class="np-quick-btn" onclick="elimNpQuick(60)">60</button>
+          <button class="np-quick-btn" onclick="elimNpQuick(26)">26</button>
+          <button class="np-quick-btn" onclick="elimNpQuick(0)">0</button>
+        </div>
+      </div>
+      <!-- Individual dart mode -->
+      <div id="elimNpIndiv" style="display:none;">
+        <div style="display:flex;gap:6px;margin-bottom:6px;">
+          <button class="toggle-btn active" id="elimIndivS" onclick="elimIndivSetMult('S')" style="font-size:14px;min-height:40px;">S</button>
+          <button class="toggle-btn" id="elimIndivD" onclick="elimIndivSetMult('D')" style="font-size:14px;min-height:40px;">D</button>
+          <button class="toggle-btn" id="elimIndivT" onclick="elimIndivSetMult('T')" style="font-size:14px;min-height:40px;">T</button>
+        </div>
+        <div class="indiv-seg-grid" id="elimIndivSegGrid"></div>
+        <div style="display:flex;gap:6px;margin-bottom:6px;">
+          <button class="np-btn" onclick="elimIndivHit(25,'S')" style="flex:1;font-size:13px;min-height:44px;">Bull 25</button>
+          <button class="np-btn" onclick="elimIndivHit(50,'D')" style="flex:1;font-size:13px;min-height:44px;">Bull 50</button>
+          <button class="np-btn" style="flex:1;font-size:13px;min-height:44px;background:#ff4444;border-color:#ff4444;" onclick="elimIndivMiss()">Miss</button>
+        </div>
+        <div class="indiv-dart-log" id="elimIndivLog"></div>
+      </div>
+      <button onclick="elimUndo()" style="width:100%;background:#334155;color:#fff;border-radius:12px;margin-top:4px;font-size:14px;min-height:40px;">↩ Zurück</button>
     </div>
   </div>
   <button onclick="show('start')" style="background:#333;color:#fff;width:100%;max-width:320px;margin-top:8px;">Zurueck</button>
@@ -439,9 +639,11 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div class="elim-players" id="shanPlayers"></div>
   <div id="matchBarShan" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:320px;"></div>
   <div class="card" style="max-width:320px; margin:8px auto;">
+    <div id="inputToggle-shanghai"></div>
     <svg id="board-shanghai" class="game-board" viewBox="0 0 200 200"></svg>
+    <div id="numpad-shanghai" style="display:none;"></div>
     <div style="display:flex; gap:8px; margin-top:6px;">
-      <button class="miss" onclick="shanMiss()" style="flex:2;">MISS</button>
+      <button class="miss" id="missBtn-shanghai" onclick="shanMiss()" style="flex:2;">MISS</button>
       <button onclick="shanUndo()" style="flex:1;background:#334155;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
     </div>
   </div>
@@ -490,8 +692,10 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="atcTurn" class="info-row"></div>
     <div id="atcDart" class="info-row"></div>
     <div id="atcTarget" class="target-label"></div>
+    <div id="inputToggle-atc"></div>
     <svg id="board-atc" class="game-board" viewBox="0 0 200 200"></svg>
-    <button class="miss" onclick="atcMiss()" style="width:100%;margin-top:6px;">MISS</button>
+    <div id="numpad-atc" style="display:none;"></div>
+    <button class="miss" id="missBtn-atc" onclick="atcMiss()" style="width:100%;margin-top:6px;">MISS</button>
   </div>
   <button onclick="show('start')" style="background:#333;color:#fff;width:100%;max-width:320px;">Zurueck</button>
 </div>
@@ -509,8 +713,10 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="b27Warn" class="warn-label"></div>
     <div id="b27Best" class="info-row"></div>
   </div>
+  <div id="inputToggle-b27"></div>
   <svg id="board-b27" class="game-board" viewBox="0 0 200 200"></svg>
-  <button class="miss" onclick="b27Miss()" style="width:100%;max-width:320px;margin-top:6px;" style="background:#ff4444;color:#fff;">MISS</button>
+  <div id="numpad-b27" style="display:none;"></div>
+  <button class="miss" id="missBtn-b27" onclick="b27Miss()" style="width:100%;max-width:320px;margin-top:6px;" style="background:#ff4444;color:#fff;">MISS</button>
 </div>
 
 <!-- CHECKOUT TRAINING -->
@@ -525,12 +731,14 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="coHits" class="info-row" style="color:#27ae60;"></div>
   </div>
   <div class="card" style="max-width:320px; margin:8px auto;">
+    <div id="inputToggle-checkout"></div>
     <svg id="board-checkout" class="game-board" viewBox="0 0 200 200"></svg>
-    <div class="bull-row" style="max-width:300px; margin:4px auto;">
+    <div id="numpad-checkout" style="display:none;"></div>
+    <div class="bull-row" id="coBullRow" style="max-width:300px; margin:4px auto;">
       <button class="bull-btn" onclick="coHit('B25',25,'B')">Bull 25</button>
       <button class="bull-btn" onclick="coHit('B50',50,'B')">Bull 50</button>
     </div>
-    <button class="miss" onclick="coMiss()" style="width:100%;margin-top:6px;">MISS</button>
+    <button class="miss" id="missBtn-checkout" onclick="coMiss()" style="width:100%;margin-top:6px;">MISS</button>
   </div>
   <button onclick="show('start')" style="background:#333;color:#fff;width:100%;max-width:320px;">Zurueck</button>
 </div>
@@ -555,6 +763,16 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   </div>
 </div>
 
+<!-- ONLINE CONNECTING OVERLAY -->
+<div id="onlineConnecting" class="modal">
+  <div class="modal-box" style="text-align:center;">
+    <div id="connectSpinner" style="width:48px;height:48px;border:4px solid #334155;border-top:4px solid #22d3ee;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+    <h3 id="connectTitle">Verbinde…</h3>
+    <p id="connectMsg" style="color:#64748b;font-size:13px;margin-top:8px;">Server wacht auf — kann bis zu 30 Sekunden dauern</p>
+    <button onclick="connectAbort()" style="background:#333;color:#fff;width:100%;margin-top:16px;">Abbrechen</button>
+  </div>
+</div>
+
 <!-- ONLINE JOIN MODAL -->
 <div id="onlineJoinModal" class="modal">
   <div class="modal-box">
@@ -573,7 +791,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <h3>Warte auf Gegner…</h3>
     <p style="color:#64748b;font-size:13px;">Schick deinem Freund diesen Code:</p>
     <div class="room-code" id="onlineRoomCode">XXXXX</div>
-    <p style="color:#64748b;font-size:12px;margin-top:4px;">Er öffnet die App → Online spielen → Beitreten</p>
+    <p style="color:#64748b;font-size:12px;margin-top:4px;">Dein Freund öffnet:<br><strong style="color:#22d3ee;font-size:13px;">darts-server-zux1.onrender.com</strong><br>→ Online spielen → Code eingeben</p>
     <button onclick="onlineCancel()" style="background:#333;color:#fff;width:100%;margin-top:16px;">Abbrechen</button>
   </div>
 </div>
@@ -710,10 +928,10 @@ const segments=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 
 // 4 Ringe: Double außen, Single, Triple, Single innen
 const RINGS=[
-  {r1:60,r2:80,type:'D'},
-  {r1:38,r2:60,type:'S'},
-  {r1:26,r2:38,type:'T'},
-  {r1:8, r2:26,type:'S'}
+  {r1:70,r2:80,type:'D'},
+  {r1:42,r2:70,type:'S'},
+  {r1:30,r2:42,type:'T'},
+  {r1:18,r2:30,type:'S'}
 ];
 const BOARD_OFFSET=-9; // 20 gerade oben
 
@@ -793,14 +1011,14 @@ function buildBoard(svg, onHit, isTarget){
   });
   // Bull outer B25
   let b1=document.createElementNS("http://www.w3.org/2000/svg","circle");
-  b1.setAttribute('cx',100);b1.setAttribute('cy',100);b1.setAttribute('r',8);
+  b1.setAttribute('cx',100);b1.setAttribute('cy',100);b1.setAttribute('r',18);
   b1.setAttribute('fill','#27ae60');
   b1.onclick=()=>onHit('B25',25,'B');
   if(isTarget&&isTarget('B25','B',25)) b1.classList.add('activeTarget');
   svg.appendChild(b1);
   // Bull inner B50
   let b2=document.createElementNS("http://www.w3.org/2000/svg","circle");
-  b2.setAttribute('cx',100);b2.setAttribute('cy',100);b2.setAttribute('r',4);
+  b2.setAttribute('cx',100);b2.setAttribute('cy',100);b2.setAttribute('r',9);
   b2.setAttribute('fill','#c0392b');
   b2.onclick=()=>onHit('B50',50,'B');
   if(isTarget&&isTarget('B50','B',50)) b2.classList.add('activeTarget');
@@ -808,7 +1026,7 @@ function buildBoard(svg, onHit, isTarget){
   // Segment numbers
   segments.forEach((num,i)=>{
     let angle=i*step+BOARD_OFFSET+step/2;
-    let pos=polar(100,100,88,angle);
+    let pos=polar(100,100,90,angle);
     let txt=document.createElementNS("http://www.w3.org/2000/svg","text");
     txt.setAttribute('x',pos.x);txt.setAttribute('y',pos.y);
     txt.setAttribute('font-size','7');txt.setAttribute('fill','#ffffff');
@@ -872,22 +1090,44 @@ function coaching(){
   return "Sauber spielen, Rhythmus halten";
 }
 function render(){
+  // Classic
   const svgC=document.getElementById('board-classic');
-  if(svgC) buildBoard(svgC,(id)=>hit(id),(id,type)=>{
-    const tgt=currentTarget();
-    if(tgt===id) return true;
-    if(tgt==='T'&&type==='T') return true;
-    if(tgt==='BULL'&&(id==='B25'||id==='B50')) return true;
-    return false;
-  });
+  renderInputToggle('inputToggle-classic');
+  if(inputMode==='numpad'){
+    if(svgC) svgC.style.display='none';
+    const npC=document.getElementById('numpad-classic');
+    if(npC){npC.style.display='';renderNumpad('numpad-classic',(pts,type,num)=>{if(num===25||num===50)hit('B'+num);else hit(type+num);},()=>miss());}
+    const mbC=document.getElementById('missBtn-classic');if(mbC)mbC.style.display='none';
+  } else {
+    if(svgC){svgC.style.display='';buildBoard(svgC,(id)=>hit(id),(id,type)=>{
+      const tgt=currentTarget();
+      if(tgt===id) return true;
+      if(tgt==='T'&&type==='T') return true;
+      if(tgt==='BULL'&&(id==='B25'||id==='B50')) return true;
+      return false;
+    });}
+    const npC=document.getElementById('numpad-classic');if(npC)npC.style.display='none';
+    const mbC=document.getElementById('missBtn-classic');if(mbC)mbC.style.display='';
+  }
+  // Flow
   const svgF=document.getElementById('board-flow');
-  if(svgF) buildBoard(svgF,(id)=>hit(id),(id,type)=>{
-    const tgt=currentTarget();
-    if(tgt===id) return true;
-    if(tgt==='T'&&type==='T') return true;
-    if(tgt==='BULL'&&(id==='B25'||id==='B50')) return true;
-    return false;
-  });
+  renderInputToggle('inputToggle-flow');
+  if(inputMode==='numpad'){
+    if(svgF) svgF.style.display='none';
+    const npF=document.getElementById('numpad-flow');
+    if(npF){npF.style.display='';renderNumpad('numpad-flow',(pts,type,num)=>{if(num===25||num===50)hit('B'+num);else hit(type+num);},()=>miss());}
+    const mbF=document.getElementById('missBtn-flow');if(mbF)mbF.style.display='none';
+  } else {
+    if(svgF){svgF.style.display='';buildBoard(svgF,(id)=>hit(id),(id,type)=>{
+      const tgt=currentTarget();
+      if(tgt===id) return true;
+      if(tgt==='T'&&type==='T') return true;
+      if(tgt==='BULL'&&(id==='B25'||id==='B50')) return true;
+      return false;
+    });}
+    const npF=document.getElementById('numpad-flow');if(npF)npF.style.display='none';
+    const mbF=document.getElementById('missBtn-flow');if(mbF)mbF.style.display='';
+  }
   updateDashboard();
   const info=document.getElementById('info');
   if(info) info.innerHTML='Score: '+state.score+'<br>'+state.round+' | Dart '+state.dart+' = '+currentTarget()+'<br>Session Score: '+state.sessionScore;
@@ -1055,14 +1295,25 @@ function ssRender(){
   // Dots
   const dotsEl=document.getElementById('ssDots');dotsEl.innerHTML='';
   for(let i=0;i<9;i++){let d=document.createElement('div');d.className='round-dot';if(i<ssState.round)d.classList.add('done');else if(i===ssState.round)d.classList.add('active');dotsEl.appendChild(d);}
-  // Board
-  buildBoard(document.getElementById('board-splitscore'),(id)=>ssHit(id),(id,type,num)=>{
-    if(r.type==='single'&&num===r.num) return true;
-    if(r.type==='double'&&type==='D') return true;
-    if(r.type==='triple'&&type==='T') return true;
-    if(r.type==='bull'&&(id==='B25'||id==='B50')) return true;
-    return false;
-  });
+  // Board / Numpad
+  const svgSS=document.getElementById('board-splitscore');
+  renderInputToggle('inputToggle-splitscore');
+  if(inputMode==='numpad'){
+    if(svgSS) svgSS.style.display='none';
+    const npSS=document.getElementById('numpad-splitscore');
+    if(npSS){npSS.style.display='';renderNumpad('numpad-splitscore',(pts,type,num)=>{if(num===25||num===50)ssHit('B'+num);else ssHit(type+num);},()=>ssMiss());}
+    const mbSS=document.getElementById('missBtn-splitscore');if(mbSS)mbSS.style.display='none';
+  } else {
+    if(svgSS){svgSS.style.display='';buildBoard(svgSS,(id)=>ssHit(id),(id,type,num)=>{
+      if(r.type==='single'&&num===r.num) return true;
+      if(r.type==='double'&&type==='D') return true;
+      if(r.type==='triple'&&type==='T') return true;
+      if(r.type==='bull'&&(id==='B25'||id==='B50')) return true;
+      return false;
+    });}
+    const npSS=document.getElementById('numpad-splitscore');if(npSS)npSS.style.display='none';
+    const mbSS=document.getElementById('missBtn-splitscore');if(mbSS)mbSS.style.display='';
+  }
 }
 
 // ── Phoenix Split ──────────────────────────────────────────────────────────────
@@ -1138,14 +1389,25 @@ function phoenixRender(){
   else c.innerText='';
   const dotsEl=document.getElementById('pDots');dotsEl.innerHTML='';
   for(let i=0;i<pxRounds.length;i++){let d=document.createElement('div');d.className='round-dot';if(i<pState.round)d.classList.add('done');else if(i===pState.round)d.classList.add('active');dotsEl.appendChild(d);}
-  buildBoard(document.getElementById('board-phoenix'),(id)=>phoenixHit(id),(id,type,num)=>{
-    if(r.type==='single'&&num===parseInt(target.substring(1))) return true;
-    if(r.type==='double'&&id===target) return true;
-    if(r.type==='triple'&&id===target) return true;
-    if(r.type==='triple_free'&&type==='T') return true;
-    if(r.type==='bull'&&(id==='B25'||id==='B50')) return true;
-    return false;
-  });
+  const svgPX=document.getElementById('board-phoenix');
+  renderInputToggle('inputToggle-phoenix');
+  if(inputMode==='numpad'){
+    if(svgPX) svgPX.style.display='none';
+    const npPX=document.getElementById('numpad-phoenix');
+    if(npPX){npPX.style.display='';renderNumpad('numpad-phoenix',(pts,type,num)=>{if(num===25||num===50)phoenixHit('B'+num);else phoenixHit(type+num);},()=>phoenixMiss());}
+    const mbPX=document.getElementById('missBtn-phoenix');if(mbPX)mbPX.style.display='none';
+  } else {
+    if(svgPX){svgPX.style.display='';buildBoard(svgPX,(id)=>phoenixHit(id),(id,type,num)=>{
+      if(r.type==='single'&&num===parseInt(target.substring(1))) return true;
+      if(r.type==='double'&&id===target) return true;
+      if(r.type==='triple'&&id===target) return true;
+      if(r.type==='triple_free'&&type==='T') return true;
+      if(r.type==='bull'&&(id==='B25'||id==='B50')) return true;
+      return false;
+    });}
+    const npPX=document.getElementById('numpad-phoenix');if(npPX)npPX.style.display='none';
+    const mbPX=document.getElementById('missBtn-phoenix');if(mbPX)mbPX.style.display='';
+  }
 }
 
 // ── X01 ────────────────────────────────────────────────────────────────────────
@@ -1187,6 +1449,7 @@ function x01Setup(startScore){
     let n2=x01BotEnabled?'Bot':(document.getElementById('nameP2').value.trim()||'Spieler 2');
     x01State.names=[n1,n2];
     x01State.botPlayer=x01BotEnabled?1:null;
+    x01HybridManual=null;
     matchInit();
     x01Init(startScore);show('x01');
   };
@@ -1200,6 +1463,7 @@ function x01SetOut(mode){
 }
 function x01Init(startScore){
   x01State.startScore=startScore;x01State.scores=[startScore,startScore];
+  x01State.scoreBeforeTurn=[startScore,startScore];
   x01State.turn=0;x01State.dartCount=0;x01State.log=[];
   x01State.opened=x01State.inMode==='single'?[true,true]:[false,false];
   x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
@@ -1307,17 +1571,17 @@ function x01ProcessThrow(mult,num,points,type){
   if(newScore===0&&!x01IsValidFinish(mult,num)) isBust=true;
   if(newScore===1&&x01State.outMode!=='single') isBust=true;
   if(isBust){
-    x01State.log.unshift(x01State.names[player]+': BUST (bleibt bei '+current+')');
-    x01State.dartCount++;x01State.currentTurnDarts++;
-    if(x01State.dartCount>=3){
-      if(x01State.outMode!=='single' && x01State.turnHadCheckoutChance){
-        gameStats.x01.checkoutAttempts++;
-      }
-      x01RecordTurn();
-      x01State.dartCount=0;x01State.turn=x01State.turn===0?1:0;
-      x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
-      x01UpdateCheckoutChance();
+    x01State.scores[player]=x01State.scoreBeforeTurn[player];
+    x01State.log.unshift(x01State.names[player]+': BUST (zurück auf '+x01State.scoreBeforeTurn[player]+')');
+    if(x01State.outMode!=='single' && x01State.turnHadCheckoutChance){
+      gameStats.x01.checkoutAttempts++;
     }
+    x01RecordTurn();
+    x01State.dartCount=0;x01State.turn=x01State.turn===0?1:0;
+    x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
+    x01State.scoreBeforeTurn[x01State.turn]=x01State.scores[x01State.turn];
+    x01UpdateCheckoutChance();
+    flashFeedback(false);
     x01Render();return;
   }
 
@@ -1361,6 +1625,7 @@ function x01ProcessThrow(mult,num,points,type){
     x01RecordTurn();
     x01State.dartCount=0;x01State.turn=x01State.turn===0?1:0;
     x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
+    x01State.scoreBeforeTurn[x01State.turn]=x01State.scores[x01State.turn];
     x01UpdateCheckoutChance();
   }
   x01Render();
@@ -1483,45 +1748,107 @@ function cricRender(){
     for(let j=0;j<3;j++){let dot=document.createElement('div');dot.className='cricket-mark'+(cricState.marks[1][i]>j?(cricState.marks[1][i]>=3?' closed':' hit'):'');m2.appendChild(dot);}
     board.appendChild(m1);board.appendChild(numEl);board.appendChild(m2);
   });
-  buildBoard(document.getElementById('board-cricket'),(id,num,type)=>{
-    if(id==='B25'||id==='B50'){cricHitNum('B',1,false);}
-    else{let m=type==='T'?3:type==='D'?2:1;if(CRICKET_NUMS.includes(num))cricHitNum(num,m,false);else{if(isMyOnlineTurn('cricket')){cricLastState=JSON.parse(JSON.stringify(cricState));cricNextDart();}}}
-  },(id,type,num)=>{
-    return CRICKET_NUMS.includes(num)||(id==='B25'||id==='B50');
-  });
+  const svgCR=document.getElementById('board-cricket');
+  renderInputToggle('inputToggle-cricket');
+  if(inputMode==='numpad'){
+    if(svgCR) svgCR.style.display='none';
+    const npCR=document.getElementById('numpad-cricket');
+    if(npCR){npCR.style.display='';renderNumpad('numpad-cricket',(pts,type,num)=>{
+      if(num===25||num===50){cricHitNum('B',1,false);}
+      else{let m=type==='T'?3:type==='D'?2:1;if(CRICKET_NUMS.includes(num))cricHitNum(num,m,false);else cricMiss();}
+    },()=>cricMiss());}
+    const mbCR=document.getElementById('missBtn-cricket');if(mbCR)mbCR.style.display='none';
+  } else {
+    if(svgCR){svgCR.style.display='';buildBoard(svgCR,(id,num,type)=>{
+      if(id==='B25'||id==='B50'){cricHitNum('B',1,false);}
+      else{let m=type==='T'?3:type==='D'?2:1;if(CRICKET_NUMS.includes(num))cricHitNum(num,m,false);else{if(isMyOnlineTurn('cricket')){cricLastState=JSON.parse(JSON.stringify(cricState));cricNextDart();}}}
+    },(id,type,num)=>{
+      return CRICKET_NUMS.includes(num)||(id==='B25'||id==='B50');
+    });}
+    const npCR=document.getElementById('numpad-cricket');if(npCR)npCR.style.display='none';
+    const mbCR=document.getElementById('missBtn-cricket');if(mbCR)mbCR.style.display='';
+  }
   matchScoreRender('matchBarCric',cricState.names);
   cricBotCheck();
 }
 
 // ── Elimination ────────────────────────────────────────────────────────────────
-let elimState={scores:[],names:[],turn:0,dartCount:0,goal:301,active:false,gameOver:false};
+let elimState={scores:[],names:[],turn:0,dartCount:0,goal:301,active:false,gameOver:false,inMode:'single',outMode:'single',reOpen:false,opened:[],eliminated:[],turnSnapshot:null};
 let elimLastState=null;
 let elimGoalVal=301;
+let elimInVal='single';
+let elimOutVal='single';
+let elimReOpenVal=false;
 
-function eliminationSetup(){elimSetGoal(301);show('eliminationSetup');}
+function eliminationSetup(){elimSetGoal(301);elimSetIn('single');elimSetOut('single');elimSetReOpen(false);show('eliminationSetup');}
 function elimSetGoal(g){
   elimGoalVal=g;
   [201,301,401,501].forEach(v=>{document.getElementById('elimGoal'+v).classList.toggle('active',v===g);});
+}
+function elimSetIn(mode){
+  elimInVal=mode;
+  ['single','double','master'].forEach(m=>{
+    const el=document.getElementById('elimIn'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(el) el.classList.toggle('active',m===mode);
+  });
+}
+function elimSetOut(mode){
+  elimOutVal=mode;
+  ['single','double','master'].forEach(m=>{
+    const el=document.getElementById('elimOut'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(el) el.classList.toggle('active',m===mode);
+  });
+}
+function elimSetReOpen(val){
+  elimReOpenVal=val;
+  document.getElementById('elimReOpenNo').classList.toggle('active',!val);
+  document.getElementById('elimReOpenYes').classList.toggle('active',val);
 }
 function eliminationStart(){
   let names=[];
   for(let i=1;i<=6;i++){let v=document.getElementById('elimName'+i).value.trim();if(v)names.push(v);}
   if(names.length<2){alert('Mindestens 2 Spieler!');return;}
-  elimState={scores:new Array(names.length).fill(0),names:names,turn:0,dartCount:0,goal:elimGoalVal,active:true,gameOver:false};elimBotThinking=false;
+  const allOpened=elimInVal==='single'?new Array(names.length).fill(true):new Array(names.length).fill(false);
+  elimState={
+    scores:new Array(names.length).fill(0),
+    scoreBeforeTurn:new Array(names.length).fill(0),
+    names:names,
+    turn:0,
+    dartCount:0,
+    goal:elimGoalVal,
+    active:true,
+    gameOver:false,
+    inMode:elimInVal,
+    outMode:elimOutVal,
+    reOpen:elimReOpenVal,
+    opened:allOpened,
+    eliminated:new Array(names.length).fill(false),
+    turnSnapshot:null
+  };
+  elimBotThinking=false;
   matchInit();
   show('elimination');elimRender();
 }
-function elimBullHit(pts,fromOnline){
-  if(!fromOnline&&!isMyOnlineTurn('elim')) return;
-  if(!fromOnline) sendOnlineAction({mode:'elim',fn:'hit',args:[pts]});
+function elimBullHit(pts,typeOrOnline,num,fromOnline){
+  let type,isOnline;
+  if(typeof typeOrOnline==='boolean'){isOnline=typeOrOnline;type='S';num=pts;}
+  else{type=typeOrOnline||'S';isOnline=fromOnline||false;}
+  if(!isOnline&&!isMyOnlineTurn('elim')) return;
+  if(!isOnline) sendOnlineAction({mode:'elim',fn:'hit',args:[pts,type,num]});
   elimLastState=JSON.parse(JSON.stringify(elimState));
-  elimProcessHit(pts);
+  if(elimState.dartCount===0&&!elimState.turnSnapshot){
+    elimState.turnSnapshot={scores:[...elimState.scores],opened:[...elimState.opened],eliminated:[...elimState.eliminated]};
+  }
+  elimProcessHit(pts,type,num);
   updateOnlineTurnLabel();
 }
 function elimMiss(fromOnline){
   if(!fromOnline&&!isMyOnlineTurn('elim')) return;
   if(!fromOnline) sendOnlineAction({mode:'elim',fn:'miss'});
   elimLastState=JSON.parse(JSON.stringify(elimState));
+  if(elimState.dartCount===0&&!elimState.turnSnapshot){
+    elimState.turnSnapshot={scores:[...elimState.scores],opened:[...elimState.opened],eliminated:[...elimState.eliminated]};
+  }
   elimNextDart();
   updateOnlineTurnLabel();
 }
@@ -1530,15 +1857,51 @@ function elimUndo(){
   elimState=elimLastState;elimLastState=null;elimBotThinking=false;elimRender();
   updateOnlineTurnLabel();
 }
-function elimProcessHit(points){
+function elimProcessHit(points,type,num){
   let p=elimState.turn;
-  elimState.scores[p]+=points;
-  for(let i=0;i<elimState.scores.length;i++){
-    if(i!==p&&elimState.scores[i]===elimState.scores[p]&&elimState.scores[p]>0){
-      elimState.scores[i]=0;flashFeedback(true);
+
+  // ── IN-CHECK: Spieler muss ggf. erst öffnen ──
+  if(!elimState.opened[p]&&elimState.inMode!=='single'){
+    let isOpener=false;
+    if(elimState.inMode==='double') isOpener=(type==='D');
+    if(elimState.inMode==='master') isOpener=(type==='D')||(type==='T');
+    if(!isOpener){
+      flashFeedback(false);
+      elimNextDart();
+      return;
     }
+    elimState.opened[p]=true;
+    flashFeedback(true);
   }
+
+  // ── PUNKTE ADDIEREN ──
+  elimState.scores[p]+=points;
+
+  // ── OUT-CHECK: Zielscore erreicht? ──
   if(elimState.scores[p]>=elimState.goal){
+    let validFinish=true;
+    if(elimState.outMode==='double') validFinish=(type==='D');
+    if(elimState.outMode==='master') validFinish=(type==='D')||(type==='T');
+
+    if(!validFinish){
+      if(elimState.turnSnapshot){
+        elimState.scores=[...elimState.turnSnapshot.scores];
+        elimState.opened=[...elimState.turnSnapshot.opened];
+        elimState.eliminated=[...elimState.turnSnapshot.eliminated];
+      } else {
+        elimState.scores[p]=elimState.scoreBeforeTurn[p];
+      }
+      elimState.turnSnapshot=null;
+      flashFeedback(false);
+      elimState.dartCount=0;
+      elimState.turn=elimFindNextPlayer(p);
+      elimState.scoreBeforeTurn[elimState.turn]=elimState.scores[elimState.turn];
+      elimRender();
+      return;
+    }
+
+    // Gültiger Sieg!
+    elimState.turnSnapshot=null;
     gameStats.elimination.gamesPlayed++;
     if(isMyWin(p,elimState)) gameStats.elimination.gamesWon++;
     saveStats();
@@ -1550,37 +1913,136 @@ function elimProcessHit(points){
         nextLeg:()=>{
           if(onlineState.active)onlineCancel();
           const names=[...elimState.names];const goal=elimState.goal;
-          elimState={scores:new Array(names.length).fill(0),names,turn:0,dartCount:0,goal,active:true,gameOver:false};
+          const allOpened=elimState.inMode==='single'?new Array(names.length).fill(true):new Array(names.length).fill(false);
+          elimState={scores:new Array(names.length).fill(0),scoreBeforeTurn:new Array(names.length).fill(0),names,turn:0,dartCount:0,goal,active:true,gameOver:false,
+            inMode:elimState.inMode,outMode:elimState.outMode,reOpen:elimState.reOpen,
+            opened:allOpened,eliminated:new Array(names.length).fill(false),turnSnapshot:null};
           elimBotThinking=false;elimRender();
         }
       });
-    },100);return;
+    },100);
+    return;
   }
-  flashFeedback(true);elimNextDart();
+
+  // ── BUST-CHECK: goal-1 bei Double/Master Out → kein gültiger Checkout möglich ──
+  if(elimState.outMode!=='single'&&elimState.scores[p]===elimState.goal-1){
+    if(elimState.turnSnapshot){
+      elimState.scores=[...elimState.turnSnapshot.scores];
+      elimState.opened=[...elimState.turnSnapshot.opened];
+      elimState.eliminated=[...elimState.turnSnapshot.eliminated];
+    } else {
+      elimState.scores[p]=elimState.scoreBeforeTurn[p];
+    }
+    elimState.turnSnapshot=null;
+    flashFeedback(false);
+    elimState.dartCount=0;
+    elimState.turn=elimFindNextPlayer(p);
+    elimState.scoreBeforeTurn[elimState.turn]=elimState.scores[elimState.turn];
+    elimRender();
+    return;
+  }
+
+  // ── ELIMINATION-CHECK: Gleicher Score = eliminiert ──
+  for(let i=0;i<elimState.scores.length;i++){
+    if(i!==p&&elimState.scores[i]===elimState.scores[p]&&elimState.scores[p]>0){
+      elimState.scores[i]=0;
+      elimState.eliminated[i]=true;
+      if(elimState.reOpen) elimState.opened[i]=false;
+      flashFeedback(true);
+    }
+  }
+
+  // ── CHECK: Nur noch 1 Spieler übrig? ──
+  const activePlayers=elimState.eliminated.filter(e=>!e).length;
+  if(activePlayers===1&&elimState.names.length>2){
+    const lastStanding=elimState.eliminated.indexOf(false);
+    elimState.turnSnapshot=null;
+    gameStats.elimination.gamesPlayed++;
+    if(isMyWin(lastStanding,elimState)) gameStats.elimination.gamesWon++;
+    saveStats();
+    elimState.gameOver=true;elimBotThinking=false;
+    elimRender();
+    setTimeout(()=>{
+      matchLegWon(lastStanding,{
+        names:elimState.names,
+        nextLeg:()=>{
+          if(onlineState.active)onlineCancel();
+          const names=[...elimState.names];const goal=elimState.goal;
+          const allOpened=elimState.inMode==='single'?new Array(names.length).fill(true):new Array(names.length).fill(false);
+          elimState={scores:new Array(names.length).fill(0),scoreBeforeTurn:new Array(names.length).fill(0),names,turn:0,dartCount:0,goal,active:true,gameOver:false,
+            inMode:elimState.inMode,outMode:elimState.outMode,reOpen:elimState.reOpen,
+            opened:allOpened,eliminated:new Array(names.length).fill(false),turnSnapshot:null};
+          elimBotThinking=false;elimRender();
+        }
+      });
+    },100);
+    return;
+  }
+
+  flashFeedback(true);
+  elimNextDart();
+}
+function elimFindNextPlayer(current){
+  let next=(current+1)%elimState.names.length;
+  let safety=0;
+  while(elimState.eliminated[next]&&safety<elimState.names.length){
+    next=(next+1)%elimState.names.length;
+    safety++;
+  }
+  return next;
 }
 function elimNextDart(){
   elimState.dartCount++;
-  if(elimState.dartCount>=3){elimState.dartCount=0;elimState.turn=(elimState.turn+1)%elimState.names.length;}
+  if(elimState.dartCount>=3){
+    elimState.dartCount=0;
+    elimState.turnSnapshot=null;
+    elimState.turn=elimFindNextPlayer(elimState.turn);
+    elimState.scoreBeforeTurn[elimState.turn]=elimState.scores[elimState.turn];
+  }
   elimRender();
 }
 function elimRender(){
   document.getElementById('elimGoalDisplay').innerText='Ziel: '+elimState.goal+' Punkte';
+  let modeText='In: '+elimState.inMode+' | Out: '+elimState.outMode;
+  if(elimState.reOpen) modeText+=' | Re-Open: Ja';
+  const modeEl=document.getElementById('elimModeDisplay');
+  if(modeEl) modeEl.innerText=modeText;
+
   document.getElementById('elimTurn').innerText=elimState.names[elimState.turn]+' ist dran';
-  document.getElementById('elimDart').innerText='Dart '+(elimState.dartCount+1)+'/3';
+  let hint='';
+  if(!elimState.opened[elimState.turn]&&elimState.inMode!=='single'){
+    hint=elimState.inMode==='double'?' (braucht Double)':' (braucht Double/Triple)';
+  }
+  document.getElementById('elimDart').innerText='Dart '+(elimState.dartCount+1)+'/3'+hint;
+
   const playersEl=document.getElementById('elimPlayers');playersEl.innerHTML='';
   elimState.names.forEach((name,i)=>{
     let div=document.createElement('div');
-    div.className='elim-player'+(i===elimState.turn?' active-turn':'')+(elimState.scores[i]===0&&i!==elimState.turn?' zeroed':'');
-    div.innerHTML='<div class="ep-name">'+name+'</div><div class="ep-score">'+elimState.scores[i]+'</div>';
+    let classes='elim-player';
+    if(i===elimState.turn) classes+=' active-turn';
+    if(elimState.eliminated[i]) classes+=' zeroed';
+    else if(elimState.scores[i]===0&&i!==elimState.turn) classes+=' zeroed';
+    div.className=classes;
+    let nameDisplay=name;
+    if(elimState.eliminated[i]&&elimState.reOpen) nameDisplay='⊘ '+name;
+    let openHint='';
+    if(!elimState.opened[i]&&elimState.inMode!=='single'&&!elimState.eliminated[i]){
+      openHint='<div style="font-size:10px;color:#E8681A;">noch nicht geöffnet</div>';
+    }
+    div.innerHTML='<div class="ep-name">'+nameDisplay+'</div><div class="ep-score">'+elimState.scores[i]+'</div>'+openHint;
     playersEl.appendChild(div);
   });
+
   buildBoard(document.getElementById('board-elimination'),(id,num,type)=>{
     if(!isMyOnlineTurn('elim')) return;
     let mult=type==='T'?3:type==='D'?2:1;
     const pts=mult*num;
-    sendOnlineAction({mode:'elim',fn:'hit',args:[pts]});
+    sendOnlineAction({mode:'elim',fn:'hit',args:[pts,type,num]});
     elimLastState=JSON.parse(JSON.stringify(elimState));
-    elimProcessHit(pts);
+    if(elimState.dartCount===0&&!elimState.turnSnapshot){
+      elimState.turnSnapshot={scores:[...elimState.scores],opened:[...elimState.opened],eliminated:[...elimState.eliminated]};
+    }
+    elimProcessHit(pts,type,num);
     updateOnlineTurnLabel();
   },null);
   matchScoreRender('matchBarElim',elimState.names);
@@ -1724,10 +2186,24 @@ function shanRender(){
   // Log
   const logEl=document.getElementById('shanLog');
   if(logEl) logEl.innerText='Segment '+shanState.round+' | '+shanState.names[shanState.turn]+' | Dart '+(shanState.dartCount+1)+'/3';
-  // Board: highlight current round segment
-  buildBoard(document.getElementById('board-shanghai'),(id,num,type)=>shanHit(id,num,type),(id,type,num)=>{
-    return num===shanState.round;
-  });
+  // Board / Numpad
+  const svgSH=document.getElementById('board-shanghai');
+  renderInputToggle('inputToggle-shanghai');
+  if(inputMode==='numpad'){
+    if(svgSH) svgSH.style.display='none';
+    const npSH=document.getElementById('numpad-shanghai');
+    if(npSH){npSH.style.display='';renderNumpad('numpad-shanghai',(pts,type,num)=>{
+      if(num===25||num===50)shanHit('B'+num,num,type);
+      else shanHit(type+num,num,type);
+    },()=>shanMiss());}
+    const mbSH=document.getElementById('missBtn-shanghai');if(mbSH)mbSH.style.display='none';
+  } else {
+    if(svgSH){svgSH.style.display='';buildBoard(svgSH,(id,num,type)=>shanHit(id,num,type),(id,type,num)=>{
+      return num===shanState.round;
+    });}
+    const npSH=document.getElementById('numpad-shanghai');if(npSH)npSH.style.display='none';
+    const mbSH=document.getElementById('missBtn-shanghai');if(mbSH)mbSH.style.display='';
+  }
   matchScoreRender('matchBarShan',shanState.names);
   shanBotCheck();
 }
@@ -1840,14 +2316,28 @@ function atcRender(){
       +'<div class="atc-progress-bar"><div class="atc-progress-fill" style="width:'+pct+'%"></div></div>';
     pl.appendChild(div);
   });
-  // Board: highlight target
-  buildBoard(document.getElementById('board-atc'),(id,num,type)=>atcHit(id,num,type),(id,type,num)=>{
-    if(target==='Bull') return id==='B25'||id==='B50';
-    if(atcState.variant==='single') return num===target;
-    if(atcState.variant==='double') return id==='D'+target;
-    if(atcState.variant==='triple') return id==='T'+target;
-    return false;
-  });
+  // Board / Numpad
+  const svgAT=document.getElementById('board-atc');
+  renderInputToggle('inputToggle-atc');
+  if(inputMode==='numpad'){
+    if(svgAT) svgAT.style.display='none';
+    const npAT=document.getElementById('numpad-atc');
+    if(npAT){npAT.style.display='';renderNumpad('numpad-atc',(pts,type,num)=>{
+      if(num===25||num===50)atcHit('B'+num,num,type);
+      else atcHit(type+num,num,type);
+    },()=>atcMiss());}
+    const mbAT=document.getElementById('missBtn-atc');if(mbAT)mbAT.style.display='none';
+  } else {
+    if(svgAT){svgAT.style.display='';buildBoard(svgAT,(id,num,type)=>atcHit(id,num,type),(id,type,num)=>{
+      if(target==='Bull') return id==='B25'||id==='B50';
+      if(atcState.variant==='single') return num===target;
+      if(atcState.variant==='double') return id==='D'+target;
+      if(atcState.variant==='triple') return id==='T'+target;
+      return false;
+    });}
+    const npAT=document.getElementById('numpad-atc');if(npAT)npAT.style.display='none';
+    const mbAT=document.getElementById('missBtn-atc');if(mbAT)mbAT.style.display='';
+  }
   matchScoreRender('matchBarAtc',atcState.names);
   atcBotCheck();
 }
@@ -1947,12 +2437,26 @@ function b27Render(){
   // Dots
   const dotsEl=document.getElementById('b27Dots');dotsEl.innerHTML='';
   for(let i=0;i<21;i++){let d=document.createElement('div');d.className='round-dot';if(i<b27St.round)d.classList.add('done');else if(i===b27St.round)d.classList.add('active');dotsEl.appendChild(d);}
-  // Board
-  buildBoard(document.getElementById('board-b27'),(id,num,type)=>b27Hit(id,num,type),(id,type,num)=>{
-    if(r.type==='double') return id==='D'+r.num;
-    if(r.type==='bull') return id==='B25'||id==='B50';
-    return false;
-  });
+  // Board / Numpad
+  const svgB27=document.getElementById('board-b27');
+  renderInputToggle('inputToggle-b27');
+  if(inputMode==='numpad'){
+    if(svgB27) svgB27.style.display='none';
+    const npB27=document.getElementById('numpad-b27');
+    if(npB27){npB27.style.display='';renderNumpad('numpad-b27',(pts,type,num)=>{
+      if(num===25||num===50)b27Hit('B'+num,num,type);
+      else b27Hit(type+num,num,type);
+    },()=>b27Miss());}
+    const mbB27=document.getElementById('missBtn-b27');if(mbB27)mbB27.style.display='none';
+  } else {
+    if(svgB27){svgB27.style.display='';buildBoard(svgB27,(id,num,type)=>b27Hit(id,num,type),(id,type,num)=>{
+      if(r.type==='double') return id==='D'+r.num;
+      if(r.type==='bull') return id==='B25'||id==='B50';
+      return false;
+    });}
+    const npB27=document.getElementById('numpad-b27');if(npB27)npB27.style.display='none';
+    const mbB27=document.getElementById('missBtn-b27');if(mbB27)mbB27.style.display='';
+  }
 }
 
 // ── CHECKOUT TRAINING ─────────────────────────────────────────────────────────
@@ -2052,12 +2556,29 @@ function coRender(){
     } else if(i===coState.round) d.classList.add('active');
     dotsEl.appendChild(d);
   }
-  // Board — highlight double field of remaining if <= 40
-  buildBoard(document.getElementById('board-checkout'),(id,num,type)=>coHit(id,num,type),(id,type,num)=>{
-    if(coState.remaining===50) return id==='B50';
-    if(coState.remaining<=40&&coState.remaining%2===0&&type==='D'&&num===coState.remaining/2) return true;
-    return false;
-  });
+  // Board / Numpad
+  const svgCO=document.getElementById('board-checkout');
+  const coBullRow=document.getElementById('coBullRow');
+  renderInputToggle('inputToggle-checkout');
+  if(inputMode==='numpad'){
+    if(svgCO) svgCO.style.display='none';
+    if(coBullRow) coBullRow.style.display='none';
+    const npCO=document.getElementById('numpad-checkout');
+    if(npCO){npCO.style.display='';renderNumpad('numpad-checkout',(pts,type,num)=>{
+      if(num===25||num===50)coHit('B'+num,num,'B');
+      else coHit(type+num,num,type);
+    },()=>coMiss());}
+    const mbCO=document.getElementById('missBtn-checkout');if(mbCO)mbCO.style.display='none';
+  } else {
+    if(svgCO){svgCO.style.display='';buildBoard(svgCO,(id,num,type)=>coHit(id,num,type),(id,type,num)=>{
+      if(coState.remaining===50) return id==='B50';
+      if(coState.remaining<=40&&coState.remaining%2===0&&type==='D'&&num===coState.remaining/2) return true;
+      return false;
+    });}
+    if(coBullRow) coBullRow.style.display='';
+    const npCO=document.getElementById('numpad-checkout');if(npCO)npCO.style.display='none';
+    const mbCO=document.getElementById('missBtn-checkout');if(mbCO)mbCO.style.display='';
+  }
 }
 
 // ── GAME STATS ────────────────────────────────────────────────────────────────
@@ -2090,6 +2611,10 @@ let matchState={
   legsWon:[0,0],
   setsWon:[0,0]
 };
+
+// Early declarations needed before first render()
+let inputMode=localStorage.getItem('inputMode')||'board';
+let npMults={};
 
 load();loadStats();render();
 mfSetMode('single');
@@ -2205,15 +2730,29 @@ let elimBotThinking=false;
 
 function elimBotCheck(){
   if(elimState.gameOver||!isBot(elimState.names[elimState.turn])||elimBotThinking) return;
+  if(elimState.eliminated[elimState.turn]){elimState.turn=elimFindNextPlayer(elimState.turn);elimRender();return;}
   elimBotThinking=true;
   setTimeout(elimBotDart,700);
 }
 function elimBotDart(){
   if(elimState.gameOver||!document.getElementById('elimination').classList.contains('active')){elimBotThinking=false;return;}
   if(!isBot(elimState.names[elimState.turn])){elimBotThinking=false;return;}
-  const r=botSimThrow(20,3);
-  if(r.num===0) elimNextDart();
-  else elimProcessHit(r.num*r.mult);
+  const botIdx=elimState.turn;
+  if(elimState.dartCount===0&&!elimState.turnSnapshot){
+    elimState.turnSnapshot={scores:[...elimState.scores],opened:[...elimState.opened],eliminated:[...elimState.eliminated]};
+  }
+  elimLastState=JSON.parse(JSON.stringify(elimState));
+  let aimNum=20, aimMult=3;
+  if(!elimState.opened[botIdx]&&elimState.inMode!=='single'){
+    aimMult=2;
+  }
+  const r=botSimThrow(aimNum,aimMult);
+  if(r.num===0){
+    elimMiss(false);
+  } else {
+    const type=r.mult===3?'T':r.mult===2?'D':'S';
+    elimProcessHit(r.num*r.mult,type,r.num);
+  }
   if(!elimState.gameOver&&isBot(elimState.names[elimState.turn])) setTimeout(elimBotDart,700);
   else elimBotThinking=false;
 }
@@ -2416,7 +2955,7 @@ function voiceRenderBtn(){
 // Verhindert, dass socket.io beim Seitenaufruf einen 404 produziert.
 let scriptLoadPromises = {};
 function loadScript(url, timeoutMs){
-  timeoutMs = timeoutMs || 5000;
+  timeoutMs = timeoutMs || 20000;
   if(scriptLoadPromises[url]) return scriptLoadPromises[url];
   scriptLoadPromises[url] = new Promise((resolve, reject) => {
     const s = document.createElement('script');
@@ -2446,7 +2985,7 @@ const SERVER_URL = location.protocol === 'file:' ? 'http://localhost:3000' : loc
 // Wirft bei Fehler -- Aufrufer muss den Fehler behandeln.
 async function ensureSocketIoLoaded(){
   if(typeof io !== 'undefined') return true;
-  await loadScript(SERVER_URL + '/socket.io/socket.io.js', 5000);
+  await loadScript(SERVER_URL + '/socket.io/socket.io.js', 20000);
   if(typeof io === 'undefined'){
     throw new Error('socket.io wurde geladen, aber "io" ist nicht verfuegbar.');
   }
@@ -2483,36 +3022,67 @@ function getOnlineName(){
   return document.getElementById('onlineName').value.trim()||'Spieler';
 }
 
+let connectAbortFn = null;
+function connectAbort(){
+  if(connectAbortFn) connectAbortFn();
+  document.getElementById('onlineConnecting').classList.remove('active');
+  onlineCancel();
+}
+
 async function ensureSocket(cb){
   if(onlineState.socket&&onlineState.socket.connected){cb();return;}
   if(onlineState.socket){onlineState.socket.disconnect();}
+
+  // Overlay anzeigen
+  const overlay = document.getElementById('onlineConnecting');
+  const titleEl = document.getElementById('connectTitle');
+  const msgEl   = document.getElementById('connectMsg');
+  overlay.classList.add('active');
+  titleEl.innerText = 'Verbinde…';
+  msgEl.innerText   = 'Server wacht auf — kann bis zu 30 Sekunden dauern';
 
   // V16.0: socket.io erst bei Bedarf laden
   try {
     await ensureSocketIoLoaded();
   } catch(e) {
+    overlay.classList.remove('active');
     alert('Online-Modus nicht verfügbar.\n\nDer Server unter '+SERVER_URL+' ist nicht erreichbar.\n\nDie App läuft weiter im Offline-Modus — du kannst alle Solo-, Bot- und lokalen Multiplayer-Spiele normal nutzen.');
     onlineCancel();
     return;
   }
 
-  const sock=io(SERVER_URL,{transports:['websocket','polling'],timeout:5000});
+  titleEl.innerText = 'Verbinde mit Server…';
+  msgEl.innerText   = 'Fast da…';
+
+  const sock=io(SERVER_URL,{transports:['websocket','polling'],timeout:20000});
   onlineState.socket=sock;
   let connected=false;
+
   const timeout=setTimeout(()=>{
     if(!connected){
       sock.disconnect();
-      alert('Verbindung zum Server fehlgeschlagen (Timeout).\n\nServer läuft auf: '+SERVER_URL+'\nBitte Terminal prüfen.');
+      overlay.classList.remove('active');
+      alert('Verbindung zum Server fehlgeschlagen.\n\nServer: '+SERVER_URL+'\n\nDer Server antwortet nicht. Bitte in 1 Minute erneut versuchen.');
       onlineCancel();
     }
-  },6000);
+  },20000);
+
+  connectAbortFn = ()=>{
+    clearTimeout(timeout);
+    sock.disconnect();
+  };
+
   sock.on('connect',()=>{
     connected=true;
     clearTimeout(timeout);
+    connectAbortFn=null;
+    overlay.classList.remove('active');
     cb();
   });
   sock.on('connect_error',(err)=>{
     clearTimeout(timeout);
+    connectAbortFn=null;
+    overlay.classList.remove('active');
     alert('Kein Server erreichbar.\n\n'+SERVER_URL+'\n\nFehler: '+err.message);
     onlineCancel();
   });
@@ -2620,7 +3190,7 @@ function onlinePickGame(mode,score){
   } else if(mode==='cricket'){
     config={mode,names:[myName,oppName]};
   } else if(mode==='elim'){
-    config={mode,goal:score||301,names:[myName,oppName]};
+    config={mode,goal:score||301,names:[myName,oppName],inMode:elimInVal,outMode:elimOutVal,reOpen:elimReOpenVal};
   } else if(mode==='shanghai'){
     config={mode,names:[myName,oppName]};
   }
@@ -2652,7 +3222,11 @@ function startOnlineGame(config,isCreator){
       show('cricket');cricRender();
       break;
     case 'elim':
-      elimState={scores:[0,0],names:config.names,turn:0,dartCount:0,goal:config.goal||301,active:true,gameOver:false};
+      const eIn=config.inMode||'single';
+      const eOpened=eIn==='single'?[true,true]:[false,false];
+      elimState={scores:[0,0],names:config.names,turn:0,dartCount:0,goal:config.goal||301,active:true,gameOver:false,
+        inMode:eIn,outMode:config.outMode||'single',reOpen:config.reOpen||false,
+        opened:eOpened,eliminated:[false,false],turnSnapshot:null};
       elimBotThinking=false;
       show('elimination');elimRender();
       break;
@@ -2712,7 +3286,7 @@ function receiveOnlineAction(action){
       else if(action.fn==='miss'){cricLastState=JSON.parse(JSON.stringify(cricState));flashFeedback(false);cricNextDart();}
       break;
     case 'elim':
-      if(action.fn==='hit') elimProcessHit(action.args[0]);
+      if(action.fn==='hit') elimProcessHit(action.args[0],action.args[1]||'S',action.args[2]||action.args[0]);
       else if(action.fn==='miss'){elimLastState=JSON.parse(JSON.stringify(elimState));elimNextDart();}
       break;
     case 'shanghai':
@@ -2895,6 +3469,466 @@ function atcBotDart(){
   if(!atcState.gameOver&&isBot(atcState.names[atcState.turn])) setTimeout(atcBotDart,700);
   else atcBotThinking=false;
 }
+
+// ── CHECKOUT DATABASE ─────────────────────────────────────────────────────────
+const CHECKOUTS_DOUBLE={
+  170:'T20 T20 Bull',167:'T20 T19 Bull',164:'T20 T18 Bull',161:'T20 T17 Bull',
+  160:'T20 T20 D20',158:'T20 T20 D19',157:'T20 T19 D20',156:'T20 T20 D18',
+  155:'T20 T19 D19',154:'T20 T18 D20',153:'T20 T19 D18',152:'T20 T20 D16',
+  151:'T20 T17 D20',150:'T20 T18 D18',149:'T20 T19 D16',148:'T20 T16 D20',
+  147:'T20 T17 D18',146:'T20 T18 D16',145:'T20 T15 D20',144:'T20 T20 D12',
+  143:'T20 T17 D16',142:'T20 T14 D20',141:'T20 T19 D12',140:'T20 T20 D10',
+  139:'T19 T14 D20',138:'T20 T18 D12',137:'T19 T16 D20',136:'T20 T20 D8',
+  135:'T20 T13 D18',134:'T20 T14 D16',133:'T20 T19 D8',132:'T20 T16 D12',
+  131:'T20 T13 D16',130:'T20 T20 D5',129:'T19 T16 D12',128:'T18 T14 D16',
+  127:'T20 T17 D8',126:'T19 T19 D6',125:'Bull T20 D5',124:'T20 T16 D8',
+  123:'T19 T16 D9',122:'T18 T18 D7',121:'T20 T11 D14',120:'T20 S20 D20',
+  119:'T19 T12 D13',118:'T20 S18 D20',117:'T20 S17 D20',116:'T20 S16 D20',
+  115:'T20 S15 D20',114:'T20 S14 D20',113:'T19 S16 D20',112:'T20 S12 D20',
+  111:'T19 S14 D20',110:'T20 S10 D20',109:'T20 S9 D20',108:'T20 S8 D20',
+  107:'T19 S10 D20',106:'T20 S6 D20',105:'T20 S5 D20',104:'T20 S4 D20',
+  103:'T19 S6 D20',102:'T20 S2 D20',101:'T17 D10',100:'T20 D20',
+  99:'T19 S2 D20',98:'T20 D19',97:'T19 D20',96:'T20 D18',95:'Bull D20',
+  94:'T18 D20',93:'T19 D18',92:'T20 D16',91:'T17 D20',90:'T18 D18',
+  89:'T19 D16',88:'T20 D14',87:'T17 D18',86:'T18 D16',85:'T19 D14',
+  84:'T20 D12',83:'T17 D16',82:'Bull D16',81:'T19 D12',80:'T20 D10',
+  79:'T19 D11',78:'T18 D12',77:'T19 D10',76:'T20 D8',75:'T17 D12',
+  74:'T14 D16',73:'T19 D8',72:'T16 D12',71:'T13 D16',70:'T18 D8',
+  69:'T19 D6',68:'T20 D4',67:'T17 D8',66:'T14 D12',65:'T19 D4',
+  64:'T16 D8',63:'T17 D6',62:'T10 D16',61:'T15 D8',60:'S20 D20',
+  59:'S19 D20',58:'S18 D20',57:'S17 D20',56:'S16 D20',55:'S15 D20',
+  54:'S14 D20',53:'S13 D20',52:'S20 D16',51:'S19 D16',50:'S18 D16',
+  49:'S17 D16',48:'S16 D16',47:'S15 D16',46:'S14 D16',45:'S13 D16',
+  44:'S12 D16',43:'S3 D20',42:'S10 D16',41:'S9 D16',40:'D20',
+  39:'S7 D16',38:'D19',37:'S5 D16',36:'D18',35:'S3 D16',34:'D17',
+  33:'S1 D16',32:'D16',31:'S7 D12',30:'D15',29:'S13 D8',28:'D14',
+  27:'S11 D8',26:'D13',25:'S17 D4',24:'D12',23:'S7 D8',22:'D11',
+  21:'S5 D8',20:'D10',19:'S3 D8',18:'D9',17:'S1 D8',16:'D8',
+  15:'S7 D4',14:'D7',13:'S7 D3',12:'D6',11:'S3 D4',10:'D5',
+  9:'S1 D4',8:'D4',7:'S3 D2',6:'D3',5:'S1 D2',4:'D2',3:'S1 D1',2:'D1'
+};
+const CHECKOUTS_MASTER={
+  180:'T20 T20 T20',179:'T20 T20 T19',178:'T20 T20 T18',177:'T20 T20 T17',
+  176:'T20 T20 T16',175:'T20 T19 T18',174:'T20 T20 T14',173:'T20 T19 T16',
+  172:'T20 T20 T12',171:'T20 T19 T14'
+};
+function getCheckout(score,outMode){
+  if(outMode==='single') return null;
+  if(outMode==='master'&&score>=171&&score<=180) return CHECKOUTS_MASTER[score]||null;
+  if(score>=2&&score<=170) return CHECKOUTS_DOUBLE[score]||null;
+  return null;
+}
+
+// ── SIMPLE NUMPAD HELPERS ─────────────────────────────────────────────────────
+function renderInputToggle(containerId){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML='<div class="input-toggle">'
+    +'<button onclick="simpleSetInputMode(\'board\')" class="'+(inputMode==='board'?'active':'')+'">🎯 Board</button>'
+    +'<button onclick="simpleSetInputMode(\'numpad\')" class="'+(inputMode==='numpad'?'active':'')+'">⌨ Numpad</button>'
+    +'</div>';
+}
+function simpleSetInputMode(mode){
+  inputMode=mode;
+  localStorage.setItem('inputMode',mode);
+  // Update X01 + Elim setup toggles
+  ['board','numpad','hybrid'].forEach(m=>{
+    const e1=document.getElementById('x01SetupMode'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(e1) e1.classList.toggle('active',m===mode);
+    const e2=document.getElementById('elimSetupMode'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(e2) e2.classList.toggle('active',m===mode);
+  });
+  // Re-render active screen
+  const activeScreen=document.querySelector('.screen.active');
+  if(!activeScreen) return;
+  const id=activeScreen.id;
+  if(id==='classic') render();
+  else if(id==='flow') render();
+  else if(id==='splitscore') ssRender();
+  else if(id==='phoenix') phoenixRender();
+  else if(id==='cricket') cricRender();
+  else if(id==='shanghai') shanRender();
+  else if(id==='atc') atcRender();
+  else if(id==='b27') b27Render();
+  else if(id==='checkout') coRender();
+  else if(id==='x01') x01Render();
+  else if(id==='elimination') elimRender();
+}
+// npMults declared early (before first render) — see above
+function renderNumpad(containerId,onInput,onMiss){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  window['_npCb_'+containerId]=onInput;
+  window['_npMiss_'+containerId]=onMiss;
+  let html='<div class="numpad-mult">';
+  html+='<button class="toggle-btn" id="npS_'+containerId+'" onclick="npSetMult(\''+containerId+'\',\'S\')" style="min-height:44px;">Single</button>';
+  html+='<button class="toggle-btn" id="npD_'+containerId+'" onclick="npSetMult(\''+containerId+'\',\'D\')" style="min-height:44px;">Double</button>';
+  html+='<button class="toggle-btn" id="npT_'+containerId+'" onclick="npSetMult(\''+containerId+'\',\'T\')" style="min-height:44px;">Triple</button>';
+  html+='</div><div class="snp-grid">';
+  for(let n=1;n<=20;n++) html+='<button class="snp-btn" onclick="npHit(\''+containerId+'\','+n+')">'+n+'</button>';
+  html+='</div><div class="bull-row">';
+  html+='<button class="bull-btn" onclick="npBull(\''+containerId+'\',25)">Bull 25</button>';
+  html+='<button class="bull-btn" onclick="npBull(\''+containerId+'\',50)">Bull 50</button>';
+  html+='</div>';
+  html+='<button class="miss" onclick="window[\'_npMiss_'+containerId+'\']()" style="width:100%;margin-top:6px;">MISS</button>';
+  el.innerHTML=html;
+  npSetMult(containerId,'S');
+}
+function npSetMult(containerId,mult){
+  npMults[containerId]=mult;
+  ['S','D','T'].forEach(m=>{
+    const btn=document.getElementById('np'+m+'_'+containerId);
+    if(btn) btn.classList.toggle('active',m===mult);
+  });
+}
+function npHit(containerId,num){
+  const mult=npMults[containerId]||'S';
+  const factor=mult==='D'?2:mult==='T'?3:1;
+  const pts=num*factor;
+  const cb=window['_npCb_'+containerId];
+  if(cb) cb(pts,mult,num);
+  npSetMult(containerId,'S');
+}
+function npBull(containerId,pts){
+  const type=pts===50?'D':'S';
+  const cb=window['_npCb_'+containerId];
+  if(cb) cb(pts,type,pts);
+  npSetMult(containerId,'S');
+}
+
+// ── INPUT MODE ────────────────────────────────────────────────────────────────
+// inputMode declared early (before first render) — see above
+let x01NpBuffer='';
+let x01NpIndivMult='S';
+let x01NpIndivDarts=[];
+let elimNpBuffer='';
+let elimNpIndivMult='S';
+let elimNpIndivDarts=[];
+let x01HybridManual=null; // 'board'|'numpad'|null
+
+function setInputMode(mode){
+  inputMode=mode;
+  localStorage.setItem('inputMode',mode);
+  // Update all setup toggles
+  ['board','numpad','hybrid'].forEach(m=>{
+    const e1=document.getElementById('x01SetupMode'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(e1) e1.classList.toggle('active',m===mode);
+    const e2=document.getElementById('elimSetupMode'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(e2) e2.classList.toggle('active',m===mode);
+  });
+}
+
+function initInputModeUI(){
+  setInputMode(inputMode); // refresh toggle highlights
+}
+
+// Determines what input to show during X01 game
+function x01GetEffectiveInput(){
+  if(inputMode==='board') return 'board';
+  if(inputMode==='numpad') return 'numpad';
+  // hybrid
+  if(x01HybridManual) return x01HybridManual;
+  const p=x01State.turn;
+  const score=x01State.scores[p];
+  const threshold=x01State.outMode==='master'?180:170;
+  return (score<=threshold&&score>1)?'board':'numpad';
+}
+
+function x01UpdateInputUI(){
+  const eff=x01GetEffectiveInput();
+  const boardArea=document.getElementById('x01BoardArea');
+  const numpadArea=document.getElementById('x01NumpadArea');
+  const hybridSwitch=document.getElementById('x01HybridSwitch');
+  if(boardArea) boardArea.style.display=eff==='board'?'':'none';
+  if(numpadArea) numpadArea.style.display=eff==='numpad'?'':'none';
+  if(hybridSwitch) hybridSwitch.style.display=inputMode==='hybrid'?'flex':'none';
+  if(inputMode==='hybrid'){
+    const hb=document.getElementById('x01HybridBoard');
+    const hn=document.getElementById('x01HybridNumpad');
+    if(hb) hb.classList.toggle('active',eff==='board');
+    if(hn) hn.classList.toggle('active',eff==='numpad');
+  }
+  // Checkout suggestion
+  const p=x01State.turn;
+  const score=x01State.scores[p];
+  const co=getCheckout(score,x01State.outMode);
+  const coBox=document.getElementById('x01CheckoutBox');
+  const coWay=document.getElementById('x01CheckoutWay');
+  if(coBox&&coWay){
+    if(co){coBox.style.display='';coWay.innerText=co;}
+    else{coBox.style.display='none';}
+  }
+  // Reset numpad display when switching to numpad
+  if(eff==='numpad'){
+    x01NpBuffer='';
+    const disp=document.getElementById('x01NpDisplay');
+    if(disp) disp.innerText='—';
+  }
+}
+
+function x01HybridOverride(mode){
+  x01HybridManual=mode;
+  x01UpdateInputUI();
+}
+
+// X01 Numpad — total score
+function x01NpPress(d){
+  if(x01NpBuffer.length>=3) return;
+  if(x01NpBuffer===''&&d==='0'){x01NpBuffer='0';}
+  else{x01NpBuffer+=d;}
+  const val=parseInt(x01NpBuffer)||0;
+  if(val>180){x01NpBuffer=x01NpBuffer.slice(0,-1);flashFeedback(false);return;}
+  document.getElementById('x01NpDisplay').innerText=x01NpBuffer||'—';
+}
+function x01NpDelete(){
+  x01NpBuffer=x01NpBuffer.slice(0,-1);
+  document.getElementById('x01NpDisplay').innerText=x01NpBuffer||'—';
+}
+function x01NpQuick(val){x01NpBuffer=String(val);x01NpOK();}
+function x01NpOK(){
+  const val=parseInt(x01NpBuffer)||0;
+  x01NpBuffer='';
+  const disp=document.getElementById('x01NpDisplay');
+  if(disp) disp.innerText='—';
+  if(!isMyOnlineTurn('x01')) return;
+  if(val<0||val>180){flashFeedback(false);return;}
+  x01LastState=JSON.parse(JSON.stringify(x01State));
+  x01ProcessNumpad(val);
+  updateOnlineTurnLabel();
+}
+function x01ProcessNumpad(totalPts){
+  const p=x01State.turn;
+  const scoreBefore=x01State.scoreBeforeTurn[p]||x01State.scores[p];
+  const current=x01State.scores[p];
+  const newScore=current-totalPts;
+  // Bust checks
+  if(newScore<0){
+    x01State.scores[p]=scoreBefore;
+    x01State.log.unshift(x01State.names[p]+': BUST – '+totalPts+' (zurück auf '+scoreBefore+')');
+    flashFeedback(false);
+  } else if(newScore===0&&x01State.outMode!=='single'){
+    x01State.log.unshift(x01State.names[p]+': Checkout per Numpad nicht möglich – Board nutzen');
+    flashFeedback(false);
+  } else if(newScore===1&&x01State.outMode!=='single'){
+    x01State.scores[p]=scoreBefore;
+    x01State.log.unshift(x01State.names[p]+': BUST – '+totalPts+' (zurück auf '+scoreBefore+')');
+    flashFeedback(false);
+  } else {
+    x01State.scores[p]=newScore;
+    x01State.currentTurnPoints+=totalPts;
+    x01State.log.unshift(x01State.names[p]+': -'+totalPts+' = '+newScore);
+    flashFeedback(true);
+    if(newScore===0){
+      gameStats.x01.gamesPlayed++;
+      if(isMyWin(p,x01State)) gameStats.x01.gamesWon++;
+      gameStats.x01.totalPoints+=x01State.currentTurnPoints;
+      gameStats.x01.totalDarts+=x01State.currentTurnDarts+3;
+      saveStats();
+      x01State.log.unshift(x01State.names[p]+' GEWINNT!');
+      x01State.gameOver=true;x01BotThinking=false;
+      x01Render();
+      matchLegWon(p,{names:x01State.names,nextLeg:()=>{if(onlineState.active)onlineCancel();x01Init(x01State.startScore);}});
+      return;
+    }
+  }
+  x01RecordTurn();
+  x01State.dartCount=0;x01State.turn=x01State.turn===0?1:0;
+  x01State.currentTurnPoints=0;x01State.currentTurnDarts=0;
+  x01State.scoreBeforeTurn[x01State.turn]=x01State.scores[x01State.turn];
+  x01HybridManual=null;
+  x01UpdateCheckoutChance();
+  x01Render();
+}
+
+// X01 Numpad — individual dart mode
+function x01SetNpMode(mode){
+  document.getElementById('x01NpModeTotal').classList.toggle('active',mode==='total');
+  document.getElementById('x01NpModeIndiv').classList.toggle('active',mode==='indiv');
+  document.getElementById('x01NpTotal').style.display=mode==='total'?'':'none';
+  document.getElementById('x01NpIndiv').style.display=mode==='indiv'?'':'none';
+  if(mode==='indiv'){x01IndivReset();x01IndivBuildGrid();}
+}
+function x01IndivBuildGrid(){
+  const grid=document.getElementById('x01IndivSegGrid');
+  if(!grid||grid.children.length>0) return;
+  for(let i=1;i<=20;i++){
+    const btn=document.createElement('button');
+    btn.className='indiv-seg-btn';btn.innerText=i;
+    btn.onclick=()=>x01IndivHit(i,x01NpIndivMult);
+    grid.appendChild(btn);
+  }
+}
+function x01IndivSetMult(m){
+  x01NpIndivMult=m;
+  ['S','D','T'].forEach(x=>{const el=document.getElementById('x01Indiv'+x);if(el)el.classList.toggle('active',x===m);});
+}
+function x01IndivReset(){
+  x01NpIndivDarts=[];x01NpIndivMult='S';
+  x01IndivSetMult('S');
+  const log=document.getElementById('x01IndivLog');
+  if(log) log.innerText='Dart 1: —   Dart 2: —   Dart 3: —';
+}
+function x01IndivUpdateLog(){
+  const log=document.getElementById('x01IndivLog');
+  if(!log) return;
+  const lines=['Dart 1','Dart 2','Dart 3'].map((l,i)=>{
+    const d=x01NpIndivDarts[i];
+    return l+': '+(d?d.label:'—');
+  });
+  log.innerText=lines.join('   ');
+}
+function x01IndivHit(num,mult){
+  const m=x01NpIndivMult;
+  const pts=(m==='D'?2:m==='T'?3:1)*(num===50?25:num);
+  const label=num===50?'B50':num===25?'B25':m+num;
+  x01NpIndivDarts.push({num,mult:m,pts,label});
+  x01IndivSetMult('S');
+  x01IndivUpdateLog();
+  if(x01NpIndivDarts.length>=3) x01IndivCommit();
+}
+function x01IndivMiss(){
+  x01NpIndivDarts.push({num:0,mult:'S',pts:0,label:'Miss'});
+  x01IndivSetMult('S');
+  x01IndivUpdateLog();
+  if(x01NpIndivDarts.length>=3) x01IndivCommit();
+}
+function x01IndivCommit(){
+  if(!isMyOnlineTurn('x01')) return;
+  x01LastState=JSON.parse(JSON.stringify(x01State));
+  const darts=[...x01NpIndivDarts];
+  x01IndivReset();
+  for(const d of darts){
+    x01ProcessThrow(d.mult==='D'?2:d.mult==='T'?3:1,d.num,d.pts,d.mult);
+    if(x01State.gameOver) return;
+  }
+}
+
+// X01 Render — hook in input UI update
+const _x01RenderOrig=x01Render;
+x01Render=function(){_x01RenderOrig();x01UpdateInputUI();};
+
+// Elimination Numpad
+function elimGetEffectiveInput(){
+  if(inputMode==='board') return 'board';
+  return 'numpad'; // hybrid not applicable for Elim (no checkout)
+}
+function elimUpdateInputUI(){
+  const eff=elimGetEffectiveInput();
+  const boardArea=document.getElementById('elimBoardArea');
+  const numpadArea=document.getElementById('elimNumpadArea');
+  if(boardArea) boardArea.style.display=eff==='board'?'':'none';
+  if(numpadArea) numpadArea.style.display=eff==='numpad'?'':'none';
+  if(eff==='numpad'){
+    elimNpBuffer='';
+    const disp=document.getElementById('elimNpDisplay');
+    if(disp&&disp.innerText==='—'||!elimNpBuffer) {if(disp) disp.innerText='—';}
+  }
+}
+function elimNpPress(d){
+  if(elimNpBuffer.length>=3) return;
+  elimNpBuffer+=d;
+  const val=parseInt(elimNpBuffer)||0;
+  if(val>180){elimNpBuffer=elimNpBuffer.slice(0,-1);flashFeedback(false);return;}
+  document.getElementById('elimNpDisplay').innerText=elimNpBuffer||'—';
+}
+function elimNpDelete(){
+  elimNpBuffer=elimNpBuffer.slice(0,-1);
+  document.getElementById('elimNpDisplay').innerText=elimNpBuffer||'—';
+}
+function elimNpQuick(val){elimNpBuffer=String(val);elimNpOK();}
+function elimNpOK(){
+  const val=parseInt(elimNpBuffer)||0;
+  elimNpBuffer='';
+  const disp=document.getElementById('elimNpDisplay');
+  if(disp) disp.innerText='—';
+  if(!isMyOnlineTurn('elim')) return;
+  elimLastState=JSON.parse(JSON.stringify(elimState));
+  if(elimState.dartCount===0&&!elimState.turnSnapshot){
+    elimState.turnSnapshot={scores:[...elimState.scores],opened:[...elimState.opened],eliminated:[...elimState.eliminated]};
+  }
+  // Simulate 3 darts as single hits internally
+  elimProcessHit(val,'S',val);
+  // Advance turn to next player (numpad = 3 darts)
+  if(!elimState.gameOver){
+    elimState.dartCount=2; // will increment to 3 in elimNextDart
+    elimNextDart();
+  }
+  updateOnlineTurnLabel();
+}
+
+// Elimination Individual
+function elimSetNpMode(mode){
+  document.getElementById('elimNpModeTotal').classList.toggle('active',mode==='total');
+  document.getElementById('elimNpModeIndiv').classList.toggle('active',mode==='indiv');
+  document.getElementById('elimNpTotal').style.display=mode==='total'?'':'none';
+  document.getElementById('elimNpIndiv').style.display=mode==='indiv'?'':'none';
+  if(mode==='indiv'){elimIndivReset();elimIndivBuildGrid();}
+}
+function elimIndivBuildGrid(){
+  const grid=document.getElementById('elimIndivSegGrid');
+  if(!grid||grid.children.length>0) return;
+  for(let i=1;i<=20;i++){
+    const btn=document.createElement('button');
+    btn.className='indiv-seg-btn';btn.innerText=i;
+    btn.onclick=()=>elimIndivHit(i,elimNpIndivMult);
+    grid.appendChild(btn);
+  }
+}
+function elimIndivSetMult(m){
+  elimNpIndivMult=m;
+  ['S','D','T'].forEach(x=>{const el=document.getElementById('elimIndiv'+x);if(el)el.classList.toggle('active',x===m);});
+}
+function elimIndivReset(){
+  elimNpIndivDarts=[];elimNpIndivMult='S';
+  elimIndivSetMult('S');
+  const log=document.getElementById('elimIndivLog');
+  if(log) log.innerText='Dart 1: —   Dart 2: —   Dart 3: —';
+}
+function elimIndivUpdateLog(){
+  const log=document.getElementById('elimIndivLog');
+  if(!log) return;
+  const lines=['Dart 1','Dart 2','Dart 3'].map((l,i)=>{
+    const d=elimNpIndivDarts[i];
+    return l+': '+(d?d.label:'—');
+  });
+  log.innerText=lines.join('   ');
+}
+function elimIndivHit(num,mult){
+  const m=elimNpIndivMult;
+  const pts=(m==='D'?2:m==='T'?3:1)*num;
+  const label=m+num;
+  elimNpIndivDarts.push({num,mult:m,pts,label});
+  elimIndivSetMult('S');
+  elimIndivUpdateLog();
+  if(elimNpIndivDarts.length>=3) elimIndivCommit();
+}
+function elimIndivMiss(){
+  elimNpIndivDarts.push({num:0,mult:'S',pts:0,label:'Miss'});
+  elimIndivSetMult('S');
+  elimIndivUpdateLog();
+  if(elimNpIndivDarts.length>=3) elimIndivCommit();
+}
+function elimIndivCommit(){
+  if(!isMyOnlineTurn('elim')) return;
+  elimLastState=JSON.parse(JSON.stringify(elimState));
+  const darts=[...elimNpIndivDarts];
+  elimIndivReset();
+  if(elimState.dartCount===0&&!elimState.turnSnapshot){
+    elimState.turnSnapshot={scores:[...elimState.scores],opened:[...elimState.opened],eliminated:[...elimState.eliminated]};
+  }
+  for(const d of darts){
+    elimBullHit(d.pts,d.mult,d.num);
+    if(elimState.gameOver) return;
+  }
+  updateOnlineTurnLabel();
+}
+
+// Hook elimRender to update input UI
+const _elimRenderOrig=elimRender;
+elimRender=function(){_elimRenderOrig();elimUpdateInputUI();};
+
+// Init on load
+initInputModeUI();
 </script>
 </body>
 </html>

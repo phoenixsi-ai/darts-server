@@ -1,7 +1,7 @@
 {
   "name": "darts-server",
-  "version": "1.0.0",
-  "description": "WebSocket relay server for Darts Trainer online mode",
+  "version": "16.2.0",
+  "description": "Darts Trainer V16.2 — Socket.io Relay-Server + WebRTC Voice",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -10,5 +10,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "socket.io": "^4.7.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
