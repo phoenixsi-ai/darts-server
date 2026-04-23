@@ -802,7 +802,28 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <h3 id="onlineReadyTitle">Verbunden!</h3>
     <p id="onlineReadyMsg" style="color:#64748b;font-size:14px;"></p>
     <div id="onlineGamePicker" style="display:none;">
-      <p style="font-size:13px;color:#94a3b8;margin:12px 0 8px;">Welches Spiel?</p>
+      <!-- Format-Picker (Legs / Sets) -->
+      <div style="margin:10px 0 8px; border-top:1px solid #1e293b; padding-top:10px;">
+        <div style="font-size:12px;color:#64748b;margin-bottom:6px;">Format</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
+          <button class="toggle-btn active" id="omfSingle" onclick="omfSet('single')" style="font-size:11px;min-height:34px;">Einzelleg</button>
+          <button class="toggle-btn" id="omfLegs" onclick="omfSet('legs')" style="font-size:11px;min-height:34px;">Legs</button>
+          <button class="toggle-btn" id="omfSets" onclick="omfSet('sets')" style="font-size:11px;min-height:34px;">Sets</button>
+        </div>
+        <div id="omfLegsRow" style="display:none;align-items:center;gap:10px;justify-content:center;margin-bottom:6px;">
+          <button onclick="omfLegsDown()" style="background:#0f172a;color:#fff;border:1px solid #334155;border-radius:8px;font-size:20px;min-width:42px;min-height:42px;cursor:pointer;padding:0;">−</button>
+          <div id="omfLegsVal" style="font-size:16px;font-weight:bold;min-width:110px;text-align:center;">Best of 3</div>
+          <button onclick="omfLegsUp()" style="background:#0f172a;color:#fff;border:1px solid #334155;border-radius:8px;font-size:20px;min-width:42px;min-height:42px;cursor:pointer;padding:0;">+</button>
+        </div>
+        <div id="omfSetsRow" style="display:none;align-items:center;gap:10px;justify-content:center;margin-bottom:6px;">
+          <div style="font-size:11px;color:#64748b;margin-right:4px;">Sätze:</div>
+          <button onclick="omfSetsDown()" style="background:#0f172a;color:#fff;border:1px solid #334155;border-radius:8px;font-size:20px;min-width:42px;min-height:42px;cursor:pointer;padding:0;">−</button>
+          <div id="omfSetsVal" style="font-size:16px;font-weight:bold;min-width:60px;text-align:center;">3</div>
+          <button onclick="omfSetsUp()" style="background:#0f172a;color:#fff;border:1px solid #334155;border-radius:8px;font-size:20px;min-width:42px;min-height:42px;cursor:pointer;padding:0;">+</button>
+        </div>
+      </div>
+      <!-- Spiel-Buttons -->
+      <p style="font-size:13px;color:#94a3b8;margin:10px 0 8px;">Welches Spiel?</p>
       <button class="primary" onclick="onlinePickGame('x01',501)" style="width:100%;margin:4px 0;">501</button>
       <button class="primary" onclick="onlinePickGame('x01',301)" style="width:100%;margin:4px 0;">301</button>
       <button class="primary" onclick="onlinePickGame('cricket',0)" style="width:100%;margin:4px 0;">Cricket</button>
@@ -3195,6 +3216,13 @@ function onlinePickGame(mode,score){
     config={mode,names:[myName,oppName]};
   }
 
+  // matchConfig mitschicken damit Joiner identisches Format bekommt
+  config.matchConfig={
+    mode:matchConfig.mode,
+    legsFirstTo:matchConfig.legsFirstTo,
+    setsFirstTo:matchConfig.setsFirstTo,
+    displayAs:matchConfig.displayAs
+  };
   // Send to opponent (they are player 1)
   onlineState.socket.emit('game_start',{roomId:onlineState.roomId,config});
   startOnlineGame(config,true);
@@ -3206,6 +3234,16 @@ function startOnlineGame(config,isCreator){
   // isCreator = playerIdx 0. Names[0] = creator, names[1] = joiner.
   // But joiner sees it mirrored: they are playerIdx 1.
   // Both see the same names array (creator first).
+  // Empfangenen matchConfig anwenden (Joiner übernimmt Format vom Creator)
+  if(config.matchConfig){
+    matchConfig.mode=config.matchConfig.mode;
+    matchConfig.legsFirstTo=config.matchConfig.legsFirstTo;
+    matchConfig.setsFirstTo=config.matchConfig.setsFirstTo;
+    matchConfig.displayAs=config.matchConfig.displayAs;
+    mfSetMode(matchConfig.mode);
+    mfRefreshLabels();
+  }
+  matchInit();
   updateOnlineBar();
   switch(config.mode){
     case 'x01':
@@ -3344,10 +3382,34 @@ function mfToggleDisplay(){
   matchConfig.displayAs=matchConfig.displayAs==='bestof'?'firstto':'bestof';
   mfRefreshLabels();
 }
-function mfLegsDown(){if(matchConfig.legsFirstTo>1)matchConfig.legsFirstTo--;mfRefreshLabels();}
-function mfLegsUp(){if(matchConfig.legsFirstTo<27)matchConfig.legsFirstTo++;mfRefreshLabels();}
-function mfSetsDown(){if(matchConfig.setsFirstTo>1)matchConfig.setsFirstTo--;mfRefreshLabels();}
-function mfSetsUp(){if(matchConfig.setsFirstTo<11)matchConfig.setsFirstTo++;mfRefreshLabels();}
+function mfLegsDown(){if(matchConfig.legsFirstTo>1)matchConfig.legsFirstTo--;mfRefreshLabels();omfRefresh();}
+function mfLegsUp(){if(matchConfig.legsFirstTo<27)matchConfig.legsFirstTo++;mfRefreshLabels();omfRefresh();}
+function mfSetsDown(){if(matchConfig.setsFirstTo>1)matchConfig.setsFirstTo--;mfRefreshLabels();omfRefresh();}
+function mfSetsUp(){if(matchConfig.setsFirstTo<11)matchConfig.setsFirstTo++;mfRefreshLabels();omfRefresh();}
+
+// Online Format Picker (inline im onlineReadyModal)
+function omfSet(mode){
+  matchConfig.mode=mode;
+  ['single','legs','sets'].forEach(m=>{
+    const el=document.getElementById('omf'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(el) el.classList.toggle('active',m===mode);
+  });
+  const lr=document.getElementById('omfLegsRow');
+  const sr=document.getElementById('omfSetsRow');
+  if(lr) lr.style.display=(mode!=='single')?'flex':'none';
+  if(sr) sr.style.display=(mode==='sets')?'flex':'none';
+  mfRefreshLabels();omfRefresh();
+}
+function omfRefresh(){
+  const lv=document.getElementById('omfLegsVal');
+  const sv=document.getElementById('omfSetsVal');
+  if(lv) lv.innerText=matchConfig.displayAs==='bestof'?'Best of '+(matchConfig.legsFirstTo*2-1):'First to '+matchConfig.legsFirstTo;
+  if(sv) sv.innerText=matchConfig.setsFirstTo;
+}
+function omfLegsDown(){if(matchConfig.legsFirstTo>1)matchConfig.legsFirstTo--;omfRefresh();mfRefreshLabels();}
+function omfLegsUp(){if(matchConfig.legsFirstTo<27)matchConfig.legsFirstTo++;omfRefresh();mfRefreshLabels();}
+function omfSetsDown(){if(matchConfig.setsFirstTo>1)matchConfig.setsFirstTo--;omfRefresh();mfRefreshLabels();}
+function omfSetsUp(){if(matchConfig.setsFirstTo<11)matchConfig.setsFirstTo++;omfRefresh();mfRefreshLabels();}
 function mfRefreshLabels(){
   const lv=document.getElementById('mfLegsVal');
   const sv=document.getElementById('mfSetsVal');
