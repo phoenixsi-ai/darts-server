@@ -1,5 +1,5 @@
 /**
- * Darts Trainer Server — V17.6.2
+ * Darts Trainer Server — V18.0
  * Node.js + Express + Socket.io
  *
  * Start: node server.js
@@ -33,7 +33,7 @@ app.get('/', (_req, res) => {
 
 // Health-Check (für Uptime-Monitoring / Cron-Ping)
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', version: '17.6.2', uptime: process.uptime() });
+  res.json({ status: 'ok', version: '18.0.0', uptime: process.uptime() });
 });
 
 // ── Room Management ───────────────────────────────────────────────────────────
@@ -201,6 +201,6 @@ io.on('connection', (socket) => {
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 httpServer.listen(PORT, () => {
-  console.log(`Darts Trainer Server V17.6.2 — Port ${PORT}`);
+  console.log(`Darts Trainer Server V18.0 — Port ${PORT}`);
   console.log(`Lokal: http://localhost:${PORT}`);
 });
