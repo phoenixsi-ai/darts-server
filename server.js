@@ -32,9 +32,12 @@ app.get('/', (_req, res) => {
 });
 
 // Health-Check (für Uptime-Monitoring / Cron-Ping)
-app.get('/health', (_req, res) => {
+// /status als Alias für Backwards-Kompat mit alten render.yaml-Configs
+function healthHandler(_req, res) {
   res.json({ status: 'ok', version: '18.0.0', uptime: process.uptime() });
-});
+}
+app.get('/health', healthHandler);
+app.get('/status', healthHandler);
 
 // ── Room Management ───────────────────────────────────────────────────────────
 /**
