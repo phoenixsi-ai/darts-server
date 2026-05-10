@@ -1,7 +1,7 @@
 {
-  "name": "darts-server",
-  "version": "16.2.0",
-  "description": "Darts Trainer V16.2 — Socket.io Relay-Server + WebRTC Voice",
+  "name": "darts-trainer-server",
+  "version": "17.6.2",
+  "description": "Darts Trainer V17.6.2 — Socket.io Relay-Server + WebRTC Voice",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
