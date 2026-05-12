@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Darts Trainer V18.0</title>
+<title>Darts Trainer V18.5</title>
 <style>
 body { margin:0; font-family:sans-serif; background:#111; color:#fff; text-align:center; overflow-y:auto; }
 /* V17.1: Modal-Animation */
@@ -42,6 +42,10 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .card { background:#1e293b; margin:10px auto; padding:15px; border-radius:12px; max-width:320px; }
 @media (min-width:768px)  { .card { max-width:500px; } }
 @media (min-width:1280px) { .card { max-width:580px; } }
+/* V18.1: Cards mit eingebettetem .game-board brauchen mehr Platz, sonst ragt das Board raus */
+.card.with-board { max-width:380px; padding:8px; }
+@media (min-width:768px)  { .card.with-board { max-width:500px; } }
+@media (min-width:1280px) { .card.with-board { max-width:580px; } }
 .card h3 { margin:5px 0; font-size:16px; opacity:0.7; }
 .card p { margin:5px 0; font-size:20px; }
 .modal { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:200; }
@@ -126,7 +130,45 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .input-mode-btn { flex:1; background:#0f172a; color:#94a3b8; border:none; font-size:13px; font-weight:bold; min-height:40px; cursor:pointer; margin:0; padding:0; }
 .input-mode-btn.active { background:#E8681A; color:#fff; }
 /* Numpad */
+/* V18.3: numpad-display (Zahlen-Echo, alt) — wird in V18.4 für X01/Elim durch Hero-Block ersetzt; bleibt für andere Modi */
 .numpad-display { font-size:36px; font-weight:bold; color:#E8681A; background:#0f172a; border-radius:8px; padding:8px 12px; margin:0 0 8px; text-align:right; min-height:56px; letter-spacing:2px; line-height:56px; }
+/* V18.4: Hero-Block = Spiel-Info-Dashboard (alle wichtigen Infos auf einen Blick) */
+.np-hero { max-width:360px; margin:10px auto; background:#0f172a; border:2px solid #E8681A; border-radius:12px; padding:10px 14px; box-shadow:0 0 14px rgba(232,104,26,0.3); text-align:left; }
+.np-hero .hero-row { display:flex; justify-content:space-between; align-items:baseline; }
+.np-hero .hero-label { font-size:13px; color:#94a3b8; }
+.np-hero .hero-score-now { font-size:42px; font-weight:bold; color:#fff; line-height:1; }
+.np-hero .hero-divider { border-top:1px solid #1e293b; margin:8px 0; }
+.np-hero .hero-input-mini { font-size:13px; color:#94a3b8; }
+.np-hero .hero-input-mini b { color:#fff; font-size:18px; font-weight:bold; margin-left:4px; letter-spacing:1px; }
+.np-hero .hero-score-after { font-size:32px; font-weight:bold; color:#22c55e; line-height:1; }
+.np-hero .hero-score-after.bust { color:#ef4444; }
+.np-hero .hero-score-after.checkout { color:#E8681A; text-shadow:0 0 8px rgba(232,104,26,0.6); }
+.np-hero .hero-status { font-size:12px; color:#94a3b8; margin-top:6px; display:flex; justify-content:space-between; }
+.np-hero .hero-checkout { color:#22c55e; font-size:13px; margin-top:6px; padding-top:6px; border-top:1px solid #1e293b; font-weight:bold; }
+/* V18.5: Game-Info-Strip — Settings + Tipp-Slot, sticky oben */
+.game-info-strip { position:sticky; top:0; z-index:50; max-width:360px; margin:0 auto 8px; background:#0f172a; border:1px solid #334155; border-radius:12px; padding:8px 12px; font-size:12px; box-shadow:0 2px 12px rgba(0,0,0,0.4); }
+.game-info-strip .gis-settings { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px; color:#94a3b8; font-size:12px; }
+.game-info-strip .gis-settings .gis-mode { color:#E8681A; font-weight:bold; font-size:14px; }
+.game-info-strip .gis-settings .gis-sep { color:#475569; }
+.game-info-strip .gis-settings .gis-match { color:#22c55e; font-weight:bold; }
+.game-info-strip .gis-toggle { background:none; border:1px solid #334155; color:#94a3b8; font-size:11px; padding:2px 8px; border-radius:6px; cursor:pointer; min-height:auto; margin:0; line-height:1.4; }
+.game-info-strip .gis-toggle.active { background:#E8681A; border-color:#E8681A; color:#fff; }
+.game-info-strip .gis-tip { margin-top:6px; padding-top:6px; border-top:1px solid #1e293b; font-size:12px; text-align:left; display:none; }
+.game-info-strip .gis-tip.active { display:block; }
+.game-info-strip .gis-tip.checkout { color:#16a34a; }
+.game-info-strip .gis-tip.setup    { color:#E8681A; }
+.game-info-strip .gis-tip.stupid   { color:#ef4444; font-weight:bold; }
+.game-info-strip .gis-tip .gis-tip-icon { font-weight:bold; margin-right:4px; }
+.game-info-strip .gis-tip .gis-tip-sub  { display:block; font-size:10px; color:#64748b; margin-top:2px; font-weight:normal; }
+/* V18.5: Hero-Gegner-Badge im Footer */
+.np-hero .hero-status .hero-opp-badge { background:#1e293b; color:#94a3b8; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:bold; }
+.np-hero .hero-status .hero-opp-badge .opp-name  { color:#64748b; margin-right:4px; }
+.np-hero .hero-status .hero-opp-badge .opp-score { color:#fff; }
+.np-hero .hero-status .hero-opp-badge.active-opp { border:1px solid #E8681A; color:#E8681A; }
+/* V18.5: kompakte Hero-Variante für Board-Modus (Option) */
+.np-hero.compact { padding:8px 12px; margin:6px auto; }
+.np-hero.compact .hero-score-now   { font-size:36px; }
+.np-hero.compact .hero-score-after { font-size:24px; }
 .numpad-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:8px; }
 .np-btn { background:#1e293b; color:#fff; border:1px solid #334155; border-radius:10px; font-size:22px; font-weight:bold; min-height:54px; cursor:pointer; margin:0; padding:0; }
 .np-btn:active { background:#334155; }
@@ -157,6 +199,35 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .snp-btn:active { background:#1e40af; }
 .numpad-mult { display:flex; gap:6px; margin:6px auto; max-width:360px; }
 .numpad-mult button { flex:1; }
+/* V18.2: Active Player Banner */
+.player-banner {
+  display:flex; align-items:center; gap:10px;
+  background:#E8681A; border-radius:12px;
+  padding:10px 16px; margin:6px auto;
+  max-width:360px; font-size:20px; font-weight:bold;
+  color:#fff; min-height:52px; box-sizing:border-box;
+}
+/* V18.3: Numpad kompakt (V18.2's 68px war zu groß, hat Display erschlagen) */
+.np-btn { min-height:50px !important; font-size:22px !important; }
+/* V18.3: Numpad-Area mit Side-Quick-Säulen links und rechts */
+.np-area { display:grid; grid-template-columns:54px 1fr 54px; gap:6px; max-width:360px; margin:0 auto 8px; align-items:stretch; }
+.np-side-quick { display:flex; flex-direction:column; gap:6px; }
+.np-side-quick-btn { background:#334155; color:#fff; border:1px solid #475569; border-radius:8px; font-size:15px; font-weight:bold; padding:0; cursor:pointer; flex:1; min-height:50px; margin:0; }
+.np-side-quick-btn:active { background:#475569; }
+/* alte .np-quick-Regel aus V18.2 verworfen — Side-Quicks ersetzen sie */
+/* V18.2: Cricket Felder */
+.cric-field-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; }
+.cric-field-btn { background:#1e293b; color:#fff; border:1px solid #334155; border-radius:10px; font-size:26px; font-weight:bold; min-height:72px; cursor:pointer; padding:0; margin:0; }
+.cric-field-btn:active { background:#334155; }
+.cric-mult-row { display:flex; gap:6px; margin-bottom:8px; }
+.cric-mult-btn { flex:1; background:#0f172a; color:#94a3b8; border:2px solid #334155; border-radius:8px; font-size:15px; font-weight:bold; min-height:48px; cursor:pointer; }
+.cric-mult-btn.active { border-color:#E8681A; color:#E8681A; }
+/* V18.2: Target Numpad (ATC/B27/Shanghai) */
+.target-numpad-label { font-size:28px; font-weight:bold; color:#E8681A; text-align:center; padding:8px; margin-bottom:8px; }
+.target-hit-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; }
+.target-hit-btn { background:#1e293b; color:#fff; border:1px solid #334155; border-radius:10px; font-size:16px; font-weight:bold; min-height:72px; cursor:pointer; padding:4px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+.target-hit-btn:active { background:#334155; }
+.target-hit-pts { font-size:11px; opacity:0.6; font-weight:normal; }
 </style>
 <!-- socket.io wird dynamisch nachgeladen beim ersten Klick auf "Online spielen" -->
 </head>
@@ -348,48 +419,58 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <button onclick="show('start')" style="background:#333;color:#fff;">Abbrechen</button>
 </div>
 
-<!-- X01 SPIEL -->
+<!-- X01 SPIEL — V18.5 Layout Unification -->
 <div id="x01" class="screen">
-  <h2 id="x01Title">501</h2>
-  <div class="card" style="max-width:320px; margin:10px auto;">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <div id="x01P1Block" style="text-align:left;">
-        <div class="info-row" id="x01P1Name">Spieler 1</div>
-        <div style="font-size:36px; font-weight:bold;" id="x01P1Score">501</div>
-        <div style="font-size:11px; color:#64748b;" id="x01P1Opener"></div>
-      </div>
-      <div id="x01P2Block" style="text-align:right;">
-        <div class="info-row" id="x01P2Name">Spieler 2</div>
-        <div style="font-size:36px; font-weight:bold;" id="x01P2Score">501</div>
-        <div style="font-size:11px; color:#64748b;" id="x01P2Opener"></div>
-      </div>
+
+  <!-- V18.5: Game-Info-Strip (sticky oben, Settings + 1 Tipp-Slot) -->
+  <div class="game-info-strip" id="x01InfoStrip">
+    <div class="gis-settings">
+      <span class="gis-mode" id="x01StripMode">501</span>
+      <span class="gis-sep">•</span>
+      <span id="x01StripOut">Out: Double</span>
+      <span class="gis-sep" id="x01StripMatchSep" style="display:none;">•</span>
+      <span class="gis-match" id="x01StripMatch" style="display:none;"></span>
+      <button class="gis-toggle" id="x01StripStrategyToggle" onclick="strategySetEnabled(!strategyHintsEnabled); updateStrategyHints();">⚙ Tipps</button>
     </div>
-    <div class="info-row" id="x01Turn">Spieler 1 ist dran</div>
-    <div class="info-row" id="x01OutMode"></div>
-    <div id="matchBarX01" style="display:none;font-size:12px;color:#E8681A;margin:3px 0;"></div>
+    <div class="gis-tip" id="x01StripTip">
+      <span class="gis-tip-icon" id="x01StripTipIcon"></span>
+      <span id="x01StripTipText"></span>
+      <span class="gis-tip-sub" id="x01StripTipSub"></span>
+    </div>
   </div>
-  <div class="card" style="max-width:320px; margin:10px auto;">
+
+  <!-- V18.5: Hero = einziger Score-Bereich (immer sichtbar, Board- + Numpad-Modus) -->
+  <div class="np-hero" id="x01HeroBlock">
+    <div class="hero-row">
+      <span class="hero-label" id="x01HeroPlayerLabel">Spieler 1</span>
+      <span class="hero-score-now" id="x01HeroScoreNow">501</span>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-row">
+      <span class="hero-input-mini">Aufnahme:<b id="x01NpDisplay">—</b></span>
+      <span class="hero-score-after" id="x01HeroScoreAfter">501</span>
+    </div>
+    <div class="hero-status">
+      <span id="x01HeroDartInfo">▶ Pfeil 1/3</span>
+      <span class="hero-opp-badge" id="x01HeroOppBadge" style="display:none;">
+        <span class="opp-name" id="x01HeroOppName"></span><span class="opp-score" id="x01HeroOppScore"></span>
+      </span>
+    </div>
+    <div id="x01HeroCheckout" class="hero-checkout" style="display:none;"></div>
+  </div>
+
+  <!-- Board/Numpad Container -->
+  <div class="card with-board" style="margin:10px auto;">
     <!-- Hybrid override -->
     <div id="x01HybridSwitch" class="hybrid-switch" style="display:none;">
       <button class="hybrid-switch-btn" id="x01HybridBoard" onclick="x01HybridOverride('board')">Board</button>
       <button class="hybrid-switch-btn" id="x01HybridNumpad" onclick="x01HybridOverride('numpad')">Numpad</button>
     </div>
-    <!-- Checkout suggestion -->
+    <!-- Checkout suggestion (Board-Modus, klein) -->
     <div id="x01CheckoutBox" class="checkout-box" style="display:none;">
       <div class="co-label">Checkout</div>
       <div class="co-way" id="x01CheckoutWay"></div>
     </div>
-    <!-- V16.10: Live-Checkout-Hint (Individual-Mode, ≤170) -->
-    <div id="checkoutHint" style="display:none;background:#0f172a;border:1px solid #16a34a;border-radius:8px;padding:6px 10px;margin:4px 0;text-align:left;font-size:13px;">
-      <span style="color:#16a34a;font-weight:bold;">Nächster: </span><span id="hintNext" style="color:#fff;font-weight:bold;"></span>
-      <span id="hintFull" style="color:#64748b;font-weight:normal;font-size:11px;margin-left:6px;"></span>
-    </div>
-    <!-- V16.10: Setup-Way-Hint (>170, Pro-Feature) -->
-    <div id="setupWayHint" style="display:none;background:#0f172a;border:1px solid #E8681A;border-radius:8px;padding:6px 10px;margin:4px 0;text-align:left;font-size:12px;">
-      <span style="color:#E8681A;font-weight:bold;">Tipp: </span><span id="hintPath" style="color:#fff;"></span>
-      <span id="hintReason" style="color:#64748b;display:block;font-size:10px;margin-top:2px;"></span>
-    </div>
-    <div id="stupidRestWarn" style="display:none;background:#7f1d1d;border:1px solid #ef4444;border-radius:8px;padding:5px 10px;margin:4px 0;text-align:center;font-size:12px;color:#fff;font-weight:bold;"></div>
     <!-- Board area -->
     <div id="x01BoardArea">
       <svg id="board-x01" class="game-board" viewBox="0 0 200 200"></svg>
@@ -402,36 +483,41 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
         <button onclick="x01Undo()" style="flex:1;background:#334155;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
       </div>
     </div>
-    <!-- Numpad area -->
+    <!-- Numpad area — Hero ist jetzt OUTSIDE, immer sichtbar -->
     <div id="x01NumpadArea" style="display:none;">
       <div style="display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid #334155;margin-bottom:8px;">
         <button id="x01NpModeTotal" class="input-mode-btn active" onclick="x01SetNpMode('total')" style="min-height:34px;font-size:12px;">Aufnahme</button>
         <button id="x01NpModeIndiv" class="input-mode-btn" onclick="x01SetNpMode('indiv')" style="min-height:34px;font-size:12px;">Einzeln</button>
       </div>
-      <!-- Total score numpad -->
       <div id="x01NpTotal">
-        <div class="numpad-display" id="x01NpDisplay">—</div>
-        <div class="numpad-grid">
-          <button class="np-btn" onclick="x01NpPress('7')">7</button>
-          <button class="np-btn" onclick="x01NpPress('8')">8</button>
-          <button class="np-btn" onclick="x01NpPress('9')">9</button>
-          <button class="np-btn" onclick="x01NpPress('4')">4</button>
-          <button class="np-btn" onclick="x01NpPress('5')">5</button>
-          <button class="np-btn" onclick="x01NpPress('6')">6</button>
-          <button class="np-btn" onclick="x01NpPress('1')">1</button>
-          <button class="np-btn" onclick="x01NpPress('2')">2</button>
-          <button class="np-btn" onclick="x01NpPress('3')">3</button>
-          <button class="np-btn np-del" onclick="x01NpDelete()">⌫</button>
-          <button class="np-btn" onclick="x01NpPress('0')">0</button>
-          <button class="np-btn np-ok" onclick="x01NpOK()">OK</button>
-        </div>
-        <div class="np-quick">
-          <button class="np-quick-btn" onclick="x01NpQuick(180)">180</button>
-          <button class="np-quick-btn" onclick="x01NpQuick(140)">140</button>
-          <button class="np-quick-btn" onclick="x01NpQuick(100)">100</button>
-          <button class="np-quick-btn" onclick="x01NpQuick(60)">60</button>
-          <button class="np-quick-btn" onclick="x01NpQuick(26)">26</button>
-          <button class="np-quick-btn" onclick="x01NpQuick(0)">0</button>
+        <!-- V18.3: Side-Quicks links/rechts, Numpad zentriert dazwischen -->
+        <div class="np-area">
+          <div class="np-side-quick">
+            <button class="np-side-quick-btn" onclick="x01NpQuick(180)">180</button>
+            <button class="np-side-quick-btn" onclick="x01NpQuick(140)">140</button>
+            <button class="np-side-quick-btn" onclick="x01NpQuick(100)">100</button>
+            <button class="np-side-quick-btn" onclick="x01NpQuick(60)">60</button>
+          </div>
+          <div class="numpad-grid">
+            <button class="np-btn" onclick="x01NpPress('7')">7</button>
+            <button class="np-btn" onclick="x01NpPress('8')">8</button>
+            <button class="np-btn" onclick="x01NpPress('9')">9</button>
+            <button class="np-btn" onclick="x01NpPress('4')">4</button>
+            <button class="np-btn" onclick="x01NpPress('5')">5</button>
+            <button class="np-btn" onclick="x01NpPress('6')">6</button>
+            <button class="np-btn" onclick="x01NpPress('1')">1</button>
+            <button class="np-btn" onclick="x01NpPress('2')">2</button>
+            <button class="np-btn" onclick="x01NpPress('3')">3</button>
+            <button class="np-btn np-del" onclick="x01NpDelete()">⌫</button>
+            <button class="np-btn" onclick="x01NpPress('0')">0</button>
+            <button class="np-btn np-ok" onclick="x01NpOK()">OK</button>
+          </div>
+          <div class="np-side-quick">
+            <button class="np-side-quick-btn" onclick="x01NpQuick(85)">85</button>
+            <button class="np-side-quick-btn" onclick="x01NpQuick(45)">45</button>
+            <button class="np-side-quick-btn" onclick="x01NpQuick(41)">41</button>
+            <button class="np-side-quick-btn" onclick="x01NpQuick(26)">26</button>
+          </div>
         </div>
       </div>
       <!-- Individual dart mode -->
@@ -521,7 +607,8 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   </div>
   <div id="matchBarCric" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:320px;"></div>
   <div id="cricketBoard" class="cricket-board"></div>
-  <div class="card" style="max-width:320px; margin:10px auto;">
+  <div class="player-banner" id="cricPlayerBanner">▶ Spieler 1 — Dart 1 von 3</div>
+  <div class="card with-board" style="margin:10px auto;">
     <div class="info-row" id="cricTurn"></div>
     <div class="info-row" id="cricDart"></div>
     <div id="inputToggle-cricket"></div>
@@ -609,7 +696,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div class="info-row" id="elimModeDisplay" style="font-size:12px;color:#64748b;margin-bottom:4px;"></div>
   <div id="matchBarElim" style="display:none;font-size:12px;color:#E8681A;margin:3px 0;"></div>
   <div class="elim-players" id="elimPlayers"></div>
-  <div class="card" style="max-width:320px; margin:8px auto;">
+  <div class="card with-board" style="margin:8px auto;">
     <div class="info-row" id="elimTurn"></div>
     <div class="info-row" id="elimDart"></div>
     <!-- Board area -->
@@ -632,28 +719,36 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
       </div>
       <!-- Total numpad -->
       <div id="elimNpTotal">
+        <!-- V18.3: Display als Hero -->
         <div class="numpad-display" id="elimNpDisplay">—</div>
-        <div class="numpad-grid">
-          <button class="np-btn" onclick="elimNpPress('7')">7</button>
-          <button class="np-btn" onclick="elimNpPress('8')">8</button>
-          <button class="np-btn" onclick="elimNpPress('9')">9</button>
-          <button class="np-btn" onclick="elimNpPress('4')">4</button>
-          <button class="np-btn" onclick="elimNpPress('5')">5</button>
-          <button class="np-btn" onclick="elimNpPress('6')">6</button>
-          <button class="np-btn" onclick="elimNpPress('1')">1</button>
-          <button class="np-btn" onclick="elimNpPress('2')">2</button>
-          <button class="np-btn" onclick="elimNpPress('3')">3</button>
-          <button class="np-btn np-del" onclick="elimNpDelete()">⌫</button>
-          <button class="np-btn" onclick="elimNpPress('0')">0</button>
-          <button class="np-btn np-ok" onclick="elimNpOK()">OK</button>
-        </div>
-        <div class="np-quick">
-          <button class="np-quick-btn" onclick="elimNpQuick(180)">180</button>
-          <button class="np-quick-btn" onclick="elimNpQuick(140)">140</button>
-          <button class="np-quick-btn" onclick="elimNpQuick(100)">100</button>
-          <button class="np-quick-btn" onclick="elimNpQuick(60)">60</button>
-          <button class="np-quick-btn" onclick="elimNpQuick(26)">26</button>
-          <button class="np-quick-btn" onclick="elimNpQuick(0)">0</button>
+        <!-- V18.3: Side-Quicks links/rechts, Numpad zentriert dazwischen -->
+        <div class="np-area">
+          <div class="np-side-quick">
+            <button class="np-side-quick-btn" onclick="elimNpQuick(180)">180</button>
+            <button class="np-side-quick-btn" onclick="elimNpQuick(140)">140</button>
+            <button class="np-side-quick-btn" onclick="elimNpQuick(100)">100</button>
+            <button class="np-side-quick-btn" onclick="elimNpQuick(60)">60</button>
+          </div>
+          <div class="numpad-grid">
+            <button class="np-btn" onclick="elimNpPress('7')">7</button>
+            <button class="np-btn" onclick="elimNpPress('8')">8</button>
+            <button class="np-btn" onclick="elimNpPress('9')">9</button>
+            <button class="np-btn" onclick="elimNpPress('4')">4</button>
+            <button class="np-btn" onclick="elimNpPress('5')">5</button>
+            <button class="np-btn" onclick="elimNpPress('6')">6</button>
+            <button class="np-btn" onclick="elimNpPress('1')">1</button>
+            <button class="np-btn" onclick="elimNpPress('2')">2</button>
+            <button class="np-btn" onclick="elimNpPress('3')">3</button>
+            <button class="np-btn np-del" onclick="elimNpDelete()">⌫</button>
+            <button class="np-btn" onclick="elimNpPress('0')">0</button>
+            <button class="np-btn np-ok" onclick="elimNpOK()">OK</button>
+          </div>
+          <div class="np-side-quick">
+            <button class="np-side-quick-btn" onclick="elimNpQuick(85)">85</button>
+            <button class="np-side-quick-btn" onclick="elimNpQuick(45)">45</button>
+            <button class="np-side-quick-btn" onclick="elimNpQuick(41)">41</button>
+            <button class="np-side-quick-btn" onclick="elimNpQuick(26)">26</button>
+          </div>
         </div>
       </div>
       <!-- Individual dart mode -->
@@ -707,7 +802,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   </div>
   <div class="elim-players" id="shanPlayers"></div>
   <div id="matchBarShan" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:320px;"></div>
-  <div class="card" style="max-width:320px; margin:8px auto;">
+  <div class="card with-board" style="margin:8px auto;">
     <div id="inputToggle-shanghai"></div>
     <svg id="board-shanghai" class="game-board" viewBox="0 0 200 200"></svg>
     <div id="numpad-shanghai" style="display:none;"></div>
@@ -757,7 +852,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div class="round-indicator" id="atcDots"></div>
   <div id="atcPlayers" style="max-width:360px; margin:8px auto;"></div>
   <div id="matchBarAtc" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:360px;"></div>
-  <div class="card" style="max-width:320px; margin:8px auto;">
+  <div class="card with-board" style="margin:8px auto;">
     <div id="atcTurn" class="info-row"></div>
     <div id="atcDart" class="info-row"></div>
     <div id="atcTarget" class="target-label"></div>
@@ -799,7 +894,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div style="font-size:11px;color:#64748b;margin-bottom:2px;">Optimaler Pfad</div>
     <div id="coPlanPath" style="color:#27ae60;font-weight:bold;font-size:16px;letter-spacing:1px;"></div>
   </div>
-  <div class="card" style="max-width:320px; margin:8px auto;">
+  <div class="card with-board" style="margin:8px auto;">
     <div id="coDart" class="info-row"></div>
     <div id="coRound" class="info-row"></div>
     <div id="coHits" class="info-row" style="color:#27ae60;"></div>
@@ -1177,7 +1272,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <h2>Highscore</h2>
   <div class="info-row" id="hsRoundLabel" style="font-size:14px;color:#E8681A;font-weight:bold;"></div>
   <div class="elim-players" id="hsPlayers"></div>
-  <div class="card" style="max-width:320px;margin:8px auto;">
+  <div class="card with-board" style="margin:8px auto;">
     <div class="info-row" id="hsTurn"></div>
     <div class="info-row" id="hsDart"></div>
     <svg id="board-hs" class="game-board" viewBox="0 0 200 200" style="margin-top:6px;"></svg>
@@ -1253,7 +1348,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <h2>Killer</h2>
   <div class="info-row" id="killVariantLabel" style="font-size:12px;color:#64748b;"></div>
   <div class="elim-players" id="killPlayers"></div>
-  <div class="card" style="max-width:320px;margin:8px auto;">
+  <div class="card with-board" style="margin:8px auto;">
     <div class="info-row" id="killTurn"></div>
     <div class="info-row" id="killDart"></div>
     <svg id="board-killer" class="game-board" viewBox="0 0 200 200" style="margin-top:6px;"></svg>
@@ -1274,7 +1369,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <h2>Phoenix Chicago</h2>
   <div class="info-row" id="chicPhaseLabel" style="font-size:13px;color:#E8681A;font-weight:bold;">Phase 1 — Deckel verteilen</div>
   <div class="elim-players" id="chicPlayers"></div>
-  <div class="card" style="max-width:320px;margin:8px auto;">
+  <div class="card with-board" style="margin:8px auto;">
     <div class="info-row" id="chicTurn"></div>
     <div class="info-row" id="chicDart"></div>
     <svg id="board-chicago" class="game-board" viewBox="0 0 200 200" style="margin-top:6px;"></svg>
@@ -1673,20 +1768,18 @@ function ssRender(){
 }
 
 // ── Phoenix Split ──────────────────────────────────────────────────────────────
+// V18.1: Phoenix Split entschärft — D/T als 9-Wurf-Block (halbieren nur wenn ALLE 9 verfehlt).
+// Vorher: 3× D-Runde + 3× T-Runde → 6 Halbierungs-Risiken (härter als Classic Splitscore, verkehrt).
 const pxRounds=[
-  {name:'15er',       type:'single',      darts:['S15','S15','S15']},
-  {name:'16er',       type:'single',      darts:['S16','S16','S16']},
-  {name:'Doppel I',   type:'double',      darts:['D16','D8','D4']  },
-  {name:'Doppel II',  type:'double',      darts:['D16','D12','D20']},
-  {name:'Doppel III', type:'double',      darts:['D20','D10','D5'] },
-  {name:'17er',       type:'single',      darts:['S17','S17','S17']},
-  {name:'18er',       type:'single',      darts:['S18','S18','S18']},
-  {name:'Triple I',   type:'triple',      darts:['T20','T19','T18']},
-  {name:'Triple II',  type:'triple_free', darts:['T','T','T']      },
-  {name:'Triple III', type:'triple',      darts:['T19','T18','T20']},
-  {name:'19er',       type:'single',      darts:['S19','S19','S19']},
-  {name:'20er',       type:'single',      darts:['S20','S20','S20']},
-  {name:'Bull',       type:'bull',        darts:['B','B','B','B','B','B','B','B','B']}
+  {name:'15er',   type:'single',       darts:['S15','S15','S15']},
+  {name:'16er',   type:'single',       darts:['S16','S16','S16']},
+  {name:'Doppel', type:'double',       darts:['D16','D8','D4','D16','D12','D20','D20','D10','D5']},
+  {name:'17er',   type:'single',       darts:['S17','S17','S17']},
+  {name:'18er',   type:'single',       darts:['S18','S18','S18']},
+  {name:'Triple', type:'triple_mixed', darts:['T20','T19','T18','T','T','T','T19','T18','T20']},
+  {name:'19er',   type:'single',       darts:['S19','S19','S19']},
+  {name:'20er',   type:'single',       darts:['S20','S20','S20']},
+  {name:'Bull',   type:'bull',         darts:['B','B','B','B','B','B','B','B','B']}
 ];
 let pState={score:64,round:0,dart:0,roundScore:0,roundHits:0,active:false};
 
@@ -1702,6 +1795,8 @@ function pxIsValid(boardId){
   if(r.type==='double') return boardId===target;
   if(r.type==='triple') return boardId===target;
   if(r.type==='triple_free') return boardId.startsWith('T');
+  // V18.1: gemischter Triple-Block — bei spezifischem Target exakt, bei 'T' jeder Triple zählt
+  if(r.type==='triple_mixed') return target==='T' ? boardId.startsWith('T') : boardId===target;
   if(r.type==='bull') return boardId==='B25'||boardId==='B50';
   return false;
 }
@@ -1739,16 +1834,19 @@ function pxNextDart(){
 function phoenixRender(){
   const r=pxCurrentRound(),target=pxTargetForDart();
   document.getElementById('pScore').innerText=pState.score;
-  document.getElementById('pRoundName').innerText='Runde '+(pState.round+1)+'/'+pxRounds.length+' — '+r.name;
+  document.getElementById('pRoundName').innerText='Block '+(pState.round+1)+'/'+pxRounds.length+': '+r.name;
   document.getElementById('pDartCount').innerText='Pfeil '+(pState.dart+1)+'/'+r.darts.length;
   document.getElementById('pTarget').innerText='Ziel: '+target;
-  document.getElementById('pBlockInfo').innerText='Block: '+r.darts.join(' · ');
-  document.getElementById('pHits').innerText=pState.roundHits>0?'Treffer: '+pState.roundHits+' (+'+pState.roundScore+' Pkt)':'0 Treffer — Halbieren droht!';
-  document.getElementById('pRoundScore').innerText='Rundenpunkte: +'+pState.roundScore;
-  const c=document.getElementById('pCoach');
+  // V18.1: Block-Info kompakt — Liste nur bei kurzen Blöcken, sonst Erklärung
+  document.getElementById('pBlockInfo').innerText = r.darts.length<=3 ? 'Block: '+r.darts.join(' · ') : 'Block: '+r.darts.length+' Würfe — Halbierung nur wenn alle verfehlt';
+  document.getElementById('pHits').innerText='Treffer im Block: '+pState.roundHits+(pState.roundHits>0?' (+'+pState.roundScore+' Pkt)':'');
   const left=r.darts.length-pState.dart-1;
-  if(left===0&&pState.roundHits===0) c.innerText='Letzter Pfeil — jetzt oder halbieren!';
-  else if(pState.roundHits>0) c.innerText='Score gesichert — weiter so';
+  document.getElementById('pRoundScore').innerText = left>0 ? 'Noch '+(left+1)+' Würfe im Block' : 'Letzter Pfeil';
+  const c=document.getElementById('pCoach');
+  // V18.1: Halbieren-Warnung nur am letzten Wurf bei 0 Treffern, sonst sanfter Hinweis
+  if(left===0&&pState.roundHits===0) c.innerText='⚠ Letzter Pfeil — sonst halbiert sich der Score!';
+  else if(pState.roundHits>0) c.innerText='✓ Block-Punkte gesichert';
+  else if(left<=2) c.innerText='Noch '+(left+1)+' Pfeile — bisher kein Treffer im Block';
   else c.innerText='';
   const dotsEl=document.getElementById('pDots');dotsEl.innerHTML='';
   for(let i=0;i<pxRounds.length;i++){let d=document.createElement('div');d.className='round-dot';if(i<pState.round)d.classList.add('done');else if(i===pState.round)d.classList.add('active');dotsEl.appendChild(d);}
@@ -1842,15 +1940,27 @@ function x01UpdateCheckoutChance(){
   x01State.turnHadCheckoutChance = (x01State.outMode!=='single' && x01State.scores[p]<=170 && x01State.scores[p]>0);
 }
 function x01Render(){
-  document.getElementById('x01Title').innerText=x01State.startScore;
-  document.getElementById('x01P1Name').innerText=x01State.names[0];
-  document.getElementById('x01P2Name').innerText=x01State.names[1];
-  document.getElementById('x01P1Score').innerText=x01State.scores[0];
-  document.getElementById('x01P2Score').innerText=x01State.scores[1];
-  document.getElementById('x01P1Block').style.opacity=x01State.turn===0?'1':'0.4';
-  document.getElementById('x01P2Block').style.opacity=x01State.turn===1?'1':'0.4';
-  document.getElementById('x01Turn').innerText=x01State.names[x01State.turn]+' — Dart '+(x01State.dartCount+1)+'/3';
-  document.getElementById('x01OutMode').innerText='In: '+x01State.inMode+' | Out: '+x01State.outMode;
+  // V18.5: Player Banner entfernt aus DOM — Hero zeigt aktiven Spieler. Guard für Restcode.
+  const x01Banner = document.getElementById('x01PlayerBanner');
+  if (x01Banner) {
+    const bName = x01State.names[x01State.turn] || ('Spieler '+(x01State.turn+1));
+    const bDart = (x01State.dartCount || 0) + 1;
+    x01Banner.textContent = '▶ ' + bName + ' — Dart ' + bDart + ' von 3';
+  }
+  // V18.4: Hero-Block update (Spielstand + Live-Preview)
+  if(typeof x01UpdateHero==='function') x01UpdateHero();
+  // V18.5: alle alten Score-Card-Elemente existieren nicht mehr — Guards einbauen, damit Restcode nicht crasht
+  const _setText=(id,v)=>{const e=document.getElementById(id); if(e) e.innerText=v;};
+  const _setOpacity=(id,v)=>{const e=document.getElementById(id); if(e) e.style.opacity=v;};
+  _setText('x01Title', x01State.startScore);
+  _setText('x01P1Name', x01State.names[0]);
+  _setText('x01P2Name', x01State.names[1]);
+  _setText('x01P1Score', x01State.scores[0]);
+  _setText('x01P2Score', x01State.scores[1]);
+  _setOpacity('x01P1Block', x01State.turn===0?'1':'0.4');
+  _setOpacity('x01P2Block', x01State.turn===1?'1':'0.4');
+  _setText('x01Turn', x01State.names[x01State.turn]+' — Dart '+(x01State.dartCount+1)+'/3');
+  _setText('x01OutMode', 'In: '+x01State.inMode+' | Out: '+x01State.outMode);
   const openerHint=['single','double','master'].indexOf(x01State.inMode)>0?
     (x01State.inMode==='double'?'Noch kein Double':'Noch kein Double/Triple'):'';
   for(let pi=0;pi<2;pi++){
@@ -1860,6 +1970,37 @@ function x01Render(){
   let logEl=document.getElementById('x01Log');
   if(logEl) logEl.innerHTML=x01State.log.slice(0,5).map(l=>'<div>'+l+'</div>').join('');
   matchScoreRender('matchBarX01',x01State.names);
+  // V18.5: Info-Strip-Felder aktualisieren
+  _setText('x01StripMode', x01State.startScore);
+  const outLabel = (x01State.outMode||'double').replace(/^./, c=>c.toUpperCase());
+  _setText('x01StripOut', 'Out: '+outLabel);
+  const stripToggle = document.getElementById('x01StripStrategyToggle');
+  if(stripToggle) stripToggle.classList.toggle('active', strategyHintsEnabled);
+  // V18.5: Match-Bar (Best of N) in Strip — wir spiegeln matchBarX01-Inhalt in x01StripMatch falls vorhanden
+  const mbSrc = document.getElementById('matchBarX01');
+  const msDst = document.getElementById('x01StripMatch');
+  const msSep = document.getElementById('x01StripMatchSep');
+  if(msDst){
+    const txt = (mbSrc && mbSrc.textContent && mbSrc.style.display!=='none') ? mbSrc.textContent.trim() : '';
+    msDst.textContent = txt;
+    msDst.style.display = txt ? '' : 'none';
+    if(msSep) msSep.style.display = txt ? '' : 'none';
+  }
+  // V18.5: Gegner-Badge im Hero-Footer
+  const oppBadge = document.getElementById('x01HeroOppBadge');
+  if(oppBadge){
+    if(x01State.names && x01State.names.length>1){
+      const activePI = x01State.turn || 0;
+      const oppPI = activePI===0 ? 1 : 0;
+      const oppName  = x01State.names[oppPI] || ('Spieler '+(oppPI+1));
+      const oppScore = (x01State.scores && x01State.scores[oppPI]!=null) ? x01State.scores[oppPI] : '';
+      _setText('x01HeroOppName',  oppName + ':');
+      _setText('x01HeroOppScore', oppScore);
+      oppBadge.style.display = '';
+    } else {
+      oppBadge.style.display = 'none';
+    }
+  }
   x01DrawBoard();
   if(typeof updateStrategyHints==='function') updateStrategyHints(); // V16.10
 }
@@ -2118,6 +2259,13 @@ function cricCheckWin(){
   }
 }
 function cricRender(){
+  // V18.2: Player Banner
+  const cricBanner = document.getElementById('cricPlayerBanner');
+  if (cricBanner && typeof cricState !== 'undefined') {
+    const cName = (cricState.names && cricState.names[cricState.turn]) || ('Spieler '+(cricState.turn+1));
+    const cDart = (cricState.dartCount||0)+1;
+    cricBanner.textContent = '▶ ' + cName + ' — Dart ' + cDart + ' von 3';
+  }
   document.getElementById('cricP1Name').innerText=cricState.names[0];
   document.getElementById('cricP2Name').innerText=cricState.names[1];
   document.getElementById('cricP1Score').innerText=cricState.scores[0];
@@ -2138,7 +2286,7 @@ function cricRender(){
   if(inputMode==='numpad'){
     if(svgCR) svgCR.style.display='none';
     const npCR=document.getElementById('numpad-cricket');
-    if(npCR){npCR.style.display='';renderNumpad('numpad-cricket',(pts,type,num)=>{
+    if(npCR){npCR.style.display='';renderCricketNumpad('numpad-cricket',(pts,type,num)=>{
       if(num===25||num===50){cricHitNum('B',1,false);}
       else{let m=type==='T'?3:type==='D'?2:1;if(CRICKET_NUMS.includes(num))cricHitNum(num,m,false);else cricMiss();}
     },()=>cricMiss());}
@@ -2639,10 +2787,14 @@ function shanRender(){
   if(inputMode==='numpad'){
     if(svgSH) svgSH.style.display='none';
     const npSH=document.getElementById('numpad-shanghai');
-    if(npSH){npSH.style.display='';renderNumpad('numpad-shanghai',(pts,type,num)=>{
-      if(num===25||num===50)shanHit('B'+num,num,type);
-      else shanHit(type+num,num,type);
-    },()=>shanMiss());}
+    if(npSH){
+      // V18.2: Target-Numpad — Shanghai-Target = aktuelle Runden-Zahl, kein Bull
+      npSH.style.display='';
+      renderTargetNumpad('numpad-shanghai', shanState.round, false,
+        (pts,type,num)=>shanHit(type+num, num, type),
+        ()=>shanMiss()
+      );
+    }
     const mbSH=document.getElementById('missBtn-shanghai');if(mbSH)mbSH.style.display='none';
   } else {
     if(svgSH){svgSH.style.display='';buildBoard(svgSH,(id,num,type)=>shanHit(id,num,type),(id,type,num)=>{
@@ -2778,10 +2930,20 @@ function atcRender(){
   if(inputMode==='numpad'){
     if(svgAT) svgAT.style.display='none';
     const npAT=document.getElementById('numpad-atc');
-    if(npAT){npAT.style.display='';renderNumpad('numpad-atc',(pts,type,num)=>{
-      if(num===25||num===50)atcHit('B'+num,num,type);
-      else atcHit(type+num,num,type);
-    },()=>atcMiss());}
+    if(npAT){
+      // V18.2: Target-Numpad — zeigt nur aktuelle Zielzahl als S/D/T (oder Bull-Variante)
+      npAT.style.display='';
+      const _atcTgt = atcTargetFor(atcState.turn);
+      const _atcIsBull = (_atcTgt==='Bull');
+      const _atcTgtNum = _atcIsBull ? 25 : _atcTgt;
+      renderTargetNumpad('numpad-atc', _atcTgtNum, _atcIsBull,
+        (pts,type,num)=>{
+          if(_atcIsBull) atcHit('B'+pts, pts, type);
+          else atcHit(type+num, num, type);
+        },
+        ()=>atcMiss()
+      );
+    }
     const mbAT=document.getElementById('missBtn-atc');if(mbAT)mbAT.style.display='none';
   } else {
     if(svgAT){svgAT.style.display='';buildBoard(svgAT,(id,num,type)=>atcHit(id,num,type),(id,type,num)=>{
@@ -2914,10 +3076,20 @@ function b27Render(){
   if(inputMode==='numpad'){
     if(svgB27) svgB27.style.display='none';
     const npB27=document.getElementById('numpad-b27');
-    if(npB27){npB27.style.display='';renderNumpad('numpad-b27',(pts,type,num)=>{
-      if(num===25||num===50)b27Hit('B'+num,num,type);
-      else b27Hit(type+num,num,type);
-    },()=>b27Miss());}
+    if(npB27){
+      // V18.2: Target-Numpad — b27 Target = aktuelle Doppel-Zahl bzw. Bull-Runde
+      npB27.style.display='';
+      const _b27Cur = b27RoundsData[b27St.round];
+      const _b27IsBull = _b27Cur && _b27Cur.type==='bull';
+      const _b27Tgt = _b27IsBull ? 25 : (_b27Cur ? _b27Cur.num : 1);
+      renderTargetNumpad('numpad-b27', _b27Tgt, _b27IsBull,
+        (pts,type,num)=>{
+          if(_b27IsBull) b27Hit('B'+pts, pts, type);
+          else b27Hit(type+num, num, type);
+        },
+        ()=>b27Miss()
+      );
+    }
     const mbB27=document.getElementById('missBtn-b27');if(mbB27)mbB27.style.display='none';
   } else {
     if(svgB27){svgB27.style.display='';buildBoard(svgB27,(id,num,type)=>b27Hit(id,num,type),(id,type,num)=>{
@@ -5239,6 +5411,82 @@ function simpleSetInputMode(mode){
   else if(id==='x01') x01Render();
   else if(id==='elimination') elimRender();
 }
+// ── V18.2: CRICKET NUMPAD — 7 Felder (15-20 + Bull) + S/D/T-Selector ─────────
+let cricNpMultStore = {};
+function renderCricketNumpad(containerId, onInput, onMiss) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  window['_cnpCb_'+containerId] = onInput;
+  window['_cnpMiss_'+containerId] = onMiss;
+  cricNpMultStore[containerId] = 'S';
+  let html = '<div class="cric-mult-row">';
+  [['S','Single'],['D','Double'],['T','Triple']].forEach(([m,l]) => {
+    html += `<button class="cric-mult-btn${m==='S'?' active':''}" id="cnpM_${containerId}_${m}" onclick="cricNpSetMult('${containerId}','${m}')">${l}</button>`;
+  });
+  html += '</div><div class="cric-field-grid">';
+  [20,19,18,17,16,15].forEach(n => {
+    html += `<button class="cric-field-btn" onclick="cricNpHit('${containerId}',${n})">${n}</button>`;
+  });
+  html += `</div><button onclick="cricNpBull('${containerId}')" style="width:100%;background:#1e293b;color:#E8681A;border:1px solid #E8681A;border-radius:10px;font-size:20px;font-weight:bold;min-height:56px;cursor:pointer;margin-bottom:8px;">BULL</button>`;
+  html += `<button class="miss" onclick="window['_cnpMiss_${containerId}']()" style="width:100%;">MISS</button>`;
+  el.innerHTML = html;
+}
+function cricNpSetMult(containerId, mult) {
+  cricNpMultStore[containerId] = mult;
+  ['S','D','T'].forEach(m => {
+    const btn = document.getElementById('cnpM_'+containerId+'_'+m);
+    if (btn) btn.classList.toggle('active', m===mult);
+  });
+}
+function cricNpHit(containerId, num) {
+  const mult = cricNpMultStore[containerId] || 'S';
+  const factor = mult==='D'?2:mult==='T'?3:1;
+  const cb = window['_cnpCb_'+containerId];
+  if (cb) cb(num*factor, mult, num);
+  cricNpSetMult(containerId, 'S');
+}
+function cricNpBull(containerId) {
+  const mult = cricNpMultStore[containerId] || 'S';
+  const pts = mult==='D'?50:25;
+  const type = mult==='D'?'D':'S';
+  const cb = window['_cnpCb_'+containerId];
+  if (cb) cb(pts, type, 25);
+  cricNpSetMult(containerId, 'S');
+}
+
+// ── V18.2: TARGET NUMPAD (ATC/B27/Shanghai) — nur Zielzahl als S/D/T ─────────
+function renderTargetNumpad(containerId, target, isBull, onHit, onMiss) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  window['_tnpHit_'+containerId] = onHit;
+  window['_tnpMiss_'+containerId] = onMiss;
+  const lbl = isBull ? 'Bull' : target;
+  let html = `<div class="target-numpad-label">Ziel: ${lbl}</div>`;
+  if (isBull) {
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">';
+    html += `<button class="target-hit-btn" onclick="tnpHit('${containerId}',25,'S',25)">Bull 25<span class="target-hit-pts">25 Pkt</span></button>`;
+    html += `<button class="target-hit-btn" style="border-color:#E8681A;color:#E8681A;" onclick="tnpHit('${containerId}',50,'D',25)">Bull 50<span class="target-hit-pts">50 Pkt</span></button>`;
+    html += '</div>';
+  } else {
+    const s=target, d=target*2, t=target*3;
+    html += '<div class="target-hit-grid">';
+    html += `<button class="target-hit-btn" onclick="tnpHit('${containerId}',${s},'S',${target})">S${target}<span class="target-hit-pts">${s} Pkt</span></button>`;
+    html += `<button class="target-hit-btn" onclick="tnpHit('${containerId}',${d},'D',${target})">D${target}<span class="target-hit-pts">${d} Pkt</span></button>`;
+    html += `<button class="target-hit-btn" onclick="tnpHit('${containerId}',${t},'T',${target})">T${target}<span class="target-hit-pts">${t} Pkt</span></button>`;
+    html += '</div>';
+  }
+  html += `<button class="miss" onclick="tnpMiss('${containerId}')" style="width:100%;">MISS</button>`;
+  el.innerHTML = html;
+}
+function tnpHit(containerId, pts, type, num) {
+  const cb = window['_tnpHit_'+containerId];
+  if (cb) cb(pts, type, num);
+}
+function tnpMiss(containerId) {
+  const cb = window['_tnpMiss_'+containerId];
+  if (cb) cb();
+}
+
 // npMults declared early (before first render) — see above
 function renderNumpad(containerId,onInput,onMiss){
   const el=document.getElementById(containerId);
@@ -5357,6 +5605,40 @@ function x01HybridOverride(mode){
 }
 
 // X01 Numpad — total score
+// V18.4: Hero-Block live-update bei jedem Tastendruck und bei Turn-Wechsel
+function x01UpdateHero(){
+  if(typeof x01State==='undefined'||!x01State||x01State.scores===undefined) return;
+  const p = x01State.turn;
+  if(p===undefined) return;
+  const pName = x01State.names[p] || ('Spieler '+(p+1));
+  const cur = x01State.scores[p];
+  const buf = parseInt(x01NpBuffer)||0;
+  const after = cur - buf;
+  const lbl=document.getElementById('x01HeroPlayerLabel'); if(lbl) lbl.textContent=pName;
+  const now=document.getElementById('x01HeroScoreNow');    if(now) now.textContent=cur;
+  const aft=document.getElementById('x01HeroScoreAfter');
+  if(aft){
+    aft.textContent = after;
+    aft.classList.remove('bust','checkout');
+    if(after<0) aft.classList.add('bust');
+    else if(after===1 && x01State.outMode!=='single') aft.classList.add('bust');
+    else if(after===0) aft.classList.add('checkout');
+  }
+  const di=document.getElementById('x01HeroDartInfo');
+  if(di) di.textContent='▶ Pfeil '+((x01State.dartCount||0)+1)+'/3';
+  const oi=document.getElementById('x01HeroOutInfo');
+  if(oi) oi.textContent='Out: '+x01State.outMode;
+  // Checkout-Hint integrieren (V16.10: nur ≤170 + Out-Modus passt)
+  const co=document.getElementById('x01HeroCheckout');
+  if(co){
+    const restAfter = buf>0 ? after : cur;
+    if(restAfter>0 && restAfter<=170 && typeof getCheckout==='function'){
+      const way = getCheckout(restAfter, x01State.outMode);
+      if(way){ co.style.display=''; co.textContent='Checkout-Weg: '+way; }
+      else { co.style.display='none'; }
+    } else { co.style.display='none'; }
+  }
+}
 function x01NpPress(d){
   if(x01NpBuffer.length>=3) return;
   if(x01NpBuffer===''&&d==='0'){x01NpBuffer='0';}
@@ -5364,10 +5646,12 @@ function x01NpPress(d){
   const val=parseInt(x01NpBuffer)||0;
   if(val>180){x01NpBuffer=x01NpBuffer.slice(0,-1);flashFeedback(false);return;}
   document.getElementById('x01NpDisplay').innerText=x01NpBuffer||'—';
+  x01UpdateHero(); // V18.4
 }
 function x01NpDelete(){
   x01NpBuffer=x01NpBuffer.slice(0,-1);
   document.getElementById('x01NpDisplay').innerText=x01NpBuffer||'—';
+  x01UpdateHero(); // V18.4
 }
 function x01NpQuick(val){x01NpBuffer=String(val);x01NpOK();}
 function x01NpOK(){
@@ -5700,7 +5984,7 @@ function getSetupWayHint(score, outMode){
     const after120 = needed-120;
     if(after120>0 && after120<=60){
       const s=findThrowSegment(after120);
-      if(s) return {path:['T20','T20',s], target, reason:'→ '+target+' (Big Fish)'};
+      if(s) return {path:['T20','T20',s], target, reason:'→ '+target+' (Setup → Big Fish)'};
     }
   }
   // Standard: T20 maximieren
@@ -5708,49 +5992,53 @@ function getSetupWayHint(score, outMode){
 }
 
 function updateStrategyHints(){
-  const hintBox = document.getElementById('checkoutHint');
-  const swBox   = document.getElementById('setupWayHint');
-  const stupidBox = document.getElementById('stupidRestWarn');
-  if(!hintBox||!swBox||!stupidBox) return;
+  // V18.5: alle Tipps in EINEN Strip-Slot (Priorität: stupid > checkout > setup)
+  const tipBox  = document.getElementById('x01StripTip');
+  const tipIcon = document.getElementById('x01StripTipIcon');
+  const tipText = document.getElementById('x01StripTipText');
+  const tipSub  = document.getElementById('x01StripTipSub');
+  if(!tipBox || !tipIcon || !tipText || !tipSub) return; // Strip nicht im DOM → still
+  // Reset
+  tipBox.className = 'gis-tip';
+  tipIcon.textContent = '';
+  tipText.textContent = '';
+  tipSub.textContent = '';
   if(typeof x01State==='undefined' || !x01State.scores) return;
   const p = x01State.turn;
   const score = x01State.scores[p];
-  const outMode = x01State.outMode;
+  if(score==null) return;
+  const outMode = x01State.outMode || 'double';
   const dartsLeft = 3 - (x01State.dartCount||0);
-  // Live-Checkout (Pflicht im Individual-Mode)
-  const isIndividualMode = (typeof inputMode!=='undefined' && (inputMode==='board'||inputMode==='hybrid'));
-  if(score<=170 && isIndividualMode){
-    const h = getNextDartHint(score, dartsLeft, outMode);
-    if(h){
-      document.getElementById('hintNext').innerText = h.nextDart;
-      document.getElementById('hintFull').innerText = h.fullPath.length>1 ? '→ '+h.fullPath.join(' → ') : '';
-      hintBox.style.display='block';
-    } else {
-      hintBox.style.display='none';
-    }
-  } else {
-    hintBox.style.display='none';
+  // 1) Stupid-Rest (höchste Priorität, nur wenn Strategie aktiv)
+  if(strategyHintsEnabled && typeof STUPID_RESTS!=='undefined' && STUPID_RESTS.includes(score)){
+    tipBox.classList.add('active','stupid');
+    tipIcon.textContent = '⚠';
+    tipText.textContent = 'Rest '+score+' schwer zu stellen';
+    return;
   }
-  // Setup-Way (zuschaltbar)
+  // 2) Live-Checkout (≤170, immer wenn machbar)
+  if(score<=170){
+    const h = getNextDartHint(score, dartsLeft, outMode);
+    if(h && h.nextDart){
+      tipBox.classList.add('active','checkout');
+      tipIcon.textContent = 'Nächster:';
+      tipText.textContent = h.nextDart;
+      tipSub.textContent  = (h.fullPath && h.fullPath.length>1) ? '→ '+h.fullPath.join(' → ') : '';
+      return;
+    }
+  }
+  // 3) Setup-Way (>170, nur mit Strategie-Toggle)
   if(strategyHintsEnabled && score>170){
     const sw = getSetupWayHint(score, outMode);
-    if(sw){
-      document.getElementById('hintPath').innerText = sw.path.join(' → ');
-      document.getElementById('hintReason').innerText = sw.reason || '';
-      swBox.style.display='block';
-    } else {
-      swBox.style.display='none';
+    if(sw && sw.path && sw.path.length){
+      tipBox.classList.add('active','setup');
+      tipIcon.textContent = 'Tipp:';
+      tipText.textContent = sw.path.join(' → ');
+      tipSub.textContent  = sw.reason || '';
+      return;
     }
-  } else {
-    swBox.style.display='none';
   }
-  // Stupid-Rest-Warnung (nur mit aktiver Strategie)
-  if(strategyHintsEnabled && STUPID_RESTS.includes(score)){
-    stupidBox.innerText = 'Achtung: Rest '+score+' schwer zu stellen';
-    stupidBox.style.display='block';
-  } else {
-    stupidBox.style.display='none';
-  }
+  // sonst: Tip-Slot bleibt versteckt (.gis-tip ohne .active)
 }
 
 // ── HIGHSCORE MODULE (V16.9) ───────────────────────────────────────────────────
