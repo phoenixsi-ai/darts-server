@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="positiv">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Phoenix Darts V19.13</title>
+<title>Phoenix Darts V19.16</title>
 <!-- ─────────────────────────────────────────────────────────────────────────
      V19.0 PHOENIX BOARD-PRINZIP (ab dieser Version Architektur-Gesetz):
      - EIN globales <svg id="board"> im DOM, niemals zweites Board-SVG hinzufügen.
@@ -12,6 +12,37 @@
      Verstoß = Architektur-Regression. Siehe BOARD_ARCHITECTURE.md im Projekt-Root.
      ───────────────────────────────────────────────────────────────────────── -->
 <style>
+/* ── V19.16 Theme System — §9 DESIGN_RICHTLINIEN ─────────────────── */
+:root[data-theme="positiv"] {
+  --bg-deep:              #0f172a;
+  --bg-card:              #1e293b;
+  --border:               #1a2030;
+  --accent:               #E8681A;
+  --text-main:            #F0E6D0;
+  --text-inv:             #0f172a;
+  --btn-inactive-bg:      #F0E6D0;
+  --btn-inactive-border:  #E8681A;
+  --btn-inactive-color:   #0f172a;
+  --btn-active-bg:        #E8681A;
+  --btn-active-border:    #F0E6D0;
+  --btn-active-color:     #F0E6D0;
+}
+
+:root[data-theme="negativ"] {
+  --bg-deep:              #0f172a;
+  --bg-card:              #F0E6D0;
+  --border:               #0f172a;
+  --accent:               #E8681A;
+  --text-main:            #0f172a;
+  --text-inv:             #F0E6D0;
+  --btn-inactive-bg:      #F0E6D0;
+  --btn-inactive-border:  #E8681A;
+  --btn-inactive-color:   #0f172a;
+  --btn-active-bg:        #1A6B3C;
+  --btn-active-border:    #0f172a;
+  --btn-active-color:     #F0E6D0;
+}
+/* ── Ende Theme System ─────────────────────────────────────────────── */
 body { margin:0; font-family:sans-serif; background:#060b14; color:#fff; text-align:center; overflow-y:auto; }
 /* V17.1: Modal-Animation */
 #appModal { transition: opacity 200ms ease-out; }
@@ -505,7 +536,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 }
 #app-wrapper { max-width:360px; margin:0 auto; background:#0f172a; min-height:100vh; position:relative; }
 /* ── V19.10 HAUPTMENÜ ──────────────────────────────────────────── */
-#start { padding: 0; background: #0f172a; }
+#start { padding: 0; background: var(--bg-deep); }
 
 /* ── V19.11 Dartscheiben-Header (echte Scheibe, oberes Viertel) ── */
 #homeDartboard {
@@ -584,8 +615,8 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   min-height: 56px;
   margin: 0 auto;
   padding: 14px 20px;
-  background: #F0E6D0;
-  color: #0f172a;
+  background: var(--btn-inactive-bg);
+  color: var(--btn-inactive-color);
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
@@ -607,7 +638,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   max-width: 360px;
   margin: 0 auto;
   padding: 4px 0 2px;
-  background: #1e293b;
+  background: var(--bg-card);
   border-radius: 0 0 12px 12px;
 }
 .expand-content.is-open { display: block; }
@@ -616,9 +647,9 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   width: calc(100% - 24px);
   margin: 4px 12px;
   padding: 11px 16px;
-  background: #0f172a;
-  color: #F0E6D0;
-  border: 1px solid #1a2030;
+  background: var(--bg-deep);
+  color: var(--text-main);
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 15px;
   text-align: left;
@@ -639,8 +670,8 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   min-height: 48px;
   margin: 0 auto;
   padding: 12px 20px;
-  background: #F0E6D0;
-  color: #0f172a;
+  background: var(--btn-inactive-bg);
+  color: var(--btn-inactive-color);
   font-size: 15px;
   font-weight: bold;
   border: 2px solid #C41E24;
@@ -664,8 +695,8 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   flex: 1;
   min-height: 48px;
   padding: 10px 8px;
-  background: #F0E6D0;
-  color: #0f172a;
+  background: var(--btn-inactive-bg);
+  color: var(--btn-inactive-color);
   font-size: 13px;
   font-weight: bold;
   border: 2px solid #C41E24;
@@ -2044,6 +2075,19 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 
 </div>
 <script>
+// ── V19.16 Theme System ────────────────────────────────────────────
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  try { localStorage.setItem('dart-theme', t); } catch(e) {}
+}
+function initTheme() {
+  try {
+    const saved = localStorage.getItem('dart-theme');
+    if (saved === 'positiv' || saved === 'negativ') setTheme(saved);
+  } catch(e) {}
+}
+initTheme();
+// ── Ende Theme System ──────────────────────────────────────────────
 const segments=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 
 // 4 Ringe: Double außen, Single außen, Triple, Inner-Single (visueller Trenner, nicht klickbar)
