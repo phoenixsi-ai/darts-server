@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Phoenix Darts V19.16</title>
+<title>Phoenix Darts V19.17</title>
 <!-- ─────────────────────────────────────────────────────────────────────────
      V19.0 PHOENIX BOARD-PRINZIP (ab dieser Version Architektur-Gesetz):
      - EIN globales <svg id="board"> im DOM, niemals zweites Board-SVG hinzufügen.
@@ -86,9 +86,9 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 @media (min-width:1280px) { .card.with-board { max-width:580px; } }
 .card h3 { margin:3px 0; font-size:16px; opacity:0.7; }
 .card p { margin:5px 0; font-size:20px; }
-.modal { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:200; }
+.modal { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:200; overscroll-behavior:contain; }
 .modal.active { display:flex; }
-.modal-box { background:#1e293b; padding:20px; border-radius:12px; max-width:320px; width:90%; }
+.modal-box { background:#1e293b; padding:20px; border-radius:12px; max-width:320px; width:90%; max-height:90vh; overflow-y:auto; overscroll-behavior:contain; box-sizing:border-box; }
 .stat-section { margin-bottom:20px; text-align:left; }
 .stat-section h3 { font-size:13px; color:#64748b; margin-bottom:8px; }
 .stat-list { list-style:none; padding:0; margin:0; }
