@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Phoenix Darts V19.17</title>
+<title>Phoenix Darts V19.18</title>
 <!-- ─────────────────────────────────────────────────────────────────────────
      V19.0 PHOENIX BOARD-PRINZIP (ab dieser Version Architektur-Gesetz):
      - EIN globales <svg id="board"> im DOM, niemals zweites Board-SVG hinzufügen.
@@ -53,7 +53,7 @@ body { margin:0; font-family:sans-serif; background:#060b14; color:#fff; text-al
 .toast { pointer-events:auto; padding:10px 14px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.4); display:flex; align-items:center; gap:8px; color:#fff; font-size:13px; transform:translateY(8px); opacity:0; transition: transform 250ms ease-out, opacity 250ms ease-out; }
 .toast.in { transform:translateY(0); opacity:1; }
 .toast.t-info    { background:#1d4ed8; border:1px solid #3b82f6; }
-.toast.t-success { background:#15803d; border:1px solid #22c55e; }
+.toast.t-success { background:#15803d; border:1px solid #1A6B3C; }
 .toast.t-warning { background:#a16207; border:1px solid #eab308; }
 .toast.t-error   { background:#b91c1c; border:1px solid #ef4444; }
 .toast button   { background:transparent; color:rgba(255,255,255,0.7); border:none; font-size:16px; cursor:pointer; padding:0 4px; }
@@ -93,8 +93,8 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .stat-section h3 { font-size:13px; color:#64748b; margin-bottom:8px; }
 .stat-list { list-style:none; padding:0; margin:0; }
 .stat-list li { padding:6px 0; border-bottom:1px solid #0f172a; font-size:14px; }
-.toggle-btn { flex:1; background:#0f172a; color:#fff; border:2px solid #1a2030; border-radius:8px; font-size:15px; font-weight:bold; min-height:40px; padding:0; margin:0; cursor:pointer; }
-.toggle-btn.active { background:#E8681A; color:#fff; border-color:#E8681A; }
+.toggle-btn { flex:1; background:#F0E6D0; color:#0f172a; border:2px solid #E8681A; border-radius:8px; font-size:15px; font-weight:bold; min-height:40px; padding:0; margin:0; cursor:pointer; }
+.toggle-btn.active { background:#E8681A; color:#F0E6D0; border-color:#F0E6D0; }
 .bull-row { display:flex; gap:6px; margin:6px 0; }
 .bull-btn { flex:1; background:#0f172a; color:#fff; border:1px solid #1a2030; border-radius:8px; font-size:15px; font-weight:bold; min-height:44px; padding:0; margin:0; cursor:pointer; }
 /* Shared — V19.13: Board skaliert in Container, aspect-ratio fix für iOS Safari */
@@ -106,7 +106,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .round-indicator { display:flex; justify-content:center; gap:5px; margin:6px auto; flex-wrap:wrap; max-width:360px; }
 .round-dot { width:10px; height:10px; border-radius:50%; background:#1a2030; display:inline-block; }
 .round-dot.active { background:#E8681A; }
-.round-dot.done { background:#27ae60; }
+.round-dot.done { background:#1A6B3C; }
 .score-big { font-size:48px; font-weight:bold; margin:8px 0; color:#E8681A; }
 .info-row { font-size:13px; color:#64748b; margin:3px 0; }
 .target-label { font-size:22px; font-weight:bold; color:#E8681A; margin:4px 0; }
@@ -117,7 +117,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .cricket-marks { display:flex; gap:4px; justify-content:center; align-items:center; }
 .cricket-mark { width:18px; height:18px; border-radius:50%; background:#1a2030; }
 .cricket-mark.hit { background:#E8681A; }
-.cricket-mark.closed { background:#27ae60; }
+.cricket-mark.closed { background:#1A6B3C; }
 /* Elimination */
 .elim-players { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:10px auto; max-width:360px; }
 .elim-player { background:#1e293b; border-radius:12px; padding:10px 16px; min-width:80px; text-align:center; }
@@ -135,7 +135,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .checkout-remain { font-size:28px; color:#fff; margin:4px 0; }
 /* Online */
 .online-bar { background:#0f172a; border-bottom:1px solid #1e293b; padding:6px 12px; font-size:12px; display:flex; justify-content:space-between; align-items:center; }
-.online-bar .ob-status { color:#27ae60; }
+.online-bar .ob-status { color:#1A6B3C; }
 .online-bar .ob-turn { color:#E8681A; font-weight:bold; }
 .online-bar.waiting { background:#1e3a1e; }
 .online-bar.myturn { background:#1a2a0f; }
@@ -164,11 +164,11 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .comm-icons { display:flex; gap:4px; align-items:center; }
 .comm-btn { background:none; border:none; color:#94a3b8; font-size:18px; padding:4px 6px; cursor:pointer; min-height:auto; margin:0; line-height:1; border-radius:6px; }
 .comm-btn:active { background:#1a2030; }
-.comm-btn.active { color:#27ae60; }
+.comm-btn.active { color:#1A6B3C; }
 /* Input mode toggle */
 .input-mode-row { display:flex; gap:0; max-width:360px; margin:8px auto 0; border-radius:10px; overflow:hidden; border:1px solid #1a2030; }
 .input-mode-btn { flex:1; background:#0f172a; color:#94a3b8; border:none; font-size:13px; font-weight:bold; min-height:40px; cursor:pointer; margin:0; padding:0; }
-.input-mode-btn.active { background:#E8681A; color:#fff; }
+.input-mode-btn.active { background:#E8681A; color:#F0E6D0; }
 /* Numpad */
 /* V18.3: numpad-display (Zahlen-Echo, alt) — wird in V18.4 für X01/Elim durch Hero-Block ersetzt; bleibt für andere Modi */
 .numpad-display { font-size:36px; font-weight:bold; color:#E8681A; background:#0f172a; border-radius:8px; padding:8px 12px; margin:0 0 8px; text-align:right; min-height:56px; letter-spacing:2px; line-height:56px; }
@@ -180,17 +180,17 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .np-hero .hero-divider { border-top:1px solid #1e293b; margin:8px 0; }
 .np-hero .hero-input-mini { font-size:13px; color:#94a3b8; }
 .np-hero .hero-input-mini b { color:#fff; font-size:18px; font-weight:bold; margin-left:4px; letter-spacing:1px; }
-.np-hero .hero-score-after { font-size:32px; font-weight:bold; color:#22c55e; line-height:1; }
+.np-hero .hero-score-after { font-size:32px; font-weight:bold; color:#1A6B3C; line-height:1; }
 .np-hero .hero-score-after.bust { color:#ef4444; }
 .np-hero .hero-score-after.checkout { color:#E8681A; text-shadow:0 0 8px rgba(232,104,26,0.6); }
 .np-hero .hero-status { font-size:12px; color:#94a3b8; margin-top:6px; display:flex; justify-content:space-between; }
-.np-hero .hero-checkout { color:#22c55e; font-size:13px; margin-top:6px; padding-top:6px; border-top:1px solid #1e293b; font-weight:bold; }
+.np-hero .hero-checkout { color:#1A6B3C; font-size:13px; margin-top:6px; padding-top:6px; border-top:1px solid #1e293b; font-weight:bold; }
 /* V18.5: Game-Info-Strip — Settings + Tipp-Slot, sticky oben */
 .game-info-strip { position:sticky; top:0; z-index:50; max-width:360px; margin:0 auto 8px; background:#0f172a; border:1px solid #1a2030; border-radius:12px; padding:8px 12px; font-size:12px; box-shadow:0 2px 12px rgba(0,0,0,0.4); }
 .game-info-strip .gis-settings { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px; color:#94a3b8; font-size:12px; }
 .game-info-strip .gis-settings .gis-mode { color:#E8681A; font-weight:bold; font-size:14px; }
 .game-info-strip .gis-settings .gis-sep { color:#475569; }
-.game-info-strip .gis-settings .gis-match { color:#22c55e; font-weight:bold; }
+.game-info-strip .gis-settings .gis-match { color:#1A6B3C; font-weight:bold; }
 .game-info-strip .gis-toggle { background:none; border:1px solid #1a2030; color:#94a3b8; font-size:11px; padding:2px 8px; border-radius:6px; cursor:pointer; min-height:auto; margin:0; line-height:1.4; }
 .game-info-strip .gis-toggle.active { background:#E8681A; border-color:#E8681A; color:#fff; }
 .game-info-strip .gis-tip { margin-top:6px; padding-top:6px; border-top:1px solid #1e293b; font-size:12px; text-align:left; display:none; }
@@ -222,9 +222,9 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .indiv-seg-btn:active { background:#1a2030; }
 .indiv-dart-log { font-size:12px; color:#64748b; margin:6px 0; text-align:left; min-height:36px; }
 /* Checkout display */
-.checkout-box { background:#0f172a; border:1px solid #27ae60; border-radius:8px; padding:6px 10px; margin:0 0 8px; text-align:left; }
+.checkout-box { background:#0f172a; border:1px solid #1A6B3C; border-radius:8px; padding:6px 10px; margin:0 0 8px; text-align:left; }
 .checkout-box .co-label { font-size:10px; color:#64748b; margin-bottom:2px; }
-.checkout-box .co-way { font-size:13px; font-weight:bold; color:#27ae60; }
+.checkout-box .co-way { font-size:13px; font-weight:bold; color:#1A6B3C; }
 /* Hybrid switch */
 .hybrid-switch { display:flex; gap:4px; justify-content:flex-end; margin-bottom:6px; }
 .hybrid-switch-btn { background:#1a2030; color:#94a3b8; border:none; border-radius:6px; font-size:11px; padding:4px 8px; cursor:pointer; margin:0; min-height:auto; }
@@ -358,7 +358,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .x01-bottom-bar .bb-tip   { gap:4px; }
 .x01-bottom-bar .bb-tip-content { font-size:11px; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; }
 .x01-bottom-bar .bb-tip-content .bb-tip-icon { font-weight:bold; margin-right:3px; }
-.x01-bottom-bar .bb-tip-content.checkout { color:#22c55e; }
+.x01-bottom-bar .bb-tip-content.checkout { color:#1A6B3C; }
 .x01-bottom-bar .bb-tip-content.setup    { color:#E8681A; }
 .x01-bottom-bar .bb-tip-content.stupid   { color:#ef4444; font-weight:bold; }
 .x01-bottom-bar .bb-tip-content.idle     { color:#475569; }
@@ -367,7 +367,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .x01-bottom-bar .bb-settings .bb-row { font-size:11px; color:#cbd5e1; display:flex; gap:4px; align-items:baseline; flex:1; white-space:nowrap; overflow:hidden; }
 .x01-bottom-bar .bb-settings .bb-row .bb-mode  { color:#E8681A; font-weight:bold; font-size:12px; }
 .x01-bottom-bar .bb-settings .bb-row .bb-sep   { color:#475569; }
-.x01-bottom-bar .bb-settings .bb-row .bb-match { color:#22c55e; font-weight:bold; }
+.x01-bottom-bar .bb-settings .bb-row .bb-match { color:#1A6B3C; font-weight:bold; }
 .x01-bottom-bar .bb-settings .bb-tap-hint { font-size:9px; color:#475569; }
 /* Label/Match-Row im super-kompakten Layout ausgeblendet (nur Hauptzeile bleibt) */
 .x01-bottom-bar .bb-label, .x01-bottom-bar .bb-settings .bb-row + .bb-row { display:none; }
@@ -935,7 +935,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="ssRoundName" style="font-size:16px; font-weight:bold;"></div>
     <div id="ssDartCount" class="info-row"></div>
     <div id="ssTarget" class="target-label"></div>
-    <div id="ssHits" class="info-row" style="color:#27ae60;"></div>
+    <div id="ssHits" class="info-row" style="color:#1A6B3C;"></div>
     <div id="ssRoundPts" class="info-row"></div>
   </div>
   <div id="inputToggle-splitscore"></div>
@@ -955,7 +955,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="pDartCount" class="info-row"></div>
     <div id="pTarget" class="target-label"></div>
     <div id="pBlockInfo" class="info-row"></div>
-    <div id="pHits" class="info-row" style="color:#27ae60;"></div>
+    <div id="pHits" class="info-row" style="color:#1A6B3C;"></div>
     <div id="pRoundScore" class="info-row"></div>
   </div>
   <div id="inputToggle-phoenix"></div>
@@ -1058,7 +1058,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <!-- V18.6: Eingabe-Modus-Selector entfernt — Hybrid ist Default, in-Game-Switch übernimmt -->
   <button onclick="mfOpen()" class="mfOpenBtn x01-action-btn" style="background:#1a2030;color:#fff;">Format: Einzelleg</button>
   <button class="primary x01-action-btn" id="x01StartBtn">Spiel starten</button>
-  <button class="x01-action-btn" onclick="show('start')" style="background:#333;color:#fff;">Abbrechen</button>
+  <button class="x01-action-btn" onclick="show('start')" style="background:#1e293b;color:#F0E6D0;">Abbrechen</button>
 </div>
 
 <!-- X01 SPIEL — V18.6 Player-Grid + Multi-Player -->
@@ -1113,7 +1113,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
       <div class="bb-row">
         <span class="bb-mode" id="x01BbMode">501</span>
         <span id="x01BbOut" style="margin-left:6px;">double out</span>
-        <span class="bb-match" id="x01BbMatch" style="margin-left:8px;color:#22c55e;font-weight:bold;display:none;"></span>
+        <span class="bb-match" id="x01BbMatch" style="margin-left:8px;color:#1A6B3C;font-weight:bold;display:none;"></span>
       </div>
       <span class="bb-tap-hint" style="margin-left:auto;">⚙</span>
     </div>
@@ -1275,7 +1275,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     </div>
     <button onclick="mfOpen()" class="mfOpenBtn" style="background:#1a2030;color:#fff;width:100%;border-radius:12px;padding:12px;font-size:15px;margin-bottom:4px;">Format: Einzelleg</button>
     <button class="primary" onclick="cricketStart()">Starten</button>
-    <button onclick="document.getElementById('cricketSetupModal').classList.remove('active')" style="background:#333;color:#fff;">Abbrechen</button>
+    <button onclick="document.getElementById('cricketSetupModal').classList.remove('active')" style="background:#1e293b;color:#F0E6D0;">Abbrechen</button>
   </div>
 </div>
 
@@ -1446,7 +1446,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
       <button onclick="elimUndo()" style="width:100%;background:#1a2030;color:#fff;border-radius:12px;margin-top:4px;font-size:14px;min-height:40px;">↩ Zurück</button>
     </div>
   </div>
-  <button onclick="show('start')" style="background:#333;color:#fff;width:100%;max-width:360px;margin-top:8px;">Zurueck</button>
+  <button onclick="show('start')" style="background:#1e293b;color:#F0E6D0;width:100%;max-width:360px;margin-top:8px;">Zurueck</button>
 </div>
 
 <!-- SHANGHAI SETUP MODAL -->
@@ -1463,7 +1463,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <input id="shanName6" class="input-name" type="text" placeholder="Spieler 6 (opt.)" maxlength="12">
     <button onclick="mfOpen()" class="mfOpenBtn" style="background:#1a2030;color:#fff;width:100%;border-radius:12px;padding:12px;font-size:15px;margin-bottom:4px;">Format: Einzelleg</button>
     <button class="primary" onclick="shanghaiStart()">Starten</button>
-    <button onclick="document.getElementById('shanghaiSetupModal').classList.remove('active')" style="background:#333;color:#fff;">Abbrechen</button>
+    <button onclick="document.getElementById('shanghaiSetupModal').classList.remove('active')" style="background:#1e293b;color:#F0E6D0;">Abbrechen</button>
   </div>
 </div>
 
@@ -1475,7 +1475,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="shanRound" style="font-size:18px; font-weight:bold;"></div>
     <div id="shanTurn" class="info-row"></div>
     <div id="shanDart" class="info-row"></div>
-    <div id="shanShanghai" class="info-row" style="color:#27ae60;"></div>
+    <div id="shanShanghai" class="info-row" style="color:#1A6B3C;"></div>
   </div>
   <div class="elim-players" id="shanPlayers"></div>
   <div id="matchBarShan" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:360px;"></div>
@@ -1550,7 +1550,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="b27RoundName" style="font-size:16px; font-weight:bold;"></div>
     <div id="b27DartCount" class="info-row"></div>
     <div id="b27Target" class="target-label"></div>
-    <div id="b27Hits" class="info-row" style="color:#27ae60;"></div>
+    <div id="b27Hits" class="info-row" style="color:#1A6B3C;"></div>
     <div id="b27Warn" class="warn-label"></div>
     <div id="b27Best" class="info-row"></div>
   </div>
@@ -1569,12 +1569,12 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <!-- V16.10.2: Optimaler Wurfpfad -->
   <div id="coPlan" style="display:none;background:#0f172a;border:1px solid #16a34a;border-radius:8px;padding:8px 12px;margin:6px auto;max-width:320px;text-align:center;font-size:14px;">
     <div style="font-size:11px;color:#64748b;margin-bottom:2px;">Optimaler Pfad</div>
-    <div id="coPlanPath" style="color:#27ae60;font-weight:bold;font-size:16px;letter-spacing:1px;"></div>
+    <div id="coPlanPath" style="color:#1A6B3C;font-weight:bold;font-size:16px;letter-spacing:1px;"></div>
   </div>
   <div class="card with-board" style="margin:8px auto;">
     <div id="coDart" class="info-row"></div>
     <div id="coRound" class="info-row"></div>
-    <div id="coHits" class="info-row" style="color:#27ae60;"></div>
+    <div id="coHits" class="info-row" style="color:#1A6B3C;"></div>
   </div>
   <div class="card" style="max-width:360px; margin:8px auto;">
     <div id="inputToggle-checkout"></div>
@@ -1605,7 +1605,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
       <button class="primary" onclick="onlineCreate()" style="flex:1;">Raum erstellen</button>
       <button onclick="onlineJoinOpen()" style="flex:1;background:#0f4c75;color:#fff;border-radius:12px;">Beitreten</button>
     </div>
-    <button onclick="document.getElementById('onlineModal').classList.remove('active')" style="background:#333;color:#fff;width:100%;margin-top:8px;">Abbrechen</button>
+    <button onclick="document.getElementById('onlineModal').classList.remove('active')" style="background:#1e293b;color:#F0E6D0;width:100%;margin-top:8px;">Abbrechen</button>
   </div>
 </div>
 
@@ -1615,7 +1615,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div id="connectSpinner" style="width:48px;height:48px;border:4px solid #1a2030;border-top:4px solid #22d3ee;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
     <h3 id="connectTitle">Verbinde…</h3>
     <p id="connectMsg" style="color:#64748b;font-size:13px;margin-top:8px;">Server wacht auf — kann bis zu 30 Sekunden dauern</p>
-    <button onclick="connectAbort()" style="background:#333;color:#fff;width:100%;margin-top:16px;">Abbrechen</button>
+    <button onclick="connectAbort()" style="background:#1e293b;color:#F0E6D0;width:100%;margin-top:16px;">Abbrechen</button>
   </div>
 </div>
 
@@ -1627,7 +1627,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <input id="onlineCodeInput" class="online-code-input" type="text" placeholder="XXXXX" maxlength="5">
     <div id="onlineJoinError" style="color:#ff4444;font-size:13px;min-height:18px;margin:4px 0;"></div>
     <button class="primary" onclick="onlineJoin()" style="width:100%;margin-top:8px;">Verbinden</button>
-    <button onclick="document.getElementById('onlineJoinModal').classList.remove('active')" style="background:#333;color:#fff;width:100%;margin-top:8px;">Zurück</button>
+    <button onclick="document.getElementById('onlineJoinModal').classList.remove('active')" style="background:#1e293b;color:#F0E6D0;width:100%;margin-top:8px;">Zurück</button>
   </div>
 </div>
 
@@ -1642,7 +1642,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
       <button onclick="copyRoomLink()" style="flex:1;background:#1a2030;color:#fff;border-radius:12px;font-size:14px;padding:10px;" id="copyLinkBtn">📋 Link kopieren</button>
     </div>
     <p style="color:#64748b;font-size:11px;margin-top:8px;">Oder manuell: Dein Freund öffnet<br><strong style="color:#22d3ee;">darts-server-zux1.onrender.com</strong><br>→ Online spielen → Code eingeben</p>
-    <button onclick="onlineCancel()" style="background:#333;color:#fff;width:100%;margin-top:12px;">Abbrechen</button>
+    <button onclick="onlineCancel()" style="background:#1e293b;color:#F0E6D0;width:100%;margin-top:12px;">Abbrechen</button>
   </div>
 </div>
 
@@ -1693,7 +1693,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
       <button class="primary" onclick="onlinePickGame('killer',0)" style="width:100%;margin:4px 0;">Killer</button>
       <button class="primary" onclick="onlinePickGame('highscore',0)" style="width:100%;margin:4px 0;">Highscore</button>
     </div>
-    <button onclick="onlineCancel()" style="background:#333;color:#fff;width:100%;margin-top:12px;">Abbrechen</button>
+    <button onclick="onlineCancel()" style="background:#1e293b;color:#F0E6D0;width:100%;margin-top:12px;">Abbrechen</button>
   </div>
 </div>
 
@@ -1814,7 +1814,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   </div>
   <div id="statsAggregate" class="card" style="max-width:360px;margin:0 auto 12px;"></div>
   <div id="statsByMode" style="max-width:360px;margin:0 auto;display:flex;flex-direction:column;gap:10px;"></div>
-  <button onclick="show('start')" style="background:#333;color:#fff;max-width:360px;width:90%;margin-top:12px;">Zurueck</button>
+  <button onclick="show('start')" style="background:#1e293b;color:#F0E6D0;max-width:360px;width:90%;margin-top:12px;">Zurueck</button>
 </div>
 
 <!-- PROFIL (V17.0c — Multi-Profile) -->
@@ -1824,7 +1824,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div id="profileList" style="max-width:360px;margin:0 auto 12px;display:flex;flex-direction:column;gap:8px;"></div>
   <button class="primary" onclick="openCreateProfileDialog()" style="max-width:360px;width:90%;">+ Neues Profil</button>
   <button onclick="confirmStorageCleanup()" style="background:#475569;color:#fff;max-width:360px;width:90%;margin-top:8px;">🧹 Storage aufraeumen</button>
-  <button onclick="show('start')" style="background:#333;color:#fff;max-width:360px;width:90%;margin-top:8px;">Zurueck</button>
+  <button onclick="show('start')" style="background:#1e293b;color:#F0E6D0;max-width:360px;width:90%;margin-top:8px;">Zurueck</button>
 </div>
 
 <!-- PHOENIX CHICAGO SETUP (V16.10.3 — v1.1) -->
@@ -2117,7 +2117,7 @@ function ringArc(cx,cy,r1,r2,start,end){
 }
 function colorForSegment(type,index){
   let a=index%2===0;
-  if(type==='D'||type==='T') return a?'#c0392b':'#27ae60';
+  if(type==='D'||type==='T') return a?'#C41E24':'#1A6B3C';
   return a?'#1a1a1a':'#f5e6c8';
 }
 function pointsForId(boardId){
@@ -2187,7 +2187,7 @@ function buildBoard(svg, onHit, isTarget){
   // Bull outer B25 — V18.6: r=20 (war 22), Bull-S Ring effektiv 12 wide (r=8..20)
   let b1=document.createElementNS("http://www.w3.org/2000/svg","circle");
   b1.setAttribute('cx',100);b1.setAttribute('cy',100);b1.setAttribute('r',20);
-  b1.setAttribute('fill','#27ae60');
+  b1.setAttribute('fill','#1A6B3C');
   b1.setAttribute('class','segment');
   b1.setAttribute('pointer-events','all');
   b1.onclick=()=>onHit('B25',25,'B');
@@ -2197,7 +2197,7 @@ function buildBoard(svg, onHit, isTarget){
   // Bull inner B50 — V18.6: r=8 (war 13), Tap-Area 531→201 sqr-px (Verhältnis Single:Double-Bull ~5×, realistischer)
   let b2=document.createElementNS("http://www.w3.org/2000/svg","circle");
   b2.setAttribute('cx',100);b2.setAttribute('cy',100);b2.setAttribute('r',8);
-  b2.setAttribute('fill','#c0392b');
+  b2.setAttribute('fill','#C41E24');
   b2.setAttribute('class','segment');
   b2.setAttribute('pointer-events','all');
   b2.onclick=()=>onHit('B50',50,'B');
@@ -4140,7 +4140,7 @@ function b27Render(){
         let _nh='';
         if(_b27IsBull){
           _nh='<button onclick="b27Hit(\'B50\',50,\'D\')" style="width:100%;padding:18px;font-size:17px;font-weight:bold;background:#e74c3c;color:#fff;border:none;border-radius:12px;cursor:pointer;margin-bottom:6px;touch-action:manipulation;">Bull 50 getroffen (+50)</button>';
-          _nh+='<button onclick="b27Hit(\'B25\',25,\'S\')" style="width:100%;padding:18px;font-size:17px;font-weight:bold;background:#e67e22;color:#fff;border:none;border-radius:12px;cursor:pointer;margin-bottom:6px;touch-action:manipulation;">Bull 25 getroffen (+25)</button>';
+          _nh+='<button onclick="b27Hit(\'B25\',25,\'S\')" style="width:100%;padding:18px;font-size:17px;font-weight:bold;background:#E8681A;color:#F0E6D0;border:none;border-radius:12px;cursor:pointer;margin-bottom:6px;touch-action:manipulation;">Bull 25 getroffen (+25)</button>';
           _nh+='<button class="miss" onclick="b27Miss()" style="width:100%;touch-action:manipulation;">Kein Bull — MISS</button>';
         } else {
           _nh='<button class="primary" onclick="b27Hit(\'D'+_b27Cur.num+'\','+_b27Cur.num+',\'D\')" style="width:100%;padding:20px;font-size:18px;font-weight:bold;margin-bottom:8px;touch-action:manipulation;">D'+_b27Cur.num+' getroffen (+'+_b27Cur.value+')</button>';
@@ -7866,7 +7866,7 @@ function killNpRender(){
   html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:260px;margin:0 auto;">';
   for(let n=1;n<=20;n++){
     const isOwn=p&&p.revealed&&p.doubleField.value===n&&p.doubleField.mult===2;
-    html+='<button onclick="killerDblNpHit('+n+')" style="padding:10px 4px;font-size:14px;border-radius:8px;background:'+(isOwn?'#16a34a':'#1e293b')+';color:#f8fafc;border:1px solid '+(isOwn?'#22c55e':'#1a2030')+';">D'+n+'</button>';
+    html+='<button onclick="killerDblNpHit('+n+')" style="padding:10px 4px;font-size:14px;border-radius:8px;background:'+(isOwn?'#16a34a':'#1e293b')+';color:#f8fafc;border:1px solid '+(isOwn?'#1A6B3C':'#1a2030')+';">D'+n+'</button>';
   }
   html+='</div><button onclick="killMiss()" style="width:100%;margin-top:6px;padding:12px;border-radius:10px;background:#7f1d1d;color:#fff;border:none;font-size:16px;">Kein Doppel (Miss)</button>';
   el.innerHTML=html;
