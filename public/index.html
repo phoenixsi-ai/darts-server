@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Phoenix Darts V19.18</title>
+<title>Phoenix Darts V19.19</title>
 <!-- ─────────────────────────────────────────────────────────────────────────
      V19.0 PHOENIX BOARD-PRINZIP (ab dieser Version Architektur-Gesetz):
      - EIN globales <svg id="board"> im DOM, niemals zweites Board-SVG hinzufügen.
@@ -112,10 +112,10 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .target-label { font-size:22px; font-weight:bold; color:#E8681A; margin:4px 0; }
 .input-name { width:90%; padding:8px 10px; margin:5px 0; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #1a2030; font-size:15px; box-sizing:border-box; }
 /* Cricket */
-.cricket-board { display:grid; grid-template-columns:1fr auto 1fr; gap:4px; max-width:360px; margin:10px auto; }
-.cricket-num { font-size:20px; font-weight:bold; text-align:center; padding:8px 0; }
+.cricket-board { display:grid; grid-template-columns:1fr auto 1fr; gap:2px; max-width:360px; margin:4px auto; }
+.cricket-num { font-size:15px; font-weight:bold; text-align:center; padding:4px 0; }
 .cricket-marks { display:flex; gap:4px; justify-content:center; align-items:center; }
-.cricket-mark { width:18px; height:18px; border-radius:50%; background:#1a2030; }
+.cricket-mark { width:14px; height:14px; border-radius:50%; background:#1a2030; }
 .cricket-mark.hit { background:#E8681A; }
 .cricket-mark.closed { background:#1A6B3C; }
 /* Elimination */
@@ -257,7 +257,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 /* alte .np-quick-Regel aus V18.2 verworfen — Side-Quicks ersetzen sie */
 /* V18.2: Cricket Felder */
 .cric-field-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; }
-.cric-field-btn { background:#1e293b; color:#fff; border:1px solid #1a2030; border-radius:10px; font-size:26px; font-weight:bold; min-height:72px; cursor:pointer; padding:0; margin:0; }
+.cric-field-btn { background:#1e293b; color:#fff; border:1px solid #1a2030; border-radius:10px; font-size:22px; font-weight:bold; min-height:56px; cursor:pointer; padding:0; margin:0; }
 .cric-field-btn:active { background:#1a2030; }
 .cric-mult-row { display:flex; gap:6px; margin-bottom:8px; }
 .cric-mult-btn { flex:1; background:#0f172a; color:#94a3b8; border:2px solid #1a2030; border-radius:8px; font-size:15px; font-weight:bold; min-height:48px; cursor:pointer; }
@@ -1292,10 +1292,8 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   </div>
   <div id="matchBarCric" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:360px;"></div>
   <div id="cricketBoard" class="cricket-board"></div>
-  <div class="player-banner" id="cricPlayerBanner">▶ Spieler 1 — Dart 1 von 3</div>
   <div class="card with-board" style="margin:10px auto;">
-    <div class="info-row" id="cricTurn"></div>
-    <div class="info-row" id="cricDart"></div>
+    <div id="cricDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
     <div id="inputToggle-cricket"></div>
     <div id="board-slot-cricket" class="board-slot" style="margin-top:8px;"></div>
     <div id="numpad-cricket" style="display:none;"></div>
@@ -3342,19 +3340,15 @@ function cricCheckWin(){
   }
 }
 function cricRender(){
-  // V18.2: Player Banner
-  const cricBanner = document.getElementById('cricPlayerBanner');
-  if (cricBanner && typeof cricState !== 'undefined') {
-    const cName = (cricState.names && cricState.names[cricState.turn]) || ('Spieler '+(cricState.turn+1));
-    const cDart = (cricState.dartCount||0)+1;
-    cricBanner.textContent = '▶ ' + cName + ' — Dart ' + cDart + ' von 3';
-  }
+  // V19.19: Einzelnes kombiniertes Anzeigefeld (cricBanner + cricTurn + cricDart → cricDart)
+  const _cricName = (cricState.names && cricState.names[cricState.turn]) || ('Spieler '+(cricState.turn+1));
+  const _cricDart = (cricState.dartCount||0)+1;
+  const cricInfoEl = document.getElementById('cricDart');
+  if(cricInfoEl) cricInfoEl.textContent = '▶ ' + _cricName + ' — Dart ' + _cricDart + ' von 3';
   document.getElementById('cricP1Name').innerText=cricState.names[0];
   document.getElementById('cricP2Name').innerText=cricState.names[1];
   document.getElementById('cricP1Score').innerText=cricState.scores[0];
   document.getElementById('cricP2Score').innerText=cricState.scores[1];
-  document.getElementById('cricTurn').innerText=cricState.names[cricState.turn]+' ist dran';
-  document.getElementById('cricDart').innerText='Dart '+(cricState.dartCount+1)+'/3';
   const board=document.getElementById('cricketBoard');board.innerHTML='';
   CRICKET_NUMS.forEach((num,i)=>{
     let m1=document.createElement('div');m1.className='cricket-marks';
@@ -5100,19 +5094,40 @@ function performUndo(){
   if(undoStack.length===0) return false;
   const snap = undoStack.pop();
   if(!snapshotRestore(snap)){ updateUndoButtons(); return false; }
-  // Alle Modus-Renderer aufrufen — der Modus, der sichtbar ist, refresht sich
-  try{ if(typeof x01Render==='function')  x01Render();  } catch(e){}
-  try{ if(typeof cricRender==='function') cricRender(); } catch(e){}
-  try{ if(typeof elimRender==='function') elimRender(); } catch(e){}
-  try{ if(typeof shanRender==='function') shanRender(); } catch(e){}
-  try{ if(typeof atcRender==='function')  atcRender();  } catch(e){}
-  try{ if(typeof b27Render==='function')  b27Render();  } catch(e){}
-  try{ if(typeof coRender==='function')   coRender();   } catch(e){}
-  try{ if(typeof ssRender==='function')   ssRender();   } catch(e){}
-  try{ if(typeof pRender==='function')    pRender();    } catch(e){}
-  try{ if(typeof chicRender==='function') chicRender(); } catch(e){}
-  try{ if(typeof killRender==='function') killRender(); } catch(e){}
-  try{ if(typeof hsRender==='function')   hsRender();   } catch(e){}
+  // V19.19: Nur aktiven Screen rendern — alle Renderer gleichzeitig verschieben
+  // das Board-SVG in den falschen Slot (bindBoardToSlot ist destruktiv).
+  const _as = document.querySelector('.screen.active');
+  const _sid = _as ? _as.id : '';
+  try{
+    if(_sid==='classic'||_sid==='flow'){ if(typeof render==='function') render(); }
+    else if(_sid==='x01'){              if(typeof x01Render==='function')  x01Render(); }
+    else if(_sid==='cricket'){          if(typeof cricRender==='function') cricRender(); }
+    else if(_sid==='elimination'){      if(typeof elimRender==='function') elimRender(); }
+    else if(_sid==='shanghai'){         if(typeof shanRender==='function') shanRender(); }
+    else if(_sid==='atc'){              if(typeof atcRender==='function')  atcRender(); }
+    else if(_sid==='b27'){              if(typeof b27Render==='function')  b27Render(); }
+    else if(_sid==='checkout'){         if(typeof coRender==='function')   coRender(); }
+    else if(_sid==='splitscore'){       if(typeof ssRender==='function')   ssRender(); }
+    else if(_sid==='phoenix'){          if(typeof pRender==='function')    pRender(); }
+    else if(_sid==='chicago'){          if(typeof chicRender==='function') chicRender(); }
+    else if(_sid==='killer'){           if(typeof killRender==='function') killRender(); }
+    else if(_sid==='hsGame'){           if(typeof hsRender==='function')   hsRender(); }
+    else {
+      // Fallback: alle rendern (Screen-ID unbekannt)
+      if(typeof x01Render==='function')  x01Render();
+      if(typeof cricRender==='function') cricRender();
+      if(typeof elimRender==='function') elimRender();
+      if(typeof shanRender==='function') shanRender();
+      if(typeof atcRender==='function')  atcRender();
+      if(typeof b27Render==='function')  b27Render();
+      if(typeof coRender==='function')   coRender();
+      if(typeof ssRender==='function')   ssRender();
+      if(typeof pRender==='function')    pRender();
+      if(typeof chicRender==='function') chicRender();
+      if(typeof killRender==='function') killRender();
+      if(typeof hsRender==='function')   hsRender();
+    }
+  } catch(e){}
   // Online-Sync
   if(typeof onlineState!=='undefined' && onlineState.active && onlineState.socket && onlineState.roomId){
     onlineState.socket.emit('undo_action', {roomId: onlineState.roomId});
