@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Phoenix Darts V19.21</title>
+<title>Phoenix Darts V19.22</title>
 <!-- ─────────────────────────────────────────────────────────────────────────
      V19.0 PHOENIX BOARD-PRINZIP (ab dieser Version Architektur-Gesetz):
      - EIN globales <svg id="board"> im DOM, niemals zweites Board-SVG hinzufügen.
@@ -112,10 +112,10 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .target-label { font-size:22px; font-weight:bold; color:#E8681A; margin:4px 0; }
 .input-name { width:90%; padding:8px 10px; margin:5px 0; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #1a2030; font-size:15px; box-sizing:border-box; }
 /* Cricket */
-.cricket-board { display:grid; grid-template-columns:1fr auto 1fr; gap:2px; max-width:360px; margin:4px auto; }
-.cricket-num { font-size:15px; font-weight:bold; text-align:center; padding:4px 0; }
-.cricket-marks { display:flex; gap:4px; justify-content:center; align-items:center; }
-.cricket-mark { width:14px; height:14px; border-radius:50%; background:#1a2030; }
+.cricket-board { display:grid; grid-template-columns:1fr auto 1fr; gap:1px; max-width:360px; margin:2px auto; }
+.cricket-num { font-size:13px; font-weight:bold; text-align:center; padding:3px 0; }
+.cricket-marks { display:flex; gap:3px; justify-content:center; align-items:center; }
+.cricket-mark { width:12px; height:12px; border-radius:50%; background:#1a2030; }
 .cricket-mark.hit { background:#E8681A; }
 .cricket-mark.closed { background:#1A6B3C; }
 /* Elimination */
@@ -259,6 +259,17 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .cric-field-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; }
 .cric-field-btn { background:#1e293b; color:#fff; border:1px solid #1a2030; border-radius:10px; font-size:22px; font-weight:bold; min-height:56px; cursor:pointer; padding:0; margin:0; }
 .cric-field-btn:active { background:#1a2030; }
+/* ── V19.22 Cricket 3-Spalten-Header ──────────────────────────────── */
+.cric-header { display:flex; align-items:center; max-width:360px; margin:0 auto 2px; padding:4px 8px; gap:6px; }
+.cric-p-col { flex:1; min-width:0; }
+.cric-p-col--right { text-align:right; }
+.cric-pname { font-size:11px; font-weight:bold; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cric-pscore { font-size:24px; font-weight:bold; color:#F0E6D0; line-height:1.1; }
+.cric-center-col { flex:1.4; text-align:center; min-width:0; }
+.cric-info { font-size:11px; font-weight:bold; color:#F0E6D0; margin-bottom:2px; line-height:1.2; }
+.cric-center-col .input-toggle { gap:4px; }
+.cric-center-col .input-toggle button { font-size:11px; padding:3px 6px; min-height:26px; border-radius:6px; }
+/* ── Ende V19.22 Cricket Header ────────────────────────────────────── */
 .cric-mult-row { display:flex; gap:6px; margin-bottom:8px; }
 .cric-mult-btn { flex:1; background:#0f172a; color:#94a3b8; border:2px solid #1a2030; border-radius:8px; font-size:15px; font-weight:bold; min-height:48px; cursor:pointer; }
 .cric-mult-btn.active { border-color:#E8681A; color:#E8681A; }
@@ -1281,28 +1292,34 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 
 <!-- CRICKET -->
 <div id="cricket" class="screen">
-  <h2>Cricket</h2>
-  <div style="display:flex; justify-content:space-between; max-width:360px; margin:8px auto; font-size:13px; color:#64748b;">
-    <div id="cricP1Name" style="font-weight:bold; font-size:16px;"></div>
-    <div id="cricP2Name" style="font-weight:bold; font-size:16px;"></div>
+  <!-- V19.22: 3-Spalten-Header: P1 | Info+Toggle | P2 -->
+  <div class="cric-header">
+    <div class="cric-p-col">
+      <div class="cric-pname" id="cricP1Name"></div>
+      <div class="cric-pscore" id="cricP1Score">0</div>
+    </div>
+    <div class="cric-center-col">
+      <div class="cric-info" id="cricDart"></div>
+      <div id="inputToggle-cricket"></div>
+    </div>
+    <div class="cric-p-col cric-p-col--right">
+      <div class="cric-pname" id="cricP2Name"></div>
+      <div class="cric-pscore" id="cricP2Score">0</div>
+    </div>
   </div>
-  <div style="display:flex; justify-content:space-between; max-width:360px; margin:0 auto 4px;">
-    <div style="font-size:28px; font-weight:bold;" id="cricP1Score">0</div>
-    <div style="font-size:28px; font-weight:bold;" id="cricP2Score">0</div>
-  </div>
-  <div id="matchBarCric" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:360px;"></div>
+  <div id="matchBarCric" style="display:none;font-size:12px;color:#E8681A;margin:2px auto;max-width:360px;text-align:center;"></div>
+  <!-- Kompaktes Marks-Grid -->
   <div id="cricketBoard" class="cricket-board"></div>
-  <div class="card with-board" style="margin:10px auto;">
-    <div id="cricDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
-    <div id="inputToggle-cricket"></div>
-    <div id="board-slot-cricket" class="board-slot" style="margin-top:8px;"></div>
+  <!-- Eingabe: Board oder Numpad, direkt darunter -->
+  <div class="card with-board" style="margin:4px auto; padding:6px 8px;">
+    <div id="board-slot-cricket" class="board-slot"></div>
     <div id="numpad-cricket" style="display:none;"></div>
     <div style="display:flex; gap:8px; margin-top:6px;">
       <button class="miss" id="missBtn-cricket" onclick="cricMiss()" style="flex:2;">MISS</button>
-      <button onclick="cricUndo()" style="flex:1;background:#1a2030;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+      <button onclick="cricUndo()" style="flex:1;background:#1a2030;color:#F0E6D0;border-radius:12px;font-size:16px;min-height:44px;border:none;cursor:pointer;">↩</button>
     </div>
   </div>
-  <button class="btn-action btn-action--cancel" onclick="show('start')">Zurück</button>
+  <button class="btn-action btn-action--cancel" onclick="show('start')" style="margin-top:4px;">Zurück</button>
 </div>
 
 <!-- ELIMINATION SETUP -->
