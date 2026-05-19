@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Phoenix Darts V19.20</title>
+<title>Phoenix Darts V19.21</title>
 <!-- ─────────────────────────────────────────────────────────────────────────
      V19.0 PHOENIX BOARD-PRINZIP (ab dieser Version Architektur-Gesetz):
      - EIN globales <svg id="board"> im DOM, niemals zweites Board-SVG hinzufügen.
@@ -86,9 +86,9 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 @media (min-width:1280px) { .card.with-board { max-width:580px; } }
 .card h3 { margin:3px 0; font-size:16px; opacity:0.7; }
 .card p { margin:5px 0; font-size:20px; }
-.modal { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:200; overscroll-behavior:contain; }
+.modal { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:200; overscroll-behavior:contain; overflow:hidden; }
 .modal.active { display:flex; }
-.modal-box { background:#1e293b; padding:20px; border-radius:12px; max-width:320px; width:90%; max-height:90vh; overflow-y:auto; overscroll-behavior:contain; box-sizing:border-box; }
+.modal-box { background:#1e293b; padding:14px; border-radius:12px; max-width:320px; width:90%; max-height:92vh; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; box-sizing:border-box; }
 .stat-section { margin-bottom:20px; text-align:left; }
 .stat-section h3 { font-size:13px; color:#64748b; margin-bottom:8px; }
 .stat-list { list-style:none; padding:0; margin:0; }
@@ -1016,36 +1016,36 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div class="extra-players" id="botSettings">
   <div class="card" id="botSetupCard">
     <button class="toggle-btn" id="botToggle" onclick="x01ToggleBot()" style="width:100%;">🤖 Bot: AUS</button>
-    <div id="botDiffCard" style="display:none;margin-top:8px;">
-      <div style="font-size:12px;color:#64748b;margin-bottom:6px;">Schwierigkeit</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">
-        <button class="toggle-btn" id="botDiffLv1" onclick="setBotDiff('lv1')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Couch-Profi<br><span style="font-size:9px;opacity:0.7;">Ø 27</span></button>
-        <button class="toggle-btn" id="botDiffLv2" onclick="setBotDiff('lv2')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Gelegenheitstäter<br><span style="font-size:9px;opacity:0.7;">Ø 33</span></button>
-        <button class="toggle-btn" id="botDiffLv3" onclick="setBotDiff('lv3')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Kneipenhocker<br><span style="font-size:9px;opacity:0.7;">Ø 37</span></button>
-        <button class="toggle-btn" id="botDiffLv4" onclick="setBotDiff('lv4')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobbyist<br><span style="font-size:9px;opacity:0.7;">Ø 43</span></button>
-        <button class="toggle-btn" id="botDiffLv5" onclick="setBotDiff('lv5')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsmitglied<br><span style="font-size:9px;opacity:0.7;">Ø 47</span></button>
-        <button class="toggle-btn" id="botDiffLv6" onclick="setBotDiff('lv6')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtisch<br><span style="font-size:9px;opacity:0.7;">Ø 53</span></button>
-        <button class="toggle-btn" id="botDiffLv7" onclick="setBotDiff('lv7')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobby-Held<br><span style="font-size:9px;opacity:0.7;">Ø 57</span></button>
-        <button class="toggle-btn" id="botDiffLv8" onclick="setBotDiff('lv8')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsspieler<br><span style="font-size:9px;opacity:0.7;">Ø 63</span></button>
-        <button class="toggle-btn" id="botDiffLv9" onclick="setBotDiff('lv9')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtischkönig<br><span style="font-size:9px;opacity:0.7;">Ø 67</span></button>
-        <button class="toggle-btn" id="botDiffLv10" onclick="setBotDiff('lv10')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Liga-Kämpfer<br><span style="font-size:9px;opacity:0.7;">Ø 72</span></button>
-        <button class="toggle-btn" id="botDiffLv11" onclick="setBotDiff('lv11')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Amateurgoat<br><span style="font-size:9px;opacity:0.7;">Ø 79</span></button>
-        <button class="toggle-btn" id="botDiffLv12" onclick="setBotDiff('lv12')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Bundesliga<br><span style="font-size:9px;opacity:0.7;">Ø 85</span></button>
-        <button class="toggle-btn" id="botDiffLv13" onclick="setBotDiff('lv13')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Fast Profi<br><span style="font-size:9px;opacity:0.7;">Ø 88</span></button>
-        <button class="toggle-btn" id="botDiffLv14" onclick="setBotDiff('lv14')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Pro<br><span style="font-size:9px;opacity:0.7;">Ø 92</span></button>
-        <button class="toggle-btn" id="botDiffLv15" onclick="setBotDiff('lv15')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stabil Pro<br><span style="font-size:9px;opacity:0.7;">Ø 97</span></button>
-        <button class="toggle-btn" id="botDiffLv16" onclick="setBotDiff('lv16')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Weltklasse<br><span style="font-size:9px;opacity:0.7;">Ø 101</span></button>
-        <button class="toggle-btn" id="botDiffLv17" onclick="setBotDiff('lv17')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Elite<br><span style="font-size:9px;opacity:0.7;">Ø 107</span></button>
-        <button class="toggle-btn" id="botDiffLv18" onclick="setBotDiff('lv18')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Semi-Legende (MVG)<br><span style="font-size:9px;opacity:0.7;">Ø 111</span></button>
-        <button class="toggle-btn" id="botDiffLv19" onclick="setBotDiff('lv19')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Legende (Gary)<br><span style="font-size:9px;opacity:0.7;">Ø 117</span></button>
-        <button class="toggle-btn" id="botDiffLv20" onclick="setBotDiff('lv20')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Phil<br><span style="font-size:9px;opacity:0.7;">Ø 121</span></button>
-        <button class="toggle-btn" id="botDiffLv21" onclick="setBotDiff('lv21')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Peter<br><span style="font-size:9px;opacity:0.7;">Ø 123,53</span></button>
-        <button class="toggle-btn" id="botDiffLv22" onclick="setBotDiff('lv22')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">GOAT<br><span style="font-size:9px;opacity:0.7;">Ø 127,11</span></button>
+    <div id="botDiffCard" style="display:none;margin-top:6px;">
+      <div style="font-size:12px;color:#64748b;margin-bottom:4px;">Schwierigkeit</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;">
+        <button class="toggle-btn" id="botDiffLv1" onclick="setBotDiff('lv1')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Couch-Profi<br><span style="font-size:9px;opacity:0.7;">Ø 27</span></button>
+        <button class="toggle-btn" id="botDiffLv2" onclick="setBotDiff('lv2')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Gelegenheitstäter<br><span style="font-size:9px;opacity:0.7;">Ø 33</span></button>
+        <button class="toggle-btn" id="botDiffLv3" onclick="setBotDiff('lv3')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Kneipenhocker<br><span style="font-size:9px;opacity:0.7;">Ø 37</span></button>
+        <button class="toggle-btn" id="botDiffLv4" onclick="setBotDiff('lv4')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Hobbyist<br><span style="font-size:9px;opacity:0.7;">Ø 43</span></button>
+        <button class="toggle-btn" id="botDiffLv5" onclick="setBotDiff('lv5')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Vereinsmitglied<br><span style="font-size:9px;opacity:0.7;">Ø 47</span></button>
+        <button class="toggle-btn" id="botDiffLv6" onclick="setBotDiff('lv6')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Stammtisch<br><span style="font-size:9px;opacity:0.7;">Ø 53</span></button>
+        <button class="toggle-btn" id="botDiffLv7" onclick="setBotDiff('lv7')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Hobby-Held<br><span style="font-size:9px;opacity:0.7;">Ø 57</span></button>
+        <button class="toggle-btn" id="botDiffLv8" onclick="setBotDiff('lv8')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Vereinsspieler<br><span style="font-size:9px;opacity:0.7;">Ø 63</span></button>
+        <button class="toggle-btn" id="botDiffLv9" onclick="setBotDiff('lv9')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Stammtischkönig<br><span style="font-size:9px;opacity:0.7;">Ø 67</span></button>
+        <button class="toggle-btn" id="botDiffLv10" onclick="setBotDiff('lv10')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Liga-Kämpfer<br><span style="font-size:9px;opacity:0.7;">Ø 72</span></button>
+        <button class="toggle-btn" id="botDiffLv11" onclick="setBotDiff('lv11')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Amateurgoat<br><span style="font-size:9px;opacity:0.7;">Ø 79</span></button>
+        <button class="toggle-btn" id="botDiffLv12" onclick="setBotDiff('lv12')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Bundesliga<br><span style="font-size:9px;opacity:0.7;">Ø 85</span></button>
+        <button class="toggle-btn" id="botDiffLv13" onclick="setBotDiff('lv13')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Fast Profi<br><span style="font-size:9px;opacity:0.7;">Ø 88</span></button>
+        <button class="toggle-btn" id="botDiffLv14" onclick="setBotDiff('lv14')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Pro<br><span style="font-size:9px;opacity:0.7;">Ø 92</span></button>
+        <button class="toggle-btn" id="botDiffLv15" onclick="setBotDiff('lv15')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Stabil Pro<br><span style="font-size:9px;opacity:0.7;">Ø 97</span></button>
+        <button class="toggle-btn" id="botDiffLv16" onclick="setBotDiff('lv16')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Weltklasse<br><span style="font-size:9px;opacity:0.7;">Ø 101</span></button>
+        <button class="toggle-btn" id="botDiffLv17" onclick="setBotDiff('lv17')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Elite<br><span style="font-size:9px;opacity:0.7;">Ø 107</span></button>
+        <button class="toggle-btn" id="botDiffLv18" onclick="setBotDiff('lv18')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Semi-Legende (MVG)<br><span style="font-size:9px;opacity:0.7;">Ø 111</span></button>
+        <button class="toggle-btn" id="botDiffLv19" onclick="setBotDiff('lv19')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Legende (Gary)<br><span style="font-size:9px;opacity:0.7;">Ø 117</span></button>
+        <button class="toggle-btn" id="botDiffLv20" onclick="setBotDiff('lv20')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Phil<br><span style="font-size:9px;opacity:0.7;">Ø 121</span></button>
+        <button class="toggle-btn" id="botDiffLv21" onclick="setBotDiff('lv21')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Peter<br><span style="font-size:9px;opacity:0.7;">Ø 123,53</span></button>
+        <button class="toggle-btn" id="botDiffLv22" onclick="setBotDiff('lv22')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">GOAT<br><span style="font-size:9px;opacity:0.7;">Ø 127,11</span></button>
       </div>
       <!-- V16.5: Varianz-Selector -->
-      <div style="margin-top:10px;">
+      <div style="margin-top:6px;">
         <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px;">Varianz (Schwankungsbreite)</label>
-        <select id="botVarianceSelect" onchange="botVarianceChange(this.value)" style="width:100%;background:#0f172a;color:#fff;border:1px solid #1a2030;border-radius:8px;padding:8px;font-size:13px;">
+        <select id="botVarianceSelect" onchange="botVarianceChange(this.value)" style="width:100%;background:#0f172a;color:#fff;border:1px solid #1a2030;border-radius:8px;padding:6px;font-size:13px;box-sizing:border-box;">
           <option value="eng">Eng (±5) — konstanter Profi</option>
           <option value="normal" selected>Normal (±10) — mittlere Schwankung</option>
           <option value="breit">Breit (±15) — Hobby-Spieler</option>
@@ -1236,36 +1236,36 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <div style="display:flex; gap:8px; margin:8px 0;">
       <button class="toggle-btn" id="cricBotToggle" onclick="cricToggleBot()">Bot: AUS</button>
     </div>
-    <div id="cricBotDiffCard" style="display:none; margin-bottom:8px;">
-      <div style="font-size:12px; color:#64748b; margin-bottom:6px;">Schwierigkeit</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">
-        <button class="toggle-btn" id="cricBotDiffLv1" onclick="setBotDiff('lv1')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Couch-Profi<br><span style="font-size:9px;opacity:0.7;">Ø 27</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv2" onclick="setBotDiff('lv2')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Gelegenheitstäter<br><span style="font-size:9px;opacity:0.7;">Ø 33</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv3" onclick="setBotDiff('lv3')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Kneipenhocker<br><span style="font-size:9px;opacity:0.7;">Ø 37</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv4" onclick="setBotDiff('lv4')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobbyist<br><span style="font-size:9px;opacity:0.7;">Ø 43</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv5" onclick="setBotDiff('lv5')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsmitglied<br><span style="font-size:9px;opacity:0.7;">Ø 47</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv6" onclick="setBotDiff('lv6')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtisch<br><span style="font-size:9px;opacity:0.7;">Ø 53</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv7" onclick="setBotDiff('lv7')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Hobby-Held<br><span style="font-size:9px;opacity:0.7;">Ø 57</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv8" onclick="setBotDiff('lv8')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Vereinsspieler<br><span style="font-size:9px;opacity:0.7;">Ø 63</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv9" onclick="setBotDiff('lv9')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stammtischkönig<br><span style="font-size:9px;opacity:0.7;">Ø 67</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv10" onclick="setBotDiff('lv10')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Liga-Kämpfer<br><span style="font-size:9px;opacity:0.7;">Ø 72</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv11" onclick="setBotDiff('lv11')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Amateurgoat<br><span style="font-size:9px;opacity:0.7;">Ø 79</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv12" onclick="setBotDiff('lv12')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Bundesliga<br><span style="font-size:9px;opacity:0.7;">Ø 85</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv13" onclick="setBotDiff('lv13')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Fast Profi<br><span style="font-size:9px;opacity:0.7;">Ø 88</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv14" onclick="setBotDiff('lv14')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Pro<br><span style="font-size:9px;opacity:0.7;">Ø 92</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv15" onclick="setBotDiff('lv15')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Stabil Pro<br><span style="font-size:9px;opacity:0.7;">Ø 97</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv16" onclick="setBotDiff('lv16')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Weltklasse<br><span style="font-size:9px;opacity:0.7;">Ø 101</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv17" onclick="setBotDiff('lv17')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Elite<br><span style="font-size:9px;opacity:0.7;">Ø 107</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv18" onclick="setBotDiff('lv18')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Semi-Legende (MVG)<br><span style="font-size:9px;opacity:0.7;">Ø 111</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv19" onclick="setBotDiff('lv19')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Legende (Gary)<br><span style="font-size:9px;opacity:0.7;">Ø 117</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv20" onclick="setBotDiff('lv20')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Phil<br><span style="font-size:9px;opacity:0.7;">Ø 121</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv21" onclick="setBotDiff('lv21')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">Peter<br><span style="font-size:9px;opacity:0.7;">Ø 123,53</span></button>
-        <button class="toggle-btn" id="cricBotDiffLv22" onclick="setBotDiff('lv22')" style="font-size:10px;min-height:40px;padding:4px 2px;line-height:1.3;">GOAT<br><span style="font-size:9px;opacity:0.7;">Ø 127,11</span></button>
+    <div id="cricBotDiffCard" style="display:none; margin-bottom:6px;">
+      <div style="font-size:12px; color:#64748b; margin-bottom:4px;">Schwierigkeit</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;">
+        <button class="toggle-btn" id="cricBotDiffLv1" onclick="setBotDiff('lv1')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Couch-Profi<br><span style="font-size:9px;opacity:0.7;">Ø 27</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv2" onclick="setBotDiff('lv2')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Gelegenheitstäter<br><span style="font-size:9px;opacity:0.7;">Ø 33</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv3" onclick="setBotDiff('lv3')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Kneipenhocker<br><span style="font-size:9px;opacity:0.7;">Ø 37</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv4" onclick="setBotDiff('lv4')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Hobbyist<br><span style="font-size:9px;opacity:0.7;">Ø 43</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv5" onclick="setBotDiff('lv5')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Vereinsmitglied<br><span style="font-size:9px;opacity:0.7;">Ø 47</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv6" onclick="setBotDiff('lv6')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Stammtisch<br><span style="font-size:9px;opacity:0.7;">Ø 53</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv7" onclick="setBotDiff('lv7')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Hobby-Held<br><span style="font-size:9px;opacity:0.7;">Ø 57</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv8" onclick="setBotDiff('lv8')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Vereinsspieler<br><span style="font-size:9px;opacity:0.7;">Ø 63</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv9" onclick="setBotDiff('lv9')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Stammtischkönig<br><span style="font-size:9px;opacity:0.7;">Ø 67</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv10" onclick="setBotDiff('lv10')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Liga-Kämpfer<br><span style="font-size:9px;opacity:0.7;">Ø 72</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv11" onclick="setBotDiff('lv11')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Amateurgoat<br><span style="font-size:9px;opacity:0.7;">Ø 79</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv12" onclick="setBotDiff('lv12')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Bundesliga<br><span style="font-size:9px;opacity:0.7;">Ø 85</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv13" onclick="setBotDiff('lv13')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Fast Profi<br><span style="font-size:9px;opacity:0.7;">Ø 88</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv14" onclick="setBotDiff('lv14')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Pro<br><span style="font-size:9px;opacity:0.7;">Ø 92</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv15" onclick="setBotDiff('lv15')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Stabil Pro<br><span style="font-size:9px;opacity:0.7;">Ø 97</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv16" onclick="setBotDiff('lv16')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Weltklasse<br><span style="font-size:9px;opacity:0.7;">Ø 101</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv17" onclick="setBotDiff('lv17')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Elite<br><span style="font-size:9px;opacity:0.7;">Ø 107</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv18" onclick="setBotDiff('lv18')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Semi-Legende (MVG)<br><span style="font-size:9px;opacity:0.7;">Ø 111</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv19" onclick="setBotDiff('lv19')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Legende (Gary)<br><span style="font-size:9px;opacity:0.7;">Ø 117</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv20" onclick="setBotDiff('lv20')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Phil<br><span style="font-size:9px;opacity:0.7;">Ø 121</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv21" onclick="setBotDiff('lv21')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">Peter<br><span style="font-size:9px;opacity:0.7;">Ø 123,53</span></button>
+        <button class="toggle-btn" id="cricBotDiffLv22" onclick="setBotDiff('lv22')" style="font-size:10px;min-height:32px;padding:2px 2px;line-height:1.2;box-sizing:border-box;max-width:100%;">GOAT<br><span style="font-size:9px;opacity:0.7;">Ø 127,11</span></button>
       </div>
       <!-- V16.5: Varianz-Selector -->
-      <div style="margin-top:10px;">
+      <div style="margin-top:6px;">
         <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px;">Varianz</label>
-        <select id="cricBotVarianceSelect" onchange="botVarianceChange(this.value)" style="width:100%;background:#0f172a;color:#fff;border:1px solid #1a2030;border-radius:8px;padding:8px;font-size:13px;">
+        <select id="cricBotVarianceSelect" onchange="botVarianceChange(this.value)" style="width:100%;background:#0f172a;color:#fff;border:1px solid #1a2030;border-radius:8px;padding:6px;font-size:13px;box-sizing:border-box;">
           <option value="eng">Eng (±5)</option>
           <option value="normal" selected>Normal (±10)</option>
           <option value="breit">Breit (±15)</option>
@@ -1273,7 +1273,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
         </select>
       </div>
     </div>
-    <button onclick="mfOpen()" class="mfOpenBtn" style="background:#1a2030;color:#fff;width:100%;border-radius:12px;padding:12px;font-size:15px;margin-bottom:4px;">Format: Einzelleg</button>
+    <button onclick="mfOpen()" class="mfOpenBtn" style="background:#1a2030;color:#fff;width:100%;border-radius:12px;padding:8px;font-size:15px;margin-bottom:4px;">Format: Einzelleg</button>
     <button class="primary" onclick="cricketStart()">Starten</button>
     <button onclick="document.getElementById('cricketSetupModal').classList.remove('active')" style="background:#1e293b;color:#F0E6D0;">Abbrechen</button>
   </div>
@@ -1458,7 +1458,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
     <input id="shanName4" class="input-name" type="text" placeholder="Spieler 4 (opt.)" maxlength="12">
     <input id="shanName5" class="input-name" type="text" placeholder="Spieler 5 (opt.)" maxlength="12">
     <input id="shanName6" class="input-name" type="text" placeholder="Spieler 6 (opt.)" maxlength="12">
-    <button onclick="mfOpen()" class="mfOpenBtn" style="background:#1a2030;color:#fff;width:100%;border-radius:12px;padding:12px;font-size:15px;margin-bottom:4px;">Format: Einzelleg</button>
+    <button onclick="mfOpen()" class="mfOpenBtn" style="background:#1a2030;color:#fff;width:100%;border-radius:12px;padding:8px;font-size:15px;margin-bottom:4px;">Format: Einzelleg</button>
     <button class="primary" onclick="shanghaiStart()">Starten</button>
     <button onclick="document.getElementById('shanghaiSetupModal').classList.remove('active')" style="background:#1e293b;color:#F0E6D0;">Abbrechen</button>
   </div>
