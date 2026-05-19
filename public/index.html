@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Phoenix Darts V19.19</title>
+<title>Phoenix Darts V19.20</title>
 <!-- ─────────────────────────────────────────────────────────────────────────
      V19.0 PHOENIX BOARD-PRINZIP (ab dieser Version Architektur-Gesetz):
      - EIN globales <svg id="board"> im DOM, niemals zweites Board-SVG hinzufügen.
@@ -96,7 +96,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .toggle-btn { flex:1; background:#F0E6D0; color:#0f172a; border:2px solid #E8681A; border-radius:8px; font-size:15px; font-weight:bold; min-height:40px; padding:0; margin:0; cursor:pointer; }
 .toggle-btn.active { background:#E8681A; color:#F0E6D0; border-color:#F0E6D0; }
 .bull-row { display:flex; gap:6px; margin:6px 0; }
-.bull-btn { flex:1; background:#0f172a; color:#fff; border:1px solid #1a2030; border-radius:8px; font-size:15px; font-weight:bold; min-height:44px; padding:0; margin:0; cursor:pointer; }
+.bull-btn { flex:1; background:#0f172a; color:#fff; border:1px solid #1a2030; border-radius:8px; font-size:15px; font-weight:bold; min-height:40px; padding:0; margin:0; cursor:pointer; }
 /* Shared — V19.13: Board skaliert in Container, aspect-ratio fix für iOS Safari */
 .game-board { width:100%; max-width:340px; aspect-ratio:1/1; height:auto; margin:0 auto; display:block; touch-action:manipulation; -webkit-user-select:none; user-select:none; }
 @media (min-width:768px)  { .game-board { max-width:440px; } }
@@ -218,7 +218,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .np-quick-btn { background:#1a2030; color:#fff; border:1px solid #475569; border-radius:8px; font-size:13px; font-weight:bold; padding:6px 10px; cursor:pointer; min-height:36px; margin:0; }
 /* Individual mode */
 .indiv-seg-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:4px; margin-bottom:6px; }
-.indiv-seg-btn { background:#1e293b; color:#fff; border:1px solid #1a2030; border-radius:6px; font-size:15px; font-weight:bold; min-height:48px; cursor:pointer; margin:0; padding:0; }
+.indiv-seg-btn { background:#1e293b; color:#fff; border:1px solid #1a2030; border-radius:6px; font-size:15px; font-weight:bold; min-height:40px; cursor:pointer; margin:0; padding:0; }
 .indiv-seg-btn:active { background:#1a2030; }
 .indiv-dart-log { font-size:12px; color:#64748b; margin:6px 0; text-align:left; min-height:36px; }
 /* Checkout display */
@@ -235,7 +235,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 .input-toggle button { background:none; border:1px solid #1a2030; color:#64748b; font-size:12px; padding:6px 14px; cursor:pointer; border-radius:6px; min-height:auto; margin:2px; }
 .input-toggle button.active { background:#E8681A; color:#fff; border-color:#E8681A; }
 .snp-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:5px; margin:6px auto; max-width:360px; }
-.snp-btn { background:#0f172a; color:#fff; border:1px solid #1a2030; border-radius:8px; padding:0; font-size:17px; font-weight:bold; min-height:48px; cursor:pointer; margin:0; width:100%; }
+.snp-btn { background:#0f172a; color:#fff; border:1px solid #1a2030; border-radius:8px; padding:0; font-size:17px; font-weight:bold; min-height:40px; cursor:pointer; margin:0; width:100%; }
 .snp-btn:active { background:#1e40af; }
 .numpad-mult { display:flex; gap:6px; margin:6px auto; max-width:360px; }
 .numpad-mult button { flex:1; }
@@ -252,7 +252,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 /* V18.3: Numpad-Area mit Side-Quick-Säulen links und rechts */
 .np-area { display:grid; grid-template-columns:54px 1fr 54px; gap:6px; max-width:360px; margin:0 auto 8px; align-items:stretch; }
 .np-side-quick { display:flex; flex-direction:column; gap:6px; }
-.np-side-quick-btn { background:#1a2030; color:#fff; border:1px solid #475569; border-radius:8px; font-size:15px; font-weight:bold; padding:0; cursor:pointer; flex:1; min-height:50px; margin:0; }
+.np-side-quick-btn { background:#1a2030; color:#fff; border:1px solid #475569; border-radius:8px; font-size:15px; font-weight:bold; padding:0; cursor:pointer; flex:1; min-height:40px; margin:0; }
 .np-side-quick-btn:active { background:#475569; }
 /* alte .np-quick-Regel aus V18.2 verworfen — Side-Quicks ersetzen sie */
 /* V18.2: Cricket Felder */
@@ -265,7 +265,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 /* V18.2: Target Numpad (ATC/B27/Shanghai) */
 .target-numpad-label { font-size:28px; font-weight:bold; color:#E8681A; text-align:center; padding:8px; margin-bottom:8px; }
 .target-hit-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; }
-.target-hit-btn { background:#1e293b; color:#fff; border:1px solid #1a2030; border-radius:10px; font-size:16px; font-weight:bold; min-height:72px; cursor:pointer; padding:4px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+.target-hit-btn { background:#1e293b; color:#fff; border:1px solid #1a2030; border-radius:10px; font-size:16px; font-weight:bold; min-height:56px; cursor:pointer; padding:4px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
 .target-hit-btn:active { background:#1a2030; }
 .target-hit-pts { font-size:11px; opacity:0.6; font-weight:normal; }
 
@@ -1372,8 +1372,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div id="matchBarElim" style="display:none;font-size:12px;color:#E8681A;margin:3px 0;"></div>
   <div class="elim-players" id="elimPlayers"></div>
   <div class="card with-board" style="margin:8px auto;">
-    <div class="info-row" id="elimTurn"></div>
-    <div class="info-row" id="elimDart"></div>
+    <div id="elimDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
     <!-- Board area -->
     <div id="elimBoardArea">
       <div id="board-slot-elimination" class="board-slot" style="margin-top:6px;"></div>
@@ -1471,8 +1470,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div class="round-indicator" id="shanDots"></div>
   <div class="card" style="max-width:360px; margin:8px auto;">
     <div id="shanRound" style="font-size:18px; font-weight:bold;"></div>
-    <div id="shanTurn" class="info-row"></div>
-    <div id="shanDart" class="info-row"></div>
+    <div id="shanDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
     <div id="shanShanghai" class="info-row" style="color:#1A6B3C;"></div>
   </div>
   <div class="elim-players" id="shanPlayers"></div>
@@ -1528,8 +1526,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div id="atcPlayers" style="max-width:360px; margin:8px auto;"></div>
   <div id="matchBarAtc" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:360px;"></div>
   <div class="card with-board" style="margin:8px auto;">
-    <div id="atcTurn" class="info-row"></div>
-    <div id="atcDart" class="info-row"></div>
+    <div id="atcDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
     <div id="atcTarget" class="target-label"></div>
     <div id="inputToggle-atc"></div>
     <div id="board-slot-atc" class="board-slot"></div>
@@ -1951,8 +1948,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div class="info-row" id="hsRoundLabel" style="font-size:14px;color:#E8681A;font-weight:bold;"></div>
   <div class="elim-players" id="hsPlayers"></div>
   <div class="card with-board" style="margin:8px auto;">
-    <div class="info-row" id="hsTurn"></div>
-    <div class="info-row" id="hsDart"></div>
+    <div id="hsDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
     <div id="inputToggle-hs"></div>
     <div id="board-slot-hs" class="board-slot" style="margin-top:6px;"></div>
     <div id="numpad-hs" style="display:none;"></div>
@@ -2029,8 +2025,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div class="info-row" id="killVariantLabel" style="font-size:12px;color:#64748b;"></div>
   <div class="elim-players" id="killPlayers"></div>
   <div class="card with-board" style="margin:8px auto;">
-    <div class="info-row" id="killTurn"></div>
-    <div class="info-row" id="killDart"></div>
+    <div id="killDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
     <div id="inputToggle-killer"></div>
     <div id="board-slot-killer" class="board-slot" style="margin-top:6px;"></div>
     <div id="numpad-killer" style="display:none;"></div>
@@ -2052,8 +2047,7 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div class="info-row" id="chicPhaseLabel" style="font-size:13px;color:#E8681A;font-weight:bold;">Phase 1 — Deckel verteilen</div>
   <div class="elim-players" id="chicPlayers"></div>
   <div class="card with-board" style="margin:8px auto;">
-    <div class="info-row" id="chicTurn"></div>
-    <div class="info-row" id="chicDart"></div>
+    <div id="chicDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
     <div id="inputToggle-chicago"></div>
     <div id="board-slot-chicago" class="board-slot" style="margin-top:6px;"></div>
     <div id="numpad-chicago" style="display:none;"></div>
@@ -3666,12 +3660,11 @@ function elimRender(){
   const modeEl=document.getElementById('elimModeDisplay');
   if(modeEl) modeEl.innerText=modeText;
 
-  document.getElementById('elimTurn').innerText=elimState.names[elimState.turn]+' ist dran';
   let hint='';
   if(!elimState.opened[elimState.turn]&&elimState.inMode!=='single'){
     hint=elimState.inMode==='double'?' (braucht Double)':' (braucht Double/Triple)';
   }
-  document.getElementById('elimDart').innerText='Dart '+(elimState.dartCount+1)+'/3'+hint;
+  document.getElementById('elimDart').innerText='▶ '+elimState.names[elimState.turn]+' — Dart '+(elimState.dartCount+1)+'/3'+hint;
 
   const playersEl=document.getElementById('elimPlayers');playersEl.innerHTML='';
   elimState.names.forEach((name,i)=>{
@@ -3835,8 +3828,7 @@ function shanRender(){
     shanDotsEl.appendChild(d);
   }
   document.getElementById('shanRound').innerText='Runde '+shanState.round+'/7 — Segment: '+shanState.round;
-  document.getElementById('shanTurn').innerText=shanState.names[shanState.turn]+' ist dran';
-  document.getElementById('shanDart').innerText='Dart '+(shanState.dartCount+1)+'/3';
+  document.getElementById('shanDart').innerText='▶ '+shanState.names[shanState.turn]+' — Dart '+(shanState.dartCount+1)+'/3';
   const hits=shanState.roundHits;
   const hitStr=[hits.S?'S':'_',hits.D?'D':'_',hits.T?'T':'_'].join(' ');
   document.getElementById('shanShanghai').innerText='Runden-Treffer: '+hitStr+(hits.S&&hits.D&&hits.T?' ← SHANGHAI!':'');
@@ -3973,8 +3965,7 @@ function atcRender(){
     else if (i === currentProgress) d.classList.add('active');
     atcDotsEl.appendChild(d);
   }
-  document.getElementById('atcTurn').innerText=atcState.names[p]+' ist dran';
-  document.getElementById('atcDart').innerText='Dart '+(atcState.dartCount+1)+'/3';
+  document.getElementById('atcDart').innerText='▶ '+atcState.names[p]+' — Dart '+(atcState.dartCount+1)+'/3';
   document.getElementById('atcTarget').innerText='Ziel: '+(target==='Bull'?'Bull':target)+
     (atcState.variant!=='single'?' ('+atcState.variant+')':'');
   // Player cards
@@ -6753,9 +6744,9 @@ function renderNumpad(containerId,onInput,onMiss){
   window['_npCb_'+containerId]=onInput;
   window['_npMiss_'+containerId]=onMiss;
   let html='<div class="numpad-mult">';
-  html+='<button class="toggle-btn" id="npS_'+containerId+'" onclick="npSetMult(\''+containerId+'\',\'S\')" style="min-height:44px;">Single</button>';
-  html+='<button class="toggle-btn" id="npD_'+containerId+'" onclick="npSetMult(\''+containerId+'\',\'D\')" style="min-height:44px;">Double</button>';
-  html+='<button class="toggle-btn" id="npT_'+containerId+'" onclick="npSetMult(\''+containerId+'\',\'T\')" style="min-height:44px;">Triple</button>';
+  html+='<button class="toggle-btn" id="npS_'+containerId+'" onclick="npSetMult(\''+containerId+'\',\'S\')" style="min-height:40px;">Single</button>';
+  html+='<button class="toggle-btn" id="npD_'+containerId+'" onclick="npSetMult(\''+containerId+'\',\'D\')" style="min-height:40px;">Double</button>';
+  html+='<button class="toggle-btn" id="npT_'+containerId+'" onclick="npSetMult(\''+containerId+'\',\'T\')" style="min-height:40px;">Triple</button>';
   html+='</div><div class="snp-grid">';
   for(let n=1;n<=20;n++) html+='<button class="snp-btn" onclick="npHit(\''+containerId+'\','+n+')">'+n+'</button>';
   html+='</div><div class="bull-row">';
@@ -7469,7 +7460,6 @@ function hsUndo(){ performUndo(); }
 function hsRender(){
   const roundLbl = hsState.suddenDeath ? 'Sudden Death — Runde ' + (hsState.currentRound - hsState.suddenDeathStartRound + 1) : 'Runde ' + hsState.currentRound + ' / ' + hsState.totalRounds;
   document.getElementById('hsRoundLabel').innerText = roundLbl + (hsState.boost && hsState.currentRound===hsState.totalRounds ? ' (×2 BOOST)' : '');
-  document.getElementById('hsTurn').innerText = hsState.players[hsState.currentPlayer].name + ' ist dran';
   // hsDart-Text in board/numpad-Weiche unten
   // Sortiert nach total für Live-Ranking
   const ranked = hsState.players.map((p,i)=>({p,i})).sort((a,b)=>b.p.total-a.p.total);
@@ -7492,13 +7482,13 @@ function hsRender(){
     if(_hsBr)_hsBr.style.display='none';
     if(_hsMiss)_hsMiss.style.display='none';
     if(_hsNp){_hsNp.style.display='';hsNpRender();}
-    document.getElementById('hsDart').innerText='Aufnahme eingeben (0–180):';
+    document.getElementById('hsDart').innerText='▶ '+hsState.players[hsState.currentPlayer].name+' — Aufnahme eingeben (0–180):';
   } else {
     bindBoardToSlot('board-slot-hs',(id,num,type)=>hsBoardHit(id,num,type),null);
     if(_hsBr)_hsBr.style.display='';
     if(_hsMiss)_hsMiss.style.display='';
     if(_hsNp)_hsNp.style.display='none';
-    document.getElementById('hsDart').innerText='Dart '+hsState.currentDart+'/3 | Aufnahme: '+hsState.thisTurnScore;
+    document.getElementById('hsDart').innerText='▶ '+hsState.players[hsState.currentPlayer].name+' — Dart '+hsState.currentDart+'/3 | Aufnahme: '+hsState.thisTurnScore;
   }
 }
 
@@ -7729,7 +7719,6 @@ function killUndo(){ performUndo(); }
 
 function killRender(){
   document.getElementById('killVariantLabel').innerText=killerState.variant==='blind'?'Blind Killer (Doubles geheim außer eigenem)':'Klassisch (Doubles offen)';
-  document.getElementById('killTurn').innerText=killerState.players[killerState.currentPlayer].name+' ist dran';
   // killDart-Text in board/numpad-Weiche unten
   const wrap=document.getElementById('killPlayers'); wrap.innerHTML='';
   killerState.players.forEach((p,i)=>{
@@ -7749,6 +7738,7 @@ function killRender(){
   const _killNp=document.getElementById('numpad-killer'),_killBr=document.getElementById('killBullRow');
   renderInputToggle('inputToggle-killer');
   const _killMe=killerState.players[killerState.currentPlayer];
+  const _killPName=_killMe.name;
   const _killPhase=_killMe.isKiller
     ? '🗡️ Killer — fremde Doppel treffen! · Pfeil '+killerState.currentDart+'/3'
     : 'Noch kein Killer — erst '+(_killMe.doubleField.label)+' treffen! · Pfeil '+killerState.currentDart+'/3';
@@ -7756,12 +7746,12 @@ function killRender(){
     releaseBoard();
     if(_killBr)_killBr.style.display='none';
     if(_killNp){_killNp.style.display='';killNpRender();}
-    document.getElementById('killDart').innerText=_killPhase;
+    document.getElementById('killDart').innerText='▶ '+_killPName+' — '+_killPhase;
   } else {
     bindBoardToSlot('board-slot-killer',(id,num,type)=>killBoardHit(id,num,type),null);
     if(_killBr)_killBr.style.display='';
     if(_killNp)_killNp.style.display='none';
-    document.getElementById('killDart').innerText=_killPhase;
+    document.getElementById('killDart').innerText='▶ '+_killPName+' — '+_killPhase;
   }
 }
 
@@ -8416,7 +8406,6 @@ function chicRender(){
     phaseText = 'Phase 2 — Deckel ablegen (höchster legt ab)';
   }
   document.getElementById('chicPhaseLabel').innerText = phaseText;
-  document.getElementById('chicTurn').innerText=chicagoState.players[chicagoState.currentPlayer].name+' ist dran';
   // chicDart-Text wird in der board/numpad-Weiche unten gesetzt
   const wrap=document.getElementById('chicPlayers'); wrap.innerHTML='';
   chicagoState.players.forEach((pl,i)=>{
@@ -8435,18 +8424,19 @@ function chicRender(){
   });
   const _chicNp=document.getElementById('numpad-chicago'),_chicBr=document.getElementById('chicBullRow'),_chicMiss=document.getElementById('chicMissBtn');
   renderInputToggle('inputToggle-chicago');
+  const _chicPName=chicagoState.players[chicagoState.currentPlayer].name;
   if(inputMode==='numpad'){
     releaseBoard();
     if(_chicBr)_chicBr.style.display='none';
     if(_chicNp){_chicNp.style.display='';chicNpRender();}
     if(_chicMiss)_chicMiss.style.display='none';
-    document.getElementById('chicDart').innerText='Aufnahme eingeben (0–180):';
+    document.getElementById('chicDart').innerText='▶ '+_chicPName+' — Aufnahme eingeben (0–180):';
   } else {
     bindBoardToSlot('board-slot-chicago',(id,num,type)=>chicBoardHit(id,num,type),null);
     if(_chicBr)_chicBr.style.display='';
     if(_chicNp)_chicNp.style.display='none';
     if(_chicMiss)_chicMiss.style.display='';
-    document.getElementById('chicDart').innerText='Dart '+chicagoState.currentDart+'/3 | Rundenscore: '+chicagoState.roundScores[chicagoState.currentPlayer];
+    document.getElementById('chicDart').innerText='▶ '+_chicPName+' — Dart '+chicagoState.currentDart+'/3 | Rundenscore: '+chicagoState.roundScores[chicagoState.currentPlayer];
   }
   if(chicagoState.gameOver){
     if(!chicagoState._statsLogged){
