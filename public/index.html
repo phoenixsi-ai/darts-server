@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Phoenix Darts V19.28</title>
+<title>Phoenix Darts V19.29</title>
 <!-- ─────────────────────────────────────────────────────────────────────────
      V19.0 PHOENIX BOARD-PRINZIP (ab dieser Version Architektur-Gesetz):
      - EIN globales <svg id="board"> im DOM, niemals zweites Board-SVG hinzufügen.
@@ -8711,13 +8711,6 @@ function homeSettings() {
   alert('Einstellungen folgen in V19.x');
 }
 
-function onlineCreate() {
-  if (typeof onlineOpen === 'function') onlineOpen();
-}
-function onlineJoin() {
-  if (typeof onlineJoinOpen === 'function') onlineJoinOpen();
-  else if (typeof onlineOpen === 'function') onlineOpen();
-}
 // ── Ende V19.4 Hauptmenü ───────────────────────────────────────────────────
 
 // ── V19.5 Spieler-Setup ───────────────────────────────────────────────────
