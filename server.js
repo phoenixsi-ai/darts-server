@@ -1,5 +1,5 @@
 /**
- * Darts Trainer Server — V18.0
+ * Darts Trainer Server — V18.0 (deploy-ping 20.05.2026)
  * Node.js + Express + Socket.io
  *
  * Start: node server.js
