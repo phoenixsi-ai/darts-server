@@ -22,6 +22,17 @@ const io         = new Server(httpServer, {
 
 const PORT = process.env.PORT || 3000;
 
+// ── DIAG: catch-all BEFORE static — antwortet auf alles mit Laufzeit-Info ─────
+app.use((req, res, next) => {
+  if (req.path === '/diag') {
+    const fs = require('fs');
+    let files = [];
+    try { files = fs.readdirSync(__dirname); } catch(e) { files = ['ERROR:'+e.message]; }
+    return res.json({ ok: true, __dirname, files, pid: process.pid, port: PORT, ts: Date.now(), path: req.path });
+  }
+  next();
+});
+
 // ── Statische Dateien ─────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname)));
@@ -31,13 +42,8 @@ app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Ping-Test — Laufzeit-Diagnose
-app.get('/ping', (_req, res) => {
-  const fs = require('fs');
-  let files = [];
-  try { files = fs.readdirSync(__dirname); } catch(e) { files = ['ERROR:'+e.message]; }
-  res.json({ pong: true, __dirname, files, pid: process.pid, ts: Date.now() });
-});
+// Ping-Test — kein Filesystem nötig
+app.get('/ping', (_req, res) => res.send('pong'));
 
 // Health-Check (für Uptime-Monitoring / Cron-Ping)
 // /status als Alias für Backwards-Kompat mit alten render.yaml-Configs
