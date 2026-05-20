@@ -31,8 +31,13 @@ app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Ping-Test — kein Filesystem nötig
-app.get('/ping', (_req, res) => res.send('pong'));
+// Ping-Test — Laufzeit-Diagnose
+app.get('/ping', (_req, res) => {
+  const fs = require('fs');
+  let files = [];
+  try { files = fs.readdirSync(__dirname); } catch(e) { files = ['ERROR:'+e.message]; }
+  res.json({ pong: true, __dirname, files, pid: process.pid, ts: Date.now() });
+});
 
 // Health-Check (für Uptime-Monitoring / Cron-Ping)
 // /status als Alias für Backwards-Kompat mit alten render.yaml-Configs
