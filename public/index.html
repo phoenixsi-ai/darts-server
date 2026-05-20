@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Phoenix Darts V19.27</title>
+<title>Phoenix Darts V19.28</title>
 <!-- ─────────────────────────────────────────────────────────────────────────
      V19.0 PHOENIX BOARD-PRINZIP (ab dieser Version Architektur-Gesetz):
      - EIN globales <svg id="board"> im DOM, niemals zweites Board-SVG hinzufügen.
@@ -5701,8 +5701,8 @@ function loadScript(url, timeoutMs){
   return scriptLoadPromises[url];
 }
 
-// Auto-detect: file:// → local dev, everything else → same origin (works on Render)
-const SERVER_URL = location.protocol === 'file:' ? 'http://localhost:3000' : location.origin;
+// Auto-detect: file:// → Render-Server, everything else → same origin (works on Render)
+const SERVER_URL = location.protocol === 'file:' ? 'https://darts-server-zux1.onrender.com' : location.origin;
 
 // Prueft, ob socket.io verfuegbar ist. Laedt bei Bedarf.
 // Wirft bei Fehler -- Aufrufer muss den Fehler behandeln.
