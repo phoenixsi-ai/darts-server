@@ -31,6 +31,9 @@ app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Ping-Test — kein Filesystem nötig
+app.get('/ping', (_req, res) => res.send('pong'));
+
 // Health-Check (für Uptime-Monitoring / Cron-Ping)
 // /status als Alias für Backwards-Kompat mit alten render.yaml-Configs
 function healthHandler(_req, res) {
