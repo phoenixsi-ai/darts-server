@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Phoenix Darts V19.23</title>
+<title>Phoenix Darts V19.27</title>
 <!-- ─────────────────────────────────────────────────────────────────────────
      V19.0 PHOENIX BOARD-PRINZIP (ab dieser Version Architektur-Gesetz):
      - EIN globales <svg id="board"> im DOM, niemals zweites Board-SVG hinzufügen.
@@ -1290,7 +1290,9 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 
 <!-- CRICKET — V19.23: Alles im Blickfeld, kein Scrollen -->
 <div id="cricket" class="screen">
-  <!-- Header: P1 | Dart-Counter | P2 — Toggle ist NICHT hier -->
+  <!-- Toggle: ganz oben -->
+  <div id="inputToggle-cricket" style="max-width:360px;margin:4px auto 2px;"></div>
+  <!-- Header: P1 | Dart-Counter | P2 -->
   <div class="cric-header">
     <div class="cric-p-col">
       <div class="cric-pname" id="cricP1Name"></div>
@@ -1307,10 +1309,8 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
   <div id="matchBarCric" style="display:none;font-size:12px;color:#E8681A;margin:2px auto;max-width:360px;text-align:center;"></div>
   <!-- Marks-Grid -->
   <div id="cricketBoard" class="cricket-board"></div>
-  <!-- Eingabe-Card: Toggle mini oben rechts, Board oder Numpad drunter -->
-  <div class="card with-board" style="margin:4px auto;padding:6px 8px;position:relative;">
-    <!-- Toggle: mini, absolut oben rechts in der Card -->
-    <div id="inputToggle-cricket" style="position:absolute;top:4px;right:6px;z-index:2;"></div>
+  <!-- Eingabe-Card -->
+  <div class="card with-board" style="margin:2px auto;padding:6px 8px;">
     <!-- Board-Modus -->
     <div id="board-slot-cricket" class="board-slot"></div>
     <!-- Board-Modus Action-Row: MISS + Undo kompakt, NUR bei board-Modus sichtbar -->
@@ -1385,36 +1385,29 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 
 <!-- ELIMINATION SPIEL -->
 <div id="elimination" class="screen">
-  <h2>Elimination</h2>
-  <div class="info-row" id="elimGoalDisplay" style="margin-bottom:4px;"></div>
-  <div class="info-row" id="elimModeDisplay" style="font-size:12px;color:#64748b;margin-bottom:4px;"></div>
-  <div id="matchBarElim" style="display:none;font-size:12px;color:#E8681A;margin:3px 0;"></div>
-  <div class="elim-players" id="elimPlayers"></div>
-  <div class="card with-board" style="margin:8px auto;">
-    <div id="elimDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
-    <!-- Board area -->
+  <!-- 1. Toggle -->
+  <div id="inputToggle-elimination" style="max-width:360px;margin:4px auto 2px;"></div>
+  <!-- 2. Input-Card -->
+  <div class="card with-board" style="margin:2px auto;">
+    <div id="elimDart" style="text-align:center;font-weight:bold;font-size:14px;color:#F0E6D0;padding:2px 0 4px;"></div>
     <div id="elimBoardArea">
-      <div id="board-slot-elimination" class="board-slot" style="margin-top:6px;"></div>
-      <div class="bull-row" style="max-width:360px; margin:4px auto;">
-        <button class="bull-btn" onclick="elimBullHit(25,'S',25)">Bull 25</button>
-        <button class="bull-btn" onclick="elimBullHit(50,'D',25)">Bull 50</button>
+      <div id="board-slot-elimination" class="board-slot"></div>
+      <div style="display:flex;gap:6px;margin-top:4px;">
+        <button class="bull-btn" onclick="elimBullHit(25,'S',25)" style="flex:1;">Bull 25</button>
+        <button class="bull-btn" onclick="elimBullHit(50,'D',25)" style="flex:1;">Bull 50</button>
       </div>
-      <div style="display:flex; gap:8px; margin-top:6px;">
-        <button class="miss" onclick="elimMiss()" style="flex:2;">MISS</button>
-        <button onclick="elimUndo()" style="flex:1;background:#1a2030;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+      <div style="display:flex;gap:6px;margin-top:4px;">
+        <button class="miss" onclick="elimMiss()" style="flex:2;">Miss</button>
+        <button onclick="elimUndo()" style="flex:1;background:#1a2030;color:#F0E6D0;border-radius:12px;font-size:20px;min-height:44px;border:none;cursor:pointer;">↩</button>
       </div>
     </div>
-    <!-- Numpad area -->
-    <div id="elimNumpadArea" style="display:none;margin-top:6px;">
-      <div style="display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid #1a2030;margin-bottom:8px;">
+    <div id="elimNumpadArea" style="display:none;margin-top:4px;">
+      <div style="display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid #1a2030;margin-bottom:6px;">
         <button id="elimNpModeTotal" class="input-mode-btn active" onclick="elimSetNpMode('total')" style="min-height:34px;font-size:12px;">Aufnahme</button>
         <button id="elimNpModeIndiv" class="input-mode-btn" onclick="elimSetNpMode('indiv')" style="min-height:34px;font-size:12px;">Einzeln</button>
       </div>
-      <!-- Total numpad -->
       <div id="elimNpTotal">
-        <!-- V18.3: Display als Hero -->
         <div class="numpad-display" id="elimNpDisplay">—</div>
-        <!-- V18.3: Side-Quicks links/rechts, Numpad zentriert dazwischen -->
         <div class="np-area">
           <div class="np-side-quick">
             <button class="np-side-quick-btn" onclick="elimNpQuick(180)">180</button>
@@ -1444,7 +1437,6 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
           </div>
         </div>
       </div>
-      <!-- Individual dart mode -->
       <div id="elimNpIndiv" style="display:none;">
         <div style="display:flex;gap:6px;margin-bottom:6px;">
           <button class="toggle-btn active" id="elimIndivS" onclick="elimIndivSetMult('S')" style="font-size:14px;min-height:40px;">S</button>
@@ -1452,17 +1444,25 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
           <button class="toggle-btn" id="elimIndivT" onclick="elimIndivSetMult('T')" style="font-size:14px;min-height:40px;">T</button>
         </div>
         <div class="indiv-seg-grid" id="elimIndivSegGrid"></div>
-        <div style="display:flex;gap:6px;margin-bottom:6px;">
+        <div style="display:flex;gap:6px;margin-bottom:4px;">
           <button class="np-btn" onclick="elimIndivHit(25,'S')" style="flex:1;font-size:13px;min-height:44px;">Bull 25</button>
           <button class="np-btn" onclick="elimIndivHit(50,'D')" style="flex:1;font-size:13px;min-height:44px;">Bull 50</button>
-          <button class="np-btn" style="flex:1;font-size:13px;min-height:44px;background:#ff4444;border-color:#ff4444;" onclick="elimIndivMiss()">Miss</button>
+          <button class="np-btn" onclick="elimIndivMiss()" style="flex:1;font-size:13px;min-height:44px;background:#ff4444;border-color:#ff4444;">Miss</button>
         </div>
         <div class="indiv-dart-log" id="elimIndivLog"></div>
       </div>
-      <button onclick="elimUndo()" style="width:100%;background:#1a2030;color:#fff;border-radius:12px;margin-top:4px;font-size:14px;min-height:40px;">↩ Zurück</button>
+      <div style="display:flex;gap:6px;margin-top:4px;">
+        <button class="miss" onclick="elimMiss()" style="flex:2;">Miss</button>
+        <button onclick="elimUndo()" style="flex:1;background:#1a2030;color:#F0E6D0;border-radius:12px;font-size:20px;min-height:44px;border:none;cursor:pointer;">↩</button>
+      </div>
     </div>
   </div>
-  <button onclick="show('start')" style="background:#1e293b;color:#F0E6D0;width:100%;max-width:360px;margin-top:8px;">Zurueck</button>
+  <!-- 3. Info + Players darunter -->
+  <div class="info-row" id="elimGoalDisplay" style="margin:4px auto;max-width:360px;font-size:13px;"></div>
+  <div class="info-row" id="elimModeDisplay" style="font-size:12px;color:#64748b;margin:2px auto;max-width:360px;"></div>
+  <div id="matchBarElim" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:360px;"></div>
+  <div class="elim-players" id="elimPlayers"></div>
+  <button onclick="show('start')" style="display:block;margin:4px auto 0;background:none;border:none;color:#64748b;font-size:13px;cursor:pointer;padding:4px 16px;">← Zurück</button>
 </div>
 
 <!-- SHANGHAI SETUP MODAL -->
@@ -1485,25 +1485,27 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 
 <!-- SHANGHAI SPIEL -->
 <div id="shanghai" class="screen">
-  <h2>Shanghai</h2>
+  <!-- 1. Toggle -->
+  <div id="inputToggle-shanghai" style="max-width:360px;margin:4px auto 2px;"></div>
+  <!-- 2. Input-Card mit Miss + ↩ innen -->
+  <div class="card with-board" style="margin:2px auto;">
+    <div id="board-slot-shanghai" class="board-slot"></div>
+    <div id="numpad-shanghai" style="display:none;"></div>
+    <div style="display:flex;gap:6px;margin-top:4px;">
+      <button class="miss" id="missBtn-shanghai" onclick="shanMiss()" style="flex:2;">Miss</button>
+      <button onclick="shanUndo()" style="flex:1;background:#1a2030;color:#F0E6D0;border-radius:12px;font-size:20px;min-height:44px;border:none;cursor:pointer;">↩</button>
+    </div>
+  </div>
+  <!-- 3. Info + Players darunter -->
   <div class="round-indicator" id="shanDots"></div>
-  <div class="card" style="max-width:360px; margin:8px auto;">
-    <div id="shanRound" style="font-size:18px; font-weight:bold;"></div>
-    <div id="shanDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
+  <div class="card" style="max-width:360px;margin:4px auto;">
+    <div id="shanRound" style="font-size:16px;font-weight:bold;"></div>
+    <div id="shanDart" style="font-weight:bold;font-size:14px;color:#F0E6D0;padding:2px 0;"></div>
     <div id="shanShanghai" class="info-row" style="color:#1A6B3C;"></div>
   </div>
   <div class="elim-players" id="shanPlayers"></div>
   <div id="matchBarShan" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:360px;"></div>
-  <div class="card with-board" style="margin:8px auto;">
-    <div id="inputToggle-shanghai"></div>
-    <div id="board-slot-shanghai" class="board-slot"></div>
-    <div id="numpad-shanghai" style="display:none;"></div>
-    <div style="display:flex; gap:8px; margin-top:6px;">
-      <button class="miss" id="missBtn-shanghai" onclick="shanMiss()" style="flex:2;">MISS</button>
-      <button onclick="shanUndo()" style="flex:1;background:#1a2030;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
-    </div>
-  </div>
-  <div class="card" style="max-width:360px;margin:8px auto;font-size:13px;color:#64748b;" id="shanLog"></div>
+  <div class="card" style="max-width:360px;margin:4px auto;font-size:13px;color:#64748b;" id="shanLog"></div>
   <button onclick="show('start')" style="display:block;margin:4px auto 0;background:none;border:none;color:#64748b;font-size:13px;cursor:pointer;padding:4px 16px;">← Zurück</button>
 </div>
 
@@ -1540,65 +1542,73 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 
 <!-- ATC SPIEL -->
 <div id="atc" class="screen">
-  <h2>Around the Clock</h2>
-  <div class="round-indicator" id="atcDots"></div>
-  <div id="atcPlayers" style="max-width:360px; margin:8px auto;"></div>
-  <div id="matchBarAtc" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:360px;"></div>
-  <div class="card with-board" style="margin:8px auto;">
-    <div id="atcDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
+  <!-- 1. Toggle -->
+  <div id="inputToggle-atc" style="max-width:360px;margin:4px auto 2px;"></div>
+  <!-- 2. Input-Card -->
+  <div class="card with-board" style="margin:2px auto;">
     <div id="atcTarget" class="target-label"></div>
-    <div id="inputToggle-atc"></div>
     <div id="board-slot-atc" class="board-slot"></div>
     <div id="numpad-atc" style="display:none;"></div>
-    <button class="miss" id="missBtn-atc" onclick="atcMiss()" style="width:100%;margin-top:6px;">MISS</button>
+    <button class="miss" id="missBtn-atc" onclick="atcMiss()" style="width:100%;margin-top:4px;">Miss</button>
   </div>
+  <!-- 3. Dart-Info + Players darunter -->
+  <div id="atcDart" style="font-weight:bold;font-size:14px;color:#F0E6D0;text-align:center;margin:4px auto;max-width:360px;padding:2px 0;"></div>
+  <div class="round-indicator" id="atcDots"></div>
+  <div id="atcPlayers" style="max-width:360px;margin:4px auto;"></div>
+  <div id="matchBarAtc" style="display:none;font-size:12px;color:#E8681A;margin:3px auto;max-width:360px;"></div>
   <button onclick="show('start')" style="display:block;margin:4px auto 0;background:none;border:none;color:#64748b;font-size:13px;cursor:pointer;padding:4px 16px;">← Zurück</button>
 </div>
 
 <!-- BOB'S 27 -->
 <div id="b27" class="screen">
-  <h2>Bob's 27</h2>
-  <div class="round-indicator" id="b27Dots"></div>
-  <div class="score-big" id="b27Score">27</div>
-  <div class="card" style="max-width:360px; margin:8px auto;">
-    <div id="b27RoundName" style="font-size:16px; font-weight:bold;"></div>
-    <div id="b27DartCount" class="info-row"></div>
+  <!-- 1. Toggle -->
+  <div id="inputToggle-b27" style="max-width:360px;margin:4px auto 2px;"></div>
+  <!-- 2. Input-Card (war zuvor cardlos floating — jetzt in Card eingehüllt) -->
+  <div class="card with-board" style="margin:2px auto;">
     <div id="b27Target" class="target-label"></div>
+    <div id="board-slot-b27" class="board-slot"></div>
+    <div id="numpad-b27" style="display:none;"></div>
+    <button class="miss" id="missBtn-b27" onclick="b27Miss()" style="width:100%;margin-top:4px;background:#ff4444;color:#fff;">Miss</button>
+  </div>
+  <!-- 3. Score + Info darunter -->
+  <div class="score-big" id="b27Score">27</div>
+  <div class="round-indicator" id="b27Dots"></div>
+  <div class="card" style="max-width:360px;margin:4px auto;">
+    <div id="b27RoundName" style="font-size:16px;font-weight:bold;"></div>
+    <div id="b27DartCount" class="info-row"></div>
     <div id="b27Hits" class="info-row" style="color:#1A6B3C;"></div>
     <div id="b27Warn" class="warn-label"></div>
     <div id="b27Best" class="info-row"></div>
   </div>
-  <div id="inputToggle-b27"></div>
-  <div id="board-slot-b27" class="board-slot"></div>
-  <div id="numpad-b27" style="display:none;"></div>
-  <button class="miss" id="missBtn-b27" onclick="b27Miss()" style="width:100%;max-width:360px;margin-top:6px;background:#ff4444;color:#fff;">MISS</button>
+  <button onclick="show('start')" style="display:block;margin:4px auto 0;background:none;border:none;color:#64748b;font-size:13px;cursor:pointer;padding:4px 16px;">← Zurück</button>
 </div>
 
 <!-- CHECKOUT TRAINING -->
 <div id="checkout" class="screen">
-  <h2>Checkout Training</h2>
-  <div class="round-indicator" id="coDots"></div>
+  <!-- 1. Toggle -->
+  <div id="inputToggle-checkout" style="max-width:360px;margin:4px auto 2px;"></div>
+  <!-- 2. Input-Card -->
+  <div class="card with-board" style="margin:2px auto;">
+    <div id="board-slot-checkout" class="board-slot"></div>
+    <div id="numpad-checkout" style="display:none;"></div>
+    <div style="display:flex;gap:6px;margin-top:4px;">
+      <button class="bull-btn" onclick="coHit('B25',25,'B')" style="flex:1;">Bull 25</button>
+      <button class="bull-btn" onclick="coHit('B50',50,'B')" style="flex:1;">Bull 50</button>
+    </div>
+    <button class="miss" id="missBtn-checkout" onclick="coMiss()" style="width:100%;margin-top:4px;">Miss</button>
+  </div>
+  <!-- 3. Target + Info darunter -->
   <div class="checkout-big" id="coTarget">-</div>
   <div class="checkout-remain" id="coRemain"></div>
-  <!-- V16.10.2: Optimaler Wurfpfad -->
-  <div id="coPlan" style="display:none;background:#0f172a;border:1px solid #16a34a;border-radius:8px;padding:8px 12px;margin:6px auto;max-width:320px;text-align:center;font-size:14px;">
+  <div id="coPlan" style="display:none;background:#0f172a;border:1px solid #16a34a;border-radius:8px;padding:8px 12px;margin:4px auto;max-width:320px;text-align:center;font-size:14px;">
     <div style="font-size:11px;color:#64748b;margin-bottom:2px;">Optimaler Pfad</div>
     <div id="coPlanPath" style="color:#1A6B3C;font-weight:bold;font-size:16px;letter-spacing:1px;"></div>
   </div>
-  <div class="card with-board" style="margin:8px auto;">
+  <div class="round-indicator" id="coDots"></div>
+  <div class="card" style="max-width:360px;margin:4px auto;">
     <div id="coDart" class="info-row"></div>
     <div id="coRound" class="info-row"></div>
     <div id="coHits" class="info-row" style="color:#1A6B3C;"></div>
-  </div>
-  <div class="card" style="max-width:360px; margin:8px auto;">
-    <div id="inputToggle-checkout"></div>
-    <div id="board-slot-checkout" class="board-slot"></div>
-    <div id="numpad-checkout" style="display:none;"></div>
-    <div class="bull-row" id="coBullRow" style="max-width:360px; margin:4px auto;">
-      <button class="bull-btn" onclick="coHit('B25',25,'B')">Bull 25</button>
-      <button class="bull-btn" onclick="coHit('B50',50,'B')">Bull 50</button>
-    </div>
-    <button class="miss" id="missBtn-checkout" onclick="coMiss()" style="width:100%;margin-top:6px;">MISS</button>
   </div>
   <button onclick="show('start')" style="display:block;margin:4px auto 0;background:none;border:none;color:#64748b;font-size:13px;cursor:pointer;padding:4px 16px;">← Zurück</button>
 </div>
@@ -1963,23 +1973,25 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 
 <!-- HIGHSCORE GAME (V16.9) -->
 <div id="hsGame" class="screen">
-  <h2>Highscore</h2>
-  <div class="info-row" id="hsRoundLabel" style="font-size:14px;color:#E8681A;font-weight:bold;"></div>
-  <div class="elim-players" id="hsPlayers"></div>
-  <div class="card with-board" style="margin:8px auto;">
-    <div id="hsDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
-    <div id="inputToggle-hs"></div>
-    <div id="board-slot-hs" class="board-slot" style="margin-top:6px;"></div>
+  <!-- 1. Toggle -->
+  <div id="inputToggle-hs" style="max-width:360px;margin:4px auto 2px;"></div>
+  <!-- 2. Input-Card -->
+  <div class="card with-board" style="margin:2px auto;">
+    <div id="hsDart" style="text-align:center;font-weight:bold;font-size:14px;color:#F0E6D0;padding:2px 0 4px;"></div>
+    <div id="board-slot-hs" class="board-slot"></div>
     <div id="numpad-hs" style="display:none;"></div>
-    <div class="bull-row" id="hsBullRow" style="max-width:360px;margin:4px auto;">
-      <button class="bull-btn" onclick="hsBullHit(25,'S')">Bull 25</button>
-      <button class="bull-btn" onclick="hsBullHit(50,'D')">Bull 50</button>
+    <div style="display:flex;gap:6px;margin-top:4px;" id="hsBullRow">
+      <button class="bull-btn" onclick="hsBullHit(25,'S')" style="flex:1;">Bull 25</button>
+      <button class="bull-btn" onclick="hsBullHit(50,'D')" style="flex:1;">Bull 50</button>
     </div>
-    <div style="display:flex;gap:8px;margin-top:6px;">
-      <button class="miss" id="hsMissBtn" onclick="hsMiss()" style="flex:2;">MISS</button>
-      <button onclick="hsUndo()" style="flex:1;background:#1a2030;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+    <div style="display:flex;gap:6px;margin-top:4px;">
+      <button class="miss" id="hsMissBtn" onclick="hsMiss()" style="flex:2;">Miss</button>
+      <button onclick="hsUndo()" style="flex:1;background:#1a2030;color:#F0E6D0;border-radius:12px;font-size:20px;min-height:44px;border:none;cursor:pointer;">↩</button>
     </div>
   </div>
+  <!-- 3. Players darunter -->
+  <div class="info-row" id="hsRoundLabel" style="font-size:14px;color:#E8681A;font-weight:bold;margin:4px auto;max-width:360px;"></div>
+  <div class="elim-players" id="hsPlayers"></div>
   <button onclick="show('start')" style="display:block;margin:4px auto 0;background:none;border:none;color:#64748b;font-size:13px;cursor:pointer;padding:4px 16px;">← Zurück</button>
 </div>
 
@@ -2040,45 +2052,49 @@ button { padding:15px; font-size:18px; margin:8px; border:none; border-radius:12
 
 <!-- KILLER GAME (V16.8) -->
 <div id="killer" class="screen">
-  <h2>Killer</h2>
-  <div class="info-row" id="killVariantLabel" style="font-size:12px;color:#64748b;"></div>
-  <div class="elim-players" id="killPlayers"></div>
-  <div class="card with-board" style="margin:8px auto;">
-    <div id="killDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
-    <div id="inputToggle-killer"></div>
-    <div id="board-slot-killer" class="board-slot" style="margin-top:6px;"></div>
+  <!-- 1. Toggle -->
+  <div id="inputToggle-killer" style="max-width:360px;margin:4px auto 2px;"></div>
+  <!-- 2. Input-Card -->
+  <div class="card with-board" style="margin:2px auto;">
+    <div id="killDart" style="text-align:center;font-weight:bold;font-size:14px;color:#F0E6D0;padding:2px 0 4px;"></div>
+    <div id="board-slot-killer" class="board-slot"></div>
     <div id="numpad-killer" style="display:none;"></div>
-    <div class="bull-row" id="killBullRow" style="max-width:360px;margin:4px auto;">
-      <button class="bull-btn" onclick="killBullHit(25,'S')">Bull 25</button>
-      <button class="bull-btn" onclick="killBullHit(50,'D')">Bull 50</button>
+    <div style="display:flex;gap:6px;margin-top:4px;" id="killBullRow">
+      <button class="bull-btn" onclick="killBullHit(25,'S')" style="flex:1;">Bull 25</button>
+      <button class="bull-btn" onclick="killBullHit(50,'D')" style="flex:1;">Bull 50</button>
     </div>
-    <div style="display:flex;gap:8px;margin-top:6px;">
-      <button class="miss" id="killMissBtn" onclick="killMiss()" style="flex:2;">MISS</button>
-      <button onclick="killUndo()" style="flex:1;background:#1a2030;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+    <div style="display:flex;gap:6px;margin-top:4px;">
+      <button class="miss" id="killMissBtn" onclick="killMiss()" style="flex:2;">Miss</button>
+      <button onclick="killUndo()" style="flex:1;background:#1a2030;color:#F0E6D0;border-radius:12px;font-size:20px;min-height:44px;border:none;cursor:pointer;">↩</button>
     </div>
   </div>
+  <!-- 3. Players darunter -->
+  <div class="info-row" id="killVariantLabel" style="font-size:12px;color:#64748b;margin:4px auto;max-width:360px;"></div>
+  <div class="elim-players" id="killPlayers"></div>
   <button onclick="show('start')" style="display:block;margin:4px auto 0;background:none;border:none;color:#64748b;font-size:13px;cursor:pointer;padding:4px 16px;">← Zurück</button>
 </div>
 
 <!-- PHOENIX CHICAGO GAME (V16.7) -->
 <div id="chicago" class="screen">
-  <h2>Phoenix Chicago</h2>
-  <div class="info-row" id="chicPhaseLabel" style="font-size:13px;color:#E8681A;font-weight:bold;">Phase 1 — Deckel verteilen</div>
-  <div class="elim-players" id="chicPlayers"></div>
-  <div class="card with-board" style="margin:8px auto;">
-    <div id="chicDart" style="text-align:center;font-weight:bold;font-size:15px;color:#F0E6D0;padding:4px 0 6px;"></div>
-    <div id="inputToggle-chicago"></div>
-    <div id="board-slot-chicago" class="board-slot" style="margin-top:6px;"></div>
+  <!-- 1. Toggle -->
+  <div id="inputToggle-chicago" style="max-width:360px;margin:4px auto 2px;"></div>
+  <!-- 2. Input-Card -->
+  <div class="card with-board" style="margin:2px auto;">
+    <div id="chicDart" style="text-align:center;font-weight:bold;font-size:14px;color:#F0E6D0;padding:2px 0 4px;"></div>
+    <div id="board-slot-chicago" class="board-slot"></div>
     <div id="numpad-chicago" style="display:none;"></div>
-    <div class="bull-row" id="chicBullRow" style="max-width:360px;margin:4px auto;">
-      <button class="bull-btn" onclick="chicBullHit(25,'S')">Bull 25</button>
-      <button class="bull-btn" onclick="chicBullHit(50,'D')">Bull 50</button>
+    <div style="display:flex;gap:6px;margin-top:4px;" id="chicBullRow">
+      <button class="bull-btn" onclick="chicBullHit(25,'S')" style="flex:1;">Bull 25</button>
+      <button class="bull-btn" onclick="chicBullHit(50,'D')" style="flex:1;">Bull 50</button>
     </div>
-    <div style="display:flex;gap:8px;margin-top:6px;">
-      <button class="miss" id="chicMissBtn" onclick="chicMiss()" style="flex:2;">MISS</button>
-      <button onclick="chicUndo()" style="flex:1;background:#1a2030;color:#fff;border-radius:12px;font-size:16px;">↩ Zurück</button>
+    <div style="display:flex;gap:6px;margin-top:4px;">
+      <button class="miss" id="chicMissBtn" onclick="chicMiss()" style="flex:2;">Miss</button>
+      <button onclick="chicUndo()" style="flex:1;background:#1a2030;color:#F0E6D0;border-radius:12px;font-size:20px;min-height:44px;border:none;cursor:pointer;">↩</button>
     </div>
   </div>
+  <!-- 3. Players darunter -->
+  <div class="info-row" id="chicPhaseLabel" style="font-size:13px;color:#E8681A;font-weight:bold;margin:4px auto;max-width:360px;">Phase 1 — Deckel verteilen</div>
+  <div class="elim-players" id="chicPlayers"></div>
   <button onclick="show('start')" style="display:block;margin:4px auto 0;background:none;border:none;color:#64748b;font-size:13px;cursor:pointer;padding:4px 16px;">← Zurück</button>
 </div>
 
@@ -3266,14 +3282,14 @@ function cricketStart(){
 function cricHitNum(num,mult,fromOnline){
   if(!fromOnline&&!isMyOnlineTurn('cricket')) return;
   if(mult===undefined) mult=1;
-  if(num==='B'||num===25||num===50) mult=1;
+  if(num==='B'||num===25||num===50) mult=Math.min(mult,2);
   if(!fromOnline) sendOnlineAction({mode:'cricket',fn:'hit',args:[num,mult,true]});
   snapshotPush(); // V16.6
   cricLastState=JSON.parse(JSON.stringify(cricState));
   let fieldIdx=num==='B'?6:CRICKET_NUMS.indexOf(num);
   if(fieldIdx===-1){cricNextDart();return;}
   let p=cricState.turn,opp=p===0?1:0;
-  let pts=num==='B'?25:(num===50)?50:num;
+  let pts=num==='B'?(mult>=2?50:25):(num===50)?50:num;
   for(let i=0;i<mult;i++){
     if(cricState.marks[p][fieldIdx]<3){cricState.marks[p][fieldIdx]++;}
     else{if(cricState.marks[opp][fieldIdx]<3){cricState.scores[p]+=pts;}}
@@ -3377,7 +3393,7 @@ function cricRender(){
     releaseBoard();
     const npCR=document.getElementById('numpad-cricket');
     if(npCR){npCR.style.display='';renderCricketNumpad('numpad-cricket',(pts,type,num)=>{
-      if(num===25||num===50){cricHitNum('B',1,false);}
+      if(num===25||num===50){cricHitNum('B',type==='D'?2:1,false);}
       else{let m=type==='T'?3:type==='D'?2:1;if(CRICKET_NUMS.includes(num))cricHitNum(num,m,false);else cricMiss();}
     },()=>cricMiss(),()=>cricUndo());}
     // Numpad-Modus: Board-Actions verstecken, Numpad zeigen
@@ -3385,7 +3401,7 @@ function cricRender(){
     const bsCR=document.getElementById('board-slot-cricket');if(bsCR)bsCR.style.display='none';
   } else {
     bindBoardToSlot('board-slot-cricket',(id,num,type)=>{
-      if(id==='B25'||id==='B50'){cricHitNum('B',1,false);}
+      if(id==='B25'){cricHitNum('B',1,false);}else if(id==='B50'){cricHitNum('B',2,false);}
       else{let m=type==='T'?3:type==='D'?2:1;if(CRICKET_NUMS.includes(num))cricHitNum(num,m,false);else{if(isMyOnlineTurn('cricket')){cricLastState=JSON.parse(JSON.stringify(cricState));cricNextDart();}}}
     },(id,type,num)=>{
       return CRICKET_NUMS.includes(num)||(id==='B25'||id==='B50');
