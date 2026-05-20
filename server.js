@@ -1,14 +1,12 @@
-// BARE MINIMUM — Render Diagnose (kein Socket.io)
-const express = require('express');
-const app = express();
+// BARE NODE HTTP — kein Express, kein Socket.io
+const http = require('http');
 const PORT = process.env.PORT || 3000;
 
-app.get('/ping', (req, res) => {
-  res.json({ pong: true, PORT, pid: process.pid, ts: Date.now() });
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain', 'X-Diag': 'BARE-NODE-' + PORT });
+  res.end('BARE NODE RUNNING ON PORT ' + PORT + ' PATH=' + req.url);
 });
 
-app.get('/', (req, res) => res.send('HELLO FROM RENDER'));
-
-app.listen(PORT, () => {
-  console.log('BARE SERVER on port ' + PORT);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log('BARE NODE SERVER on ' + PORT);
 });
